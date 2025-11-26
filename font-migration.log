@@ -1,0 +1,415 @@
+
+=$ Migrating Fonts from Strapi to Convex
+
+============================================================
+
+=� Fetching fonts from Strapi...
+ Found 49 fonts
+
+
+=� Font: 优设标题黑
+   Font Family: N/A
+   =� Downloading: 优设标题黑.woff2
+    Uploaded to Convex
+   =� Downloading: 优设标题黑.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 优设鲨鱼菲特健康体
+   Font Family: N/A
+   =� Downloading: 优设鲨鱼菲特健康体.woff2
+    Uploaded to Convex
+   =� Downloading: 优设鲨鱼菲特健康体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 包图小白体
+   Font Family: N/A
+   =� Downloading: 包图小白体.woff2
+    Uploaded to Convex
+   =� Downloading: 包图小白体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 字体视界法棍体
+   Font Family: N/A
+   =� Downloading: 字体视界法棍体.woff2
+    Uploaded to Convex
+   =� Downloading: 字体视界法棍体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 字体视界法棍体拼音版
+   Font Family: N/A
+   =� Downloading: 字体视界法棍体拼音版.woff2
+    Uploaded to Convex
+   =� Downloading: 字体视界法棍体拼音版.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 庞门正道粗书体
+   Font Family: N/A
+   =� Downloading: 庞门正道粗书体.woff2
+    Uploaded to Convex
+   =� Downloading: 庞门正道粗书体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 庞门正道轻松体
+   Font Family: N/A
+   =� Downloading: 庞门正道轻松体.woff2
+    Uploaded to Convex
+   =� Downloading: 庞门正道轻松体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 得意黑
+   Font Family: N/A
+   =� Downloading: 得意黑.woff2
+    Uploaded to Convex
+   =� Downloading: 得意黑.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 手书体
+   Font Family: N/A
+   =� Downloading: 手书体.woff2
+    Uploaded to Convex
+   =� Downloading: 手书体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 杨任东竹石体-Bold
+   Font Family: N/A
+   =� Downloading: 杨任东竹石体-Bold.woff2
+    Uploaded to Convex
+   =� Downloading: 杨任东竹石体-Bold.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 杨任东竹石体-Extralight
+   Font Family: N/A
+   =� Downloading: 杨任东竹石体-Extralight.woff2
+    Uploaded to Convex
+   =� Downloading: 杨任东竹石体-Extralight.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 杨任东竹石体-Heavy
+   Font Family: N/A
+   =� Downloading: 杨任东竹石体-Heavy.woff2
+    Uploaded to Convex
+   =� Downloading: 杨任东竹石体-Heavy.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 杨任东竹石体-Light
+   Font Family: N/A
+   =� Downloading: 杨任东竹石体-Light.woff2
+    Uploaded to Convex
+   =� Downloading: 杨任东竹石体-Light.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 杨任东竹石体-Medium
+   Font Family: N/A
+   =� Downloading: 杨任东竹石体-Medium.woff2
+    Uploaded to Convex
+   =� Downloading: 杨任东竹石体-Medium.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 杨任东竹石体-Regular
+   Font Family: N/A
+   =� Downloading: 杨任东竹石体-Regular.woff2
+    Uploaded to Convex
+   =� Downloading: 杨任东竹石体-Regular.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 杨任东竹石体-Semibold
+   Font Family: N/A
+   =� Downloading: 杨任东竹石体-Semibold.woff2
+    Uploaded to Convex
+   =� Downloading: 杨任东竹石体-Semibold.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 沐瑶软笔手写体
+   Font Family: N/A
+   =� Downloading: 沐瑶软笔手写体.woff2
+    Uploaded to Convex
+   =� Downloading: 沐瑶软笔手写体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 沐瑶随心手写体
+   Font Family: N/A
+   =� Downloading: 沐瑶随心手写体.woff2
+    Uploaded to Convex
+   =� Downloading: 沐瑶随心手写体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷仓耳渔阳体W01
+   Font Family: N/A
+   =� Downloading: 站酷仓耳渔阳体W01.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷仓耳渔阳体W01.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷仓耳渔阳体W02
+   Font Family: N/A
+   =� Downloading: 站酷仓耳渔阳体W02.woff2
+    Uploaded to Convex
+   L Failed: Error: [Request ID: 8c1df92c71a7f2e1] Server Error
+ArgumentValidationError: Value does not match validator.
+Path: .imageUrl
+Value: null
+Validator: v.string()
+
+
+    at ConvexHttpClient.mutationInner (/Users/dnyaneshwarwantace/Documents/GitHub/image editor/ai-image-editor/node_modules/convex/src/browser/http_client.ts:383:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConvexHttpClient.processMutationQueue (/Users/dnyaneshwarwantace/Documents/GitHub/image editor/ai-image-editor/node_modules/convex/src/browser/http_client.ts:398:24)
+
+=� Font: 站酷仓耳渔阳体W03
+   Font Family: N/A
+   =� Downloading: 站酷仓耳渔阳体W03.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷仓耳渔阳体W03.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷仓耳渔阳体W04
+   Font Family: N/A
+   =� Downloading: 站酷仓耳渔阳体W04.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷仓耳渔阳体W04.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷仓耳渔阳体W05
+   Font Family: N/A
+   =� Downloading: 站酷仓耳渔阳体W05.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷仓耳渔阳体W05.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷小薇LOGO体
+   Font Family: N/A
+   =� Downloading: 站酷小薇LOGO体.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷小薇LOGO体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷庆科黄油体
+   Font Family: N/A
+   =� Downloading: 站酷庆科黄油体.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷庆科黄油体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷快乐体
+   Font Family: N/A
+   =� Downloading: 站酷快乐体.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷快乐体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷快乐体2016修订版
+   Font Family: N/A
+   =� Downloading: 站酷快乐体2016修订版.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷快乐体2016修订版.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷文艺体
+   Font Family: N/A
+   =� Downloading: 站酷文艺体.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷文艺体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 站酷高端黑
+   Font Family: N/A
+   =� Downloading: 站酷高端黑.woff2
+    Uploaded to Convex
+   =� Downloading: 站酷高端黑.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 联盟起艺卢帅正锐黑体
+   Font Family: N/A
+   =� Downloading: 联盟起艺卢帅正锐黑体.woff2
+    Uploaded to Convex
+   =� Downloading: 联盟起艺卢帅正锐黑体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 钉钉进步体
+   Font Family: N/A
+   =� Downloading: 钉钉进步体.woff2
+    Uploaded to Convex
+   =� Downloading: 钉钉进步体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 钟齐志莽行书
+   Font Family: N/A
+   =� Downloading: 钟齐志莽行书.woff2
+    Uploaded to Convex
+   =� Downloading: 钟齐志莽行书.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 锐字真言体
+   Font Family: N/A
+   =� Downloading: 锐字真言体.woff2
+    Uploaded to Convex
+   =� Downloading: 锐字真言体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里妈妈东方大楷
+   Font Family: N/A
+   =� Downloading: 阿里妈妈东方大楷.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里妈妈东方大楷.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里妈妈刀隶体
+   Font Family: N/A
+   =� Downloading: 阿里妈妈刀隶体.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里妈妈刀隶体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里妈妈数黑体
+   Font Family: N/A
+   =� Downloading: 阿里妈妈数黑体.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里妈妈数黑体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里妈妈方圆体
+   Font Family: N/A
+   =� Downloading: 阿里妈妈方圆体.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里妈妈方圆体.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体Black
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体Black.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体Black.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体Bold
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体Bold.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体Bold.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体ExtraBold
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体ExtraBold.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体ExtraBold.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体Heavy
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体Heavy.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体Heavy.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体Light
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体Light.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体Light.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体Medium
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体Medium.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体Medium.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体Regular
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体Regular.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体Regular.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体SemiBold
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体SemiBold.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体SemiBold.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: 阿里巴巴普惠体Thin
+   Font Family: N/A
+   =� Downloading: 阿里巴巴普惠体Thin.woff2
+    Uploaded to Convex
+   =� Downloading: 阿里巴巴普惠体Thin.svg
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: RunningSmobble
+   Font Family: N/A
+   =� Downloading: 1758680571699
+    Uploaded to Convex
+   =� Downloading: 1758680573248
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: Catharsis-Bedouin
+   Font Family: N/A
+   =� Downloading: 1758680632146
+    Uploaded to Convex
+   =� Downloading: 1758680633130
+    Uploaded to Convex
+    Created in Convex
+
+=� Font: test
+   Font Family: N/A
+   =� Downloading: _bdaa8e6350.ttf
+    Uploaded to Convex
+   =� Downloading: 16123ve1o6gw0.png
+    Uploaded to Convex
+    Created in Convex
+
+============================================================
+
+ Migration Complete!
+   Success: 48
+   Failed: 1
+
+============================================================

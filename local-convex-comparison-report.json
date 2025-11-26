@@ -1,0 +1,86 @@
+{
+  "templates": {
+    "local": {
+      "total": 150,
+      "withImages": 150,
+      "withJson": 150,
+      "imagesInJson": 98
+    },
+    "convex": {
+      "total": 150,
+      "withImages": 150,
+      "withJson": 150,
+      "imagesInJson": 108,
+      "convexUrls": 108,
+      "strapiUrls": 0
+    }
+  },
+  "materials": {
+    "local": {
+      "total": 1234,
+      "withImages": 1234,
+      "withSmall": 999,
+      "withThumbnail": 1165
+    },
+    "convex": {
+      "total": 1314,
+      "withImages": 1314,
+      "withSmall": 1079,
+      "withThumbnail": 1245,
+      "strapiUrls": 0
+    }
+  },
+  "fonts": {
+    "local": {
+      "total": 49,
+      "withFiles": 49,
+      "withImages": 48
+    },
+    "convex": {
+      "total": 49,
+      "withFiles": 49,
+      "withImages": 48,
+      "strapiUrls": 0
+    }
+  },
+  "materialTypes": {
+    "local": {
+      "total": 9
+    },
+    "convex": {
+      "total": 24
+    }
+  },
+  "fontStyles": {
+    "local": {
+      "total": 40
+    },
+    "convex": {
+      "total": 40
+    }
+  },
+  "fontBorders": {
+    "local": {
+      "total": 18
+    },
+    "convex": {
+      "total": 18
+    }
+  },
+  "sizes": {
+    "local": {
+      "total": 0
+    },
+    "convex": {
+      "total": 11
+    }
+  },
+  "banners": {
+    "local": {
+      "total": 0
+    },
+    "convex": {
+      "total": 2
+    }
+  }
+}

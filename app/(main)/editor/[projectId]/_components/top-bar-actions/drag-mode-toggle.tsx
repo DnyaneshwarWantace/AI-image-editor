@@ -1,0 +1,46 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useCanvasContext } from "@/providers/canvas-provider";
+
+export function DragModeToggle() {
+  const { editor } = useCanvasContext();
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleStartDring = () => setEnabled(true);
+    const handleEndDring = () => setEnabled(false);
+
+    editor.on?.("startDring", handleStartDring);
+    editor.on?.("endDring", handleEndDring);
+
+    return () => {
+      editor.off?.("startDring", handleStartDring);
+      editor.off?.("endDring", handleEndDring);
+    };
+  }, [editor]);
+
+  const handleToggle = (checked: boolean) => {
+    if (!editor) return;
+    setEnabled(checked);
+    if (checked) {
+      editor.startDring?.();
+    } else {
+      editor.endDring?.();
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Switch checked={enabled} onCheckedChange={handleToggle} id="drag-mode" />
+      <Label htmlFor="drag-mode" className="text-sm cursor-pointer">
+        Drag Mode
+      </Label>
+    </div>
+  );
+}
+

@@ -1,0 +1,35 @@
+"use client";
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Crop } from "lucide-react";
+import { useCanvasContext } from "@/providers/canvas-provider";
+import { CropImageDialog } from "./crop-image-dialog";
+
+export function CropImage() {
+  const { canvas } = useCanvasContext();
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleCrop = () => {
+    setDialogOpen(true);
+  };
+
+  const activeObject = canvas?.getActiveObject();
+  if (!activeObject || activeObject.type !== "image") {
+    return null;
+  }
+
+  return (
+    <>
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold text-gray-900">Crop Image</h4>
+        <Button variant="outline" size="sm" onClick={handleCrop} className="w-full">
+          <Crop className="h-4 w-4 mr-2" />
+          Crop Image
+        </Button>
+      </div>
+      <CropImageDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+    </>
+  );
+}
+

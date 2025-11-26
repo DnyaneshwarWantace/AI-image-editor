@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-11-22T07:45:22.501Z",
+  "materialTypes": {
+    "strapi": 24,
+    "convex": 24,
+    "api": 24,
+    "missing": [],
+    "status": "✅ In Sync"
+  },
+  "materials": {
+    "strapi": 1234,
+    "convex": 1224,
+    "api": 25,
+    "missing": [],
+    "status": "✅ In Sync"
+  },
+  "templateTypes": {
+    "strapi": 9,
+    "convex": 9,
+    "api": 9,
+    "missing": [],
+    "status": "✅ In Sync"
+  },
+  "templates": {
+    "strapi": 150,
+    "convex": 150,
+    "api": 25,
+    "missing": [],
+    "status": "✅ In Sync"
+  },
+  "fonts": {
+    "strapi": 49,
+    "convex": 52,
+    "api": 25,
+    "missing": [
+      "站酷仓耳渔阳体W02"
+    ],
+    "status": "❌ Out of Sync"
+  },
+  "overall": {
+    "allInSync": false,
+    "issues": [
+      "Some items are missing in Convex",
+      "Materials count mismatch: Strapi(1234) vs Convex(1224)"
+    ]
+  }
+}

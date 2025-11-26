@@ -1,0 +1,29 @@
+{
+  "materialTypes": {
+    "total": 23,
+    "translated": 23,
+    "failed": 0
+  },
+  "materials": {
+    "total": 0,
+    "translated": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "templateTypes": {
+    "total": 0,
+    "translated": 0,
+    "failed": 0
+  },
+  "templates": {
+    "total": 104,
+    "translated": 104,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fonts": {
+    "total": 49,
+    "translated": 49,
+    "failed": 0
+  }
+}

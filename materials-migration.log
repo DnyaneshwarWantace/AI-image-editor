@@ -1,0 +1,3820 @@
+
+🎨 Migrating Materials from Strapi to Convex
+
+============================================================
+
+📡 Fetching material types from Convex...
+✅ Found 24 material types in Convex
+
+📡 Fetching materials from Strapi...
+
+📄 Page 1/50 - Processing 25 materials...
+
+   🎨 Material: 10031.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10157.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10162.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10168.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10171.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10202.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10217.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10233.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10239.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10243.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10245.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10260.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10266.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10278.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10280.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10281.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10296.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10298.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10301.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10306.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10307.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10309.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10310.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10312.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10316.png
+      ⚠️  Skipping - no full image
+
+📄 Page 2/50 - Processing 25 materials...
+
+   🎨 Material: 10320.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10322.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10324.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10325.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10326.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10331.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10333.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10334.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10339.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10340.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10346.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10354.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10365.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10370.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10372.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10415.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10430.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10437.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10440.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10457.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10459.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10463.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10465.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10512.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10521.png
+      ⚠️  Skipping - no full image
+
+📄 Page 3/50 - Processing 25 materials...
+
+   🎨 Material: 10537.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10552.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10555.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10562.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10574.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10580.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10585.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10602.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10611.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10617.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10624.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10626.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10631.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10637.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10638.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10640.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10657.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10680.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10684.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10687.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10691.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10695.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10708.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10709.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10711.png
+      ⚠️  Skipping - no full image
+
+📄 Page 4/50 - Processing 25 materials...
+
+   🎨 Material: 10712.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10718.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10727.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10731.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10742.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10746.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10761.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10762.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10765.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10766.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10782.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10786.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10795.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10808.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10810.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10814.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10821.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10823.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10881.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10890.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10915.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10916.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10937.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10939.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10946.png
+      ⚠️  Skipping - no full image
+
+📄 Page 5/50 - Processing 25 materials...
+
+   🎨 Material: 10950.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10958.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10961.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10962.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10963.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10964.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10965.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10966.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10968.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10974.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10976.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10985.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10988.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10996.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10009.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10010.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10039.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10078.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10085.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10091.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10097.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10115.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10120.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10147.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10150.png
+      ⚠️  Skipping - no full image
+
+📄 Page 6/50 - Processing 25 materials...
+
+   🎨 Material: 10153.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10155.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10165.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10190.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10200.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10201.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10212.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10225.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10232.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10241.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10248.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10250.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10252.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10256.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10257.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10258.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10259.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10270.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10277.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10290.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10297.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10299.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10314.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10319.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10332.png
+      ⚠️  Skipping - no full image
+
+📄 Page 7/50 - Processing 25 materials...
+
+   🎨 Material: 10342.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10344.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10347.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10353.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10369.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10379.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10384.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10400.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10628.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10686.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10815.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10871.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10886.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10901.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10914.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10925.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10926.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10927.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10930.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10949.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10969.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10977.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10983.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10986.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10987.png
+      ⚠️  Skipping - no full image
+
+📄 Page 8/50 - Processing 25 materials...
+
+   🎨 Material: 11001.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11018.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10033.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10034.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10054.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10055.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10062.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10086.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10107.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10116.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10122.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10123.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10129.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10132.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10133.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10142.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10174.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10224.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10357.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10412.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10427.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10508.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10510.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10575.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10581.png
+      ⚠️  Skipping - no full image
+
+📄 Page 9/50 - Processing 25 materials...
+
+   🎨 Material: 10633.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10707.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10744.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10802.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10807.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10832.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10836.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10847.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10855.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10866.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10911.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11016.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11020.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10038.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10056.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10069.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10077.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10080.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10098.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10118.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10178.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10191.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10197.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10215.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10251.png
+      ⚠️  Skipping - no full image
+
+📄 Page 10/50 - Processing 25 materials...
+
+   🎨 Material: 10282.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10405.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10407.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10436.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10453.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10454.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10563.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10566.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10568.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10692.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10824.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10825.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10826.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10828.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10829.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10830.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10831.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10833.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10834.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10835.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10837.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10838.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10839.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10840.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10842.png
+      ⚠️  Skipping - no full image
+
+📄 Page 11/50 - Processing 25 materials...
+
+   🎨 Material: 10843.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10844.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10845.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10846.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10848.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10849.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10850.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10851.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10852.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10853.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10854.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10856.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10857.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10858.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10859.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10860.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10861.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10862.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10863.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10864.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10865.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10868.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10895.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10967.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10989.png
+      ⚠️  Skipping - no full image
+
+📄 Page 12/50 - Processing 25 materials...
+
+   🎨 Material: 11012.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10021.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10040.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10058.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10059.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10230.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10238.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10244.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10247.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10265.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10302.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10304.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10305.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10311.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10338.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10345.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10348.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10355.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10356.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10406.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10410.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10435.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10444.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10451.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10649.png
+      ⚠️  Skipping - no full image
+
+📄 Page 13/50 - Processing 25 materials...
+
+   🎨 Material: 10663.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10678.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10716.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10801.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10892.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10906.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10907.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10918.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10919.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10928.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10934.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10943.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10956.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10971.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10984.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10993.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10994.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11011.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10001.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10002.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10003.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10004.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10005.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10006.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10007.png
+      ⚠️  Skipping - no full image
+
+📄 Page 14/50 - Processing 25 materials...
+
+   🎨 Material: 10008.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10009.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10010.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10011.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10012.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10013.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10014.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10016.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10017.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10019.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10020.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10021.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10022.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10023.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10025.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10026.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10027.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10028.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10029.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10030.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10031.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10032.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10033.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10034.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10036.png
+      ⚠️  Skipping - no full image
+
+📄 Page 15/50 - Processing 25 materials...
+
+   🎨 Material: 10037.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10038.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10041.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10043.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10044.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10052.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10053.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10054.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10055.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10056.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10057.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10060.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10061.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10062.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10063.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10065.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10066.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10067.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10068.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10071.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10075.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10076.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10077.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10078.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10081.png
+      ⚠️  Skipping - no full image
+
+📄 Page 16/50 - Processing 25 materials...
+
+   🎨 Material: 10082.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10083.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10084.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10087.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10088.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10092.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10093.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10097.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10098.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10099.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10101.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10102.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10103.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10104.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10113.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10121.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10122.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10123.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10126.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10132.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10142.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10163.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10166.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10168.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10200.png
+      ⚠️  Skipping - no full image
+
+📄 Page 17/50 - Processing 25 materials...
+
+   🎨 Material: 10229.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10263.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10266.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10330.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10352.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10407.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10414.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10430.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10593.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10607.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10642.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10647.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10770.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10775.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10781.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10793.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10800.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 23958.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 25912.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 31113.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 35775.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 35776.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 35777.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 36483.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 37027.svg
+      ⚠️  Skipping - no full image
+
+📄 Page 18/50 - Processing 25 materials...
+
+   🎨 Material: 40168.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 47621.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 48943.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 303454.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 304120.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 304291.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 305389.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 307936.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 309556.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 311956.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 312092.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 312096.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 575782.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 610706.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 885482.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1069877.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1091576.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1109556.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1109569.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1139372.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1139375.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1139399.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1181548.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1247882.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1265913.svg
+      ⚠️  Skipping - no full image
+
+📄 Page 19/50 - Processing 25 materials...
+
+   🎨 Material: 1291317.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1293487.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1420404.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1465449.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1485096.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1485605.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1578289.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1893885.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1896897.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1920550.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1920559.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1920565.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1924513.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1935735.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2006154.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2007289.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2007291.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2007292.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2007294.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2029729.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2096712.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10045.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10064.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10196.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10211.png
+      ⚠️  Skipping - no full image
+
+📄 Page 20/50 - Processing 25 materials...
+
+   🎨 Material: 10213.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10218.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10284.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10303.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10358.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10382.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10596.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10601.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10789.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10794.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10813.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10817.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10880.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10897.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11002.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11014.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10169.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10359.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10376.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10396.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10411.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10413.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10417.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10425.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10515.png
+      ⚠️  Skipping - no full image
+
+📄 Page 21/50 - Processing 25 materials...
+
+   🎨 Material: 10522.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10526.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10529.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10535.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10536.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10539.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10541.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10543.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10548.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10551.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10558.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10579.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10584.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10589.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10606.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10608.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10615.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10622.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10627.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10639.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10644.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10651.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10655.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10662.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10667.png
+      ⚠️  Skipping - no full image
+
+📄 Page 22/50 - Processing 25 materials...
+
+   🎨 Material: 10669.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10670.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10672.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10675.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10679.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10689.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10700.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10710.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10724.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10729.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10732.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10747.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10068.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10081.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10220.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10229.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10246.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10323.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10343.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10375.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10383.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10398.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10402.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10431.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10432.png
+      ⚠️  Skipping - no full image
+
+📄 Page 23/50 - Processing 25 materials...
+
+   🎨 Material: 10433.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10442.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10452.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10458.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10462.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10466.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10468.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10470.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10513.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10514.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10525.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10549.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10600.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10623.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10635.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10694.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10696.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10721.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10725.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10773.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10905.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10970.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10979.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10995.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10998.png
+      ⚠️  Skipping - no full image
+
+📄 Page 24/50 - Processing 25 materials...
+
+   🎨 Material: 10017.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10022.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10024.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10025.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10026.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10036.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10042.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10043.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10065.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10070.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10093.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10095.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10105.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10125.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10126.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10154.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10175.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10184.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10193.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10276.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10349.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10392.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10393.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10428.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10448.png
+      ⚠️  Skipping - no full image
+
+📄 Page 25/50 - Processing 25 materials...
+
+   🎨 Material: 10469.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10518.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10540.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10542.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10547.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10561.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10564.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10588.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10603.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10605.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10620.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10650.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10763.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10776.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10783.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10787.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10797.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10806.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10819.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10889.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10902.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10913.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10922.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10933.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10978.png
+      ⚠️  Skipping - no full image
+
+📄 Page 26/50 - Processing 25 materials...
+
+   🎨 Material: 11010.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11013.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10011.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10014.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10016.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10029.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10041.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10061.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10090.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10100.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10134.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10161.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10164.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10166.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10167.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10180.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10210.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10216.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10219.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10221.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10228.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10235.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10286.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10313.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10351.png
+      ⚠️  Skipping - no full image
+
+📄 Page 27/50 - Processing 25 materials...
+
+   🎨 Material: 10360.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10374.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10519.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10557.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10559.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10571.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10591.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10599.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10646.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10654.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10720.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10736.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10743.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10745.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10809.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10870.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10872.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10873.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10878.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10879.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10887.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10893.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10894.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10917.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10929.png
+      ⚠️  Skipping - no full image
+
+📄 Page 28/50 - Processing 25 materials...
+
+   🎨 Material: 10932.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10944.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10947.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10948.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10953.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10954.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10959.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10972.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10981.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10982.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11006.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11008.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11019.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10019.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10047.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10048.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10052.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10063.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10071.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10072.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10073.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10079.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10083.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10092.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10094.png
+      ⚠️  Skipping - no full image
+
+📄 Page 29/50 - Processing 25 materials...
+
+   🎨 Material: 10101.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10104.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10130.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10135.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10136.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10137.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10139.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10140.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10145.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10149.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10151.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10152.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10156.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10158.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10160.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10163.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10173.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10177.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10185.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10199.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10206.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10222.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10223.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10390.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10394.png
+      ⚠️  Skipping - no full image
+
+📄 Page 30/50 - Processing 25 materials...
+
+   🎨 Material: 10395.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10401.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10409.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10421.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10464.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10472.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10530.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10533.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10544.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10573.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10576.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10587.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10597.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10613.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10618.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10629.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10636.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10665.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10673.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10683.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10697.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10699.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10706.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10715.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10717.png
+      ⚠️  Skipping - no full image
+
+📄 Page 31/50 - Processing 25 materials...
+
+   🎨 Material: 10741.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10750.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10767.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10771.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10780.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10798.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10898.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10908.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10057.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10089.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10181.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10183.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10378.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10381.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10389.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10399.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10403.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10419.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10426.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10471.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10516.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10532.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10553.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10554.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10556.png
+      ⚠️  Skipping - no full image
+
+📄 Page 32/50 - Processing 25 materials...
+
+   🎨 Material: 10567.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10577.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10578.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10582.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10612.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10625.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10632.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10645.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10648.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10660.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10668.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10701.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10705.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10719.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10728.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10733.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10735.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10748.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10758.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10764.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10778.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10779.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10784.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10790.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10803.png
+      ⚠️  Skipping - no full image
+
+📄 Page 33/50 - Processing 25 materials...
+
+   🎨 Material: 10805.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10909.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10921.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10923.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10924.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10936.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10941.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10119.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10121.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10124.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10131.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10144.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10148.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10176.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10179.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10187.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10188.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10194.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10198.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10203.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10205.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10234.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10236.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10240.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10249.png
+      ⚠️  Skipping - no full image
+
+📄 Page 34/50 - Processing 25 materials...
+
+   🎨 Material: 10261.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10268.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10269.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10274.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10275.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10283.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10285.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10287.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10288.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10295.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10308.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10327.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10329.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10336.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10363.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10366.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10367.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10368.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10385.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10388.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10424.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10446.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10450.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10461.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10609.png
+      ⚠️  Skipping - no full image
+
+📄 Page 35/50 - Processing 25 materials...
+
+   🎨 Material: 10621.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10634.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10935.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10938.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10945.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10957.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10973.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10980.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10990.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10991.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10997.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11003.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10013.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10018.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10035.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10037.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10046.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10050.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10053.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10060.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10066.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10075.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10076.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10082.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10084.png
+      ⚠️  Skipping - no full image
+
+📄 Page 36/50 - Processing 25 materials...
+
+   🎨 Material: 10117.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10128.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10138.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10172.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10182.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10186.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10192.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10204.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10208.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10237.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10271.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10291.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10293.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10300.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10361.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10362.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10364.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10373.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10387.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10423.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10438.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10517.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10528.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10619.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10630.png
+      ⚠️  Skipping - no full image
+
+📄 Page 37/50 - Processing 25 materials...
+
+   🎨 Material: 10676.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10677.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10703.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10726.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10738.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10753.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10755.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10772.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10788.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10791.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10792.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10796.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10818.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10015.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10020.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10023.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10027.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10028.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10044.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10049.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10067.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10074.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10102.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10106.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10112.png
+      ⚠️  Skipping - no full image
+
+📄 Page 38/50 - Processing 25 materials...
+
+   🎨 Material: 10113.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10114.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10141.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10146.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10159.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10189.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10226.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10255.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10262.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10272.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10273.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10279.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10318.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10321.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10335.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10416.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10447.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10449.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10511.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10592.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10604.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10610.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10641.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10659.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10664.png
+      ⚠️  Skipping - no full image
+
+📄 Page 39/50 - Processing 25 materials...
+
+   🎨 Material: 10666.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10674.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10688.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10713.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10737.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10952.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10341.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10811.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10816.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10822.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10827.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10841.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10867.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10869.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10874.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10875.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10876.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10877.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10882.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10883.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10884.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10885.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10896.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10899.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10900.png
+      ⚠️  Skipping - no full image
+
+📄 Page 40/50 - Processing 25 materials...
+
+   🎨 Material: 10903.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10904.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10910.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10912.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10920.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10931.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10940.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10951.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10955.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10960.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10975.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10992.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10999.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11000.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11007.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11009.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11015.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11017.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11021.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11022.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11023.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11025.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10088.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10096.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10099.png
+      ⚠️  Skipping - no full image
+
+📄 Page 41/50 - Processing 25 materials...
+
+   🎨 Material: 10103.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10108.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10110.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10111.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10127.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10170.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10195.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10207.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10209.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10214.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10227.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10231.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10242.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10253.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10254.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10263.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10264.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10315.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10328.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10330.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10337.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10350.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10371.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10377.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10386.png
+      ⚠️  Skipping - no full image
+
+📄 Page 42/50 - Processing 25 materials...
+
+   🎨 Material: 10397.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10414.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10418.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10420.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10422.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10429.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10434.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10439.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10443.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10445.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10455.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10456.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10460.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10467.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10527.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10569.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10590.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10598.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10658.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10690.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10740.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10774.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10785.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 0b7a33246162d72d7a8d38cb7eb4812c_81ebf810d4.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1fff9c4b2b4f1bdc31d81f47706046a2_adee6d616e.png
+      ⚠️  Skipping - no full image
+
+📄 Page 43/50 - Processing 25 materials...
+
+   🎨 Material: 3c497956aeb06b8271fe1ba9a81bce2b_4db5fdd04c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 4c62b3b69debf7c3f0fbb3d9cb8ff4d6_0f7dc98817-1.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 4c62b3b69debf7c3f0fbb3d9cb8ff4d6_0f7dc98817.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 4fbab56717a2f35384a37d6fb70a5a97_bb754c2b91.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 5f32f9fcacc696ef52ddcb6d35a7710f_ec5b461107.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 06bc878801abd8400a100c141bd57998_7db9d8752b.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 7c29c0300529c2d158c5a115ed876a87_5be31d8f0e.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 7f1e76dfa48109719569f2fc2dce8625_c048b6160b.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 8b662660a2a6b360274cd59eb191f548_8860e7e481.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 8dbaf0e15fe1a2b25a4975f07dd64d58_218a329f3b.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 12ef6afad2a70cefd63b09a7f5497329_d0897466f7.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 23eb19e44b186bf191ef8c4542df0630_f514f7a613.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 42d6488b6486e36efdddc8350cd751ae_f30c6475c6.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 98c55d4c3810a92338aa8dc23c919473_17d05778b2.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 199b00ca91335fb2d0ee4ad36434410e_edd9f6728f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 331c18084f59cfd4c611f1f9ac9e91fd_488b74d56c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 341fb1fa15cfc123ea9f58be6a1e2f41_9c7085ca9f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 0776b7f90f80e669cebd2b249c50d4c1_9188a3ddac.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2278b9cec10df16f681ef0be1c1ea87a_5e7a72f375.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 6780d7e387de0691cb8f906511da4d94_26f03567ba.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 6992e401aaa0e9de829ed893ebec141e_68a36142f1-1.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 6992e401aaa0e9de829ed893ebec141e_68a36142f1.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 651131ef127ccd7f5d30213a445cb19a_0abd9ca99a.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11626642f914cc19369ea88ce7edd69b_965654fe95-1.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 11626642f914cc19369ea88ce7edd69b_965654fe95.png
+      ⚠️  Skipping - no full image
+
+📄 Page 44/50 - Processing 25 materials...
+
+   🎨 Material: a229e8867cab9ef15a788ec66ae792b4_cb6cdd79b8.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: ad74de45d49a694db48d1457284cb36c_43a1232adf.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: be00e59fad750984f011f857bda35db8_0fc29d8c9f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: c72cc00098ae21e9632385779842d7b0_17af5b3f47.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: d0a1499af9d67fff0e4fef30bd6cf532_5916dce3b6.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: d34837ab324714be087551842767dae6_02e2673e9c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: e33b6b8a4ca58bf22031c40b4280d3ea_703e1439d4.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: eae3a4bade4ed4c252a57509866c3633_92280462d3.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: ede269adf6a90bfc73d2ad93588441c7_7fc57ce241.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: f296b6fdde211285f852481794d84647_bacc38345a.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: f54768ccd392891392ed8f7185b36a04_3ae49bb63f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: fbe33c7af0546f4122f4dcdb3ff6f06c_d6b4a90ff9.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 4a8fcecfd5fe5904a2cf0835256346eb_a49e98706c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 4b46d9517b14db165b108087956bb23a_18921feb79.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 4e6a2b43bfd6115094278cd613f5ec68_c30f0b99d4.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 7ce8e8e7375189e562a73ee5e56607a1_e60882a9b2.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 8c5a0987d6dbb427b871aa906291b6b6_7bc7ccea97.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 8e6a517ca5e751f2aa06ed899f533fba_efda871718.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 9cb1e175e65c7547ed7964ed890c0c26_ed3d30f46b.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 9e58588a743683e7e44901c57a31d9ad_7a1fda4f1b.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 48d2cc48f95d11d0a3ab3ac120341a27_83ddc42ee4.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 74aceb4e99c24db24dad2708f47ebee7_5242eb631b.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 80db24ff7fa2d1a4489aa9d432d2f828_fdeec9c48f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 143ee029b1f6465e70aa43f7c033635c_b98e15469f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 471b7541dc314d77906f68524e6259bf_5f00b34926.png
+      ⚠️  Skipping - no full image
+
+📄 Page 45/50 - Processing 25 materials...
+
+   🎨 Material: 483bbb000ccbabcf1a5a30171a5ce3bf_5f63f5a14c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 564f6ff3ef3d1fec6a0c3b36aaebf58b_35ab318aed.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 789b8f5dbd207d36227ecd23fbc1049f_5ed96faf59.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 2499ffd69783b4dad44325b5dc86d9e3_54d8228732.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 86089f12d6564f9279dde02d6fd23c92_5980efb0db.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: a3fd5c1e346b230696177f37a9f6feab_cc1ec02b83.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: a5ad29d92f6d88c847fc575eb8f55462_02cca67bd4.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: a12d04f84a3e919a7d62cee3399ca22d_551ac94868.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: c2125ed6a105ac0b607ff74a8e7947d3_5a6e38b027.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: ca97a49cc2901394797a18e3076716bd_973ac399fb.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: d04a67652c4bc7e03946eef3daac9782_a782296e35.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: d6c76712a83eb9e737f454d67a8d73cb_86bafb114b.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: d58c34c3a2d1f60b60775eb2e9fba99d_39d06f1e53.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: dd57f2102c79548090440ce77128ea47_3e4203155c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: dd79573a2c82768f4f8a0c2bf408603b_cf70f34753.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: e94f1943e2bf3bf285b451d4bff5bea5_61191bd532.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: e890531139ff3211cb9d35ded5124550_0487d95471.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: eb7a5752f057066656ba85e8d965c8d7_75403c380c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: ed48e4d73985027f17dd81f9841c7335_0b764b0342.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: efb63f0a3c1561ef463868dd2f5c89e6_28cc3f560d.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: feddf31a4e1e8edc289ac2dee9a0cd09_3f748c9252.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 0a48e7f73ec2b039aaf113f6d81b83db_b5dfb0828d.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 0f25cf7e9d74b861a6a0956c811d85e0_b31c3d1c0d.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 5ac74c0c490b07e996dc64682739f449_b65532066f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 6dc3270fa85d8fdf6d7aaa8610628ca9_7de0fdfcec.jpg
+      ⚠️  Skipping - no full image
+
+📄 Page 46/50 - Processing 25 materials...
+
+   🎨 Material: 7a8e3b3eed2be05f57b24874fdafde52_106ecae29c.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 58bee993dd36d824baa7591fb4d8bf17_f23989714f.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 75da8415cf036c7d8f08c945285945a0_1152b36de6.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 486c481875976ce687a01ba34afa45f5_39d1623613.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 860e36a2b0dfcf26a4d62f7e63bb168f_e7938cfaec.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 034694d18249a87414e497a0db857a77_972dffccac.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 65083c97db363be63966772a318752b1_3377360d24.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 147068dd2c4c2a06bc81ae61d955ad6b_28924cf105.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 15420344a83d127a351034077055e3ef_ce43befd40.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: a088a3f4eb1ae038bdd4d2548749282d_bca2294123.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: a90f5045555e086a8c9624b30247e788_8bf42d453c.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: aa08242ad9041c93c6ecd7811ba2497f_e58bc5da38.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: ac456116d7e3d9c4a808f71a2c6a8de2_7505609963.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: b2e5c53fb182e1b21c21719d44d39480_59877f89a0.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: b76f46b78cb03fcdc24083ff0823dcbc_4e866d26ae.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: b78aa5f69505342bbea070c21b411805_4b7192d205.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: c5e396ff1aaebf435e706f632a930b09_6a2b28345e.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: cea32f3da246c61c899ed236865c0031_2dabd6307c.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: d44a4e11b52063e262622794259d0c0a_27cf73b8b3.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: e4a4bde8ac6f28daaac668180df6d78f_74e1868d65.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: eb703a9c0cd99bf596eb0bb08db8649d_47c29c0907.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 0bc4a1baa5f511a41d0434bb56a1177d_96a009ad33.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 0ece87d3e6a479844cc6644b9b61c017_e5097f68c1.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 0efd3ed4bc85d649b5bfbbb6f50c872d_6e3c373fe5.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1b281482e5877240d302a3fa414f0033_287ae8ea80.jpg
+      ⚠️  Skipping - no full image
+
+📄 Page 47/50 - Processing 25 materials...
+
+   🎨 Material: 1c715661ddd732c429f21fa56e84fc05_78fdb609ca.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 1e1428c3607c959cac64941389611e08_0456ddd876.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 3a6bbf5a3d3085e5568d03c985e6c694_178423af53.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 05b4e3565d660ea18fa09933759c1ec4_cce83fc0a0.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 5b28d52e8e110aca3b03cc9daa1c51f0_7b6d334d55.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 5daa2824071ac883674331170c5e99ae_820cac0002.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 06b91970a7ad9b4f76aafb7ef5ca2425_d1291e90e9.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 8ce053ceed33ea88f451595c5e979add_90708d100f.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 08d1121134c69b5b0d5e0f71b10b9732_804e248066.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 8efa3e755f398dd8f76a7626e49dc75b_d4a3e54799.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 9d8235b6a4d832866eb817090f04cc02_e2bd7f9a29.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 15d8833a9f7e7a65201660399b87c786_edcc4a7e63.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 20a878e62e2244bb7fe34453b12bbe2f_e58d753b6a.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 28ad0b3cc5915201d36d6e11d0013b1d_7be1b77576.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 43f51b92f2014aa8577d4cd21080be6b_dda8442603.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 44d57d7c570ab01aa804b5b53f270b8a_eec400af6f.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 56c66718c535988ce2d944598f729afc_036004f237.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 58db327589231a1f3921334df3b81620_2229af9b1e.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 63a33775d1f8a886a7758d0fd4b31577_6bceea1e46.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 70b9b1e04dacb5608ffc8f6e7b0b8172_cce22ece91.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 73be496a159e50156e00b9e76f4597d5_ef35c200de.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 099ad0c22536c6cc002d7dd7234bfff4_6b277972cc.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 268ba38816143c41e04109cbe2f54ead_b253301f2d.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 375b24b757d1634758679a2c63be033e_7e3ab6660d.png
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 617f55ee8c82e5d9c6c9d61f82cec034_0b87b914bc.jpg
+      ⚠️  Skipping - no full image
+
+📄 Page 48/50 - Processing 25 materials...
+
+   🎨 Material: 787fd6c48c713d23da10839882e9b326_e8530ce61b.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 6207aac075383080b259343146451df2_dc336154c8.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 30505_69b1da6aa2.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 30506_ee7f09f1e8.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 56327d7a85cae113c5c4727b3e54fd04_daa0dff99e.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 596457ef9344d60a63b00a7ff587f28d_093c9d8c18.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: b698c870b66514432f671ed097317103_4dd4881588.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: bbfb066eed766017ca706bfa065ae818_1f59c8e391.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: c8b39ddd942a87fcb291025418e4e219_c9dd2ffe8f.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: c18e1154c6002375ae1c9b4363abcfe2_ae61e100ad.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: c37ad5175fc6b8f35c343cddfd861e85_03ca130484.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: dd07d7d8ba8cd2409a003ccc36879cf1_f2e447a7f6.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: eff96e42bf523437cfaa74cc4a696ca3_f64d046fe0.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: f96135befca6371e46d22b26c71dba56_fdbf58da56.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: fe8ffb55c1015edfcc48660cafc8c5c9_d946e22cd8.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: fe2278a4250b89fb313a688366b29896_6115216f8d.jpg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: 10dd4efcba094275addc68d1a581ed37.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-1.avif
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-1.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-1.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-2.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-2.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-3.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-3.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-4.svg
+      ⚠️  Skipping - no full image
+
+📄 Page 49/50 - Processing 25 materials...
+
+   🎨 Material: download-4.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-5.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-5.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-6.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-6.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-7.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-7.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-8.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-8.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-9.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-9.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-10.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-10.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-11.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-12.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-13.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-14.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-15.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-16.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-17.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-18.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-19.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-20.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-21.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-22.webp
+      ⚠️  Skipping - no full image
+
+📄 Page 50/50 - Processing 9 materials...
+
+   🎨 Material: download-23.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-24.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-25.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-26.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-27.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download-28.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download.svg
+      ⚠️  Skipping - no full image
+
+   🎨 Material: download.webp
+      ⚠️  Skipping - no full image
+
+   🎨 Material: ee08b245c2e846b89f930b7b525a8903.png
+      ⚠️  Skipping - no full image
+
+============================================================
+
+✅ Migration Complete!
+   Total Materials: 1234
+   Success: 0
+   Failed: 1234
+
+============================================================

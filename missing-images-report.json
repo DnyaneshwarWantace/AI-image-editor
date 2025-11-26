@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2025-11-21T11:09:27.082Z",
+  "totalMissing": 5,
+  "missingByType": {
+    "templates": [
+      {
+        "name": "Apron (in JSON)",
+        "url": "/uploads/1750067900855_f9ab9faae5.webp",
+        "reason": "Image in template JSON still points to Strapi"
+      },
+      {
+        "name": "Underwear (in JSON)",
+        "url": "/uploads/1750068162860_1818e5ea58.png",
+        "reason": "Image in template JSON still points to Strapi"
+      },
+      {
+        "name": "Hoodie (in JSON)",
+        "url": "/uploads/1750068547106_cee11033fe.png",
+        "reason": "Image in template JSON still points to Strapi"
+      },
+      {
+        "name": "Racket (in JSON)",
+        "url": "/uploads/1750068620923_7e16517523.png",
+        "reason": "Image in template JSON still points to Strapi"
+      },
+      {
+        "name": "Shoes (in JSON)",
+        "url": "/uploads/1750068757207_b1b8c04460.png",
+        "reason": "Image in template JSON still points to Strapi"
+      }
+    ],
+    "materials": [],
+    "fontStyles": [],
+    "fontBorders": [],
+    "banners": [],
+    "website": []
+  }
+}

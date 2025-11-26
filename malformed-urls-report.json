@@ -1,0 +1,10 @@
+{
+  "summary": {
+    "totalIssues": 0,
+    "concatenatedUrls": 0,
+    "malformedConcatenation": 0,
+    "multipleDomains": 0,
+    "strapiDomains": 0
+  },
+  "issues": []
+}

@@ -1,0 +1,899 @@
+{
+  "checkedAt": "2025-11-21T11:10:07.677Z",
+  "totalUrls": 108,
+  "uniqueUrls": [
+    "https://api.kuaitu.cc/uploads/1762242661175_a3af2b0df0.png",
+    "https://api.kuaitu.cc/uploads/1762242666414_59e2fa2ccd.png",
+    "https://api.kuaitu.cc/uploads/1762242672091_1c7019fd52.png",
+    "https://api.kuaitu.cc/uploads/1762242676399_b5d39a492e.png",
+    "https://api.kuaitu.cc/uploads/1762242716605_355b774a77.png",
+    "https://api.kuaitu.cc/uploads/1762242740018_be7f2d3e54.png",
+    "/uploads/1750068131805_d01a88a738.png",
+    "/uploads/1750069565081_7cc077ab2f.png",
+    "/uploads/1750069452368_a7aea5e433.png",
+    "/uploads/1750069393141_0f8d4e8d03.png",
+    "/uploads/1750069348246_fea9c796b8.webp",
+    "/uploads/1750069303941_9d6a5dfd1d.webp",
+    "/uploads/1750069233723_9b8e775846.png",
+    "/uploads/1750069171076_5d9e6a2610.webp",
+    "/uploads/1750069116712_a9ff481f6a.png",
+    "/uploads/1750069060677_2cfd5564ee.png",
+    "/uploads/1750068979312_d2b2d56e7d.png",
+    "/uploads/1750068912723_5b553e443f.png",
+    "/uploads/1750068848374_e352338e19.png",
+    "/uploads/1750068672353_785dd3eed3.png",
+    "/uploads/1750068481910_06a639c836.png",
+    "/uploads/1750068274504_b62eb13af2.webp",
+    "/uploads/1750068212211_affdc92d80.webp",
+    "/uploads/1750068090703_549753b648.webp",
+    "/uploads/1750067992861_7cca41ee4e.webp",
+    "/uploads/1750067806501_f576b9a979.webp",
+    "/uploads/1750067548461_c5639d5fb5.png",
+    "/uploads/1750067437001_6d9d73d27f.webp",
+    "/uploads/1750063235302_d9044174f7.png",
+    "/uploads/1750063247730_341176d5ba.png",
+    "/uploads/1750063248819_36642f34f0.png",
+    "/uploads/1750063250004_bc1d35cedb.png",
+    "https://api.kuaitu.cc/uploads/1749978391903_13b008bfe3.png",
+    "https://api.kuaitu.cc/uploads/1763352083086_7371ef865a.png",
+    "https://api.kuaitu.cc/uploads/1763352083334_6599de2020.png",
+    "/uploads/1750060990292_8f1392daaf.png",
+    "/uploads/1750060990632_df377c0457.png",
+    "/uploads/1750060991770_8ec0bdd0ee.png",
+    "/uploads/1750060992542_e999c8e215.png",
+    "/uploads/1750060993537_97350b935b.png",
+    "/uploads/1750060994491_6273b0d83e.png",
+    "/uploads/1750060994860_6d56524e19.png",
+    "/uploads/1750060995515_f847ced177.png",
+    "/uploads/1750060996129_4ffd49c0b6.png",
+    "/uploads/1750060996641_2a0f5d678b.png",
+    "/uploads/1750060997257_2e6927b370.png",
+    "/uploads/1750060997770_79432e46b6.png",
+    "/uploads/1750060960273_4114c3fa15.png",
+    "/uploads/1750060960700_28eb12c2ea.png",
+    "/uploads/1750060961863_655203b9e8.png",
+    "/uploads/1750060962410_6e44b41678.png",
+    "/uploads/1750060962867_5a33aee0ae.png",
+    "/uploads/1750060963583_cbe1d2d156.png",
+    "/uploads/1750060963901_8d0bf49473.png",
+    "/uploads/1750060964453_337c92dbeb.png",
+    "/uploads/1750056881795_5f54d1f2d9.png",
+    "/uploads/1750056882271_299c6251d1.png",
+    "/uploads/1750056884984_c90269fa9e.png",
+    "/uploads/1750056885373_f1e98aa00d.png",
+    "/uploads/1750056885891_58d042a3af.png",
+    "/uploads/1750054541163_9c98648f5d.png",
+    "/uploads/1750054548496_df21267399.png",
+    "/uploads/1750054549044_fead84a2b6.png",
+    "/uploads/1750054549722_9b1365a3ea.png",
+    "/uploads/1750054550023_2673645e18.png",
+    "/uploads/1750054550299_e0772b809e.png",
+    "/uploads/1750054550744_e7156f0a23.png",
+    "/uploads/1750054550965_05593d9b14.png"
+  ],
+  "templatesAffected": 32,
+  "byTemplate": {
+    "520": [
+      "/uploads/1750060960273_4114c3fa15.png",
+      "/uploads/1750060960700_28eb12c2ea.png",
+      "/uploads/1750060961863_655203b9e8.png",
+      "/uploads/1750060962410_6e44b41678.png",
+      "/uploads/1750060962867_5a33aee0ae.png",
+      "/uploads/1750060963583_cbe1d2d156.png",
+      "/uploads/1750060963901_8d0bf49473.png",
+      "/uploads/1750060964453_337c92dbeb.png",
+      "/uploads/1750060960273_4114c3fa15.png",
+      "/uploads/1750060960700_28eb12c2ea.png",
+      "/uploads/1750060961863_655203b9e8.png",
+      "/uploads/1750060962410_6e44b41678.png",
+      "/uploads/1750060962867_5a33aee0ae.png",
+      "/uploads/1750060963583_cbe1d2d156.png",
+      "/uploads/1750060963901_8d0bf49473.png",
+      "/uploads/1750060964453_337c92dbeb.png"
+    ],
+    "Oval Badge": [
+      "https://api.kuaitu.cc/uploads/1762242661175_a3af2b0df0.png"
+    ],
+    "Long Strip Badge": [
+      "https://api.kuaitu.cc/uploads/1762242666414_59e2fa2ccd.png"
+    ],
+    "Square Badge": [
+      "https://api.kuaitu.cc/uploads/1762242672091_1c7019fd52.png"
+    ],
+    "Water Drop Badge": [
+      "https://api.kuaitu.cc/uploads/1762242676399_b5d39a492e.png"
+    ],
+    "Cat Ear Badge": [
+      "https://api.kuaitu.cc/uploads/1762242716605_355b774a77.png"
+    ],
+    "Round Badge": [
+      "https://api.kuaitu.cc/uploads/1762242740018_be7f2d3e54.png"
+    ],
+    "T-Shirt": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069565081_7cc077ab2f.png"
+    ],
+    "Swimsuit": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069452368_a7aea5e433.png"
+    ],
+    "Face Mask": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069393141_0f8d4e8d03.png",
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069393141_0f8d4e8d03.png"
+    ],
+    "Sweater": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069348246_fea9c796b8.webp"
+    ],
+    "Apron": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069303941_9d6a5dfd1d.webp",
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069303941_9d6a5dfd1d.webp"
+    ],
+    "Fleece": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069233723_9b8e775846.png"
+    ],
+    "Shoes": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069171076_5d9e6a2610.webp",
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069171076_5d9e6a2610.webp"
+    ],
+    "Hoodie Back": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069116712_a9ff481f6a.png"
+    ],
+    "Hoodie": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069060677_2cfd5564ee.png",
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750069060677_2cfd5564ee.png"
+    ],
+    "Phone Case": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068979312_d2b2d56e7d.png"
+    ],
+    "Racket": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068912723_5b553e443f.png",
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068912723_5b553e443f.png"
+    ],
+    "Towel": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068848374_e352338e19.png"
+    ],
+    "Sun Hat": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068672353_785dd3eed3.png"
+    ],
+    "Silk Scarf": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068481910_06a639c836.png"
+    ],
+    "Underwear": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068274504_b62eb13af2.webp",
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068274504_b62eb13af2.webp"
+    ],
+    "Cloth Bag": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068212211_affdc92d80.webp"
+    ],
+    "Umbrella": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750068090703_549753b648.webp"
+    ],
+    "Canvas Bag": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750067992861_7cca41ee4e.webp"
+    ],
+    "Children's Clothing": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750067806501_f576b9a979.webp"
+    ],
+    "Product Template": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750067548461_c5639d5fb5.png"
+    ],
+    "Women's Short Sleeve": [
+      "/uploads/1750068131805_d01a88a738.png",
+      "/uploads/1750067437001_6d9d73d27f.webp"
+    ],
+    "Daily Sign": [
+      "/uploads/1750063235302_d9044174f7.png",
+      "/uploads/1750063247730_341176d5ba.png",
+      "/uploads/1750063248819_36642f34f0.png",
+      "/uploads/1750063250004_bc1d35cedb.png",
+      "https://api.kuaitu.cc/uploads/1749978391903_13b008bfe3.png",
+      "https://api.kuaitu.cc/uploads/1763352083086_7371ef865a.png",
+      "https://api.kuaitu.cc/uploads/1763352083334_6599de2020.png"
+    ],
+    "Start of Summer": [
+      "/uploads/1750060990292_8f1392daaf.png",
+      "/uploads/1750060990632_df377c0457.png",
+      "/uploads/1750060991770_8ec0bdd0ee.png",
+      "/uploads/1750060992542_e999c8e215.png",
+      "/uploads/1750060993537_97350b935b.png",
+      "/uploads/1750060994491_6273b0d83e.png",
+      "/uploads/1750060994860_6d56524e19.png",
+      "/uploads/1750060995515_f847ced177.png",
+      "/uploads/1750060996129_4ffd49c0b6.png",
+      "/uploads/1750060996641_2a0f5d678b.png",
+      "/uploads/1750060997257_2e6927b370.png",
+      "/uploads/1750060997770_79432e46b6.png"
+    ],
+    "New Year's Eve": [
+      "/uploads/1750056881795_5f54d1f2d9.png",
+      "/uploads/1750056882271_299c6251d1.png",
+      "/uploads/1750056884984_c90269fa9e.png",
+      "/uploads/1750056885373_f1e98aa00d.png",
+      "/uploads/1750056885891_58d042a3af.png"
+    ],
+    "Burger": [
+      "/uploads/1750054541163_9c98648f5d.png",
+      "/uploads/1750054548496_df21267399.png",
+      "/uploads/1750054549044_fead84a2b6.png",
+      "/uploads/1750054549722_9b1365a3ea.png",
+      "/uploads/1750054550023_2673645e18.png",
+      "/uploads/1750054550299_e0772b809e.png",
+      "/uploads/1750054550744_e7156f0a23.png",
+      "/uploads/1750054550965_05593d9b14.png"
+    ]
+  },
+  "allUrls": [
+    {
+      "templateName": "Oval Badge",
+      "templateId": "js73d964c1ktjv4031gvjpwfsd7vvmcs",
+      "url": "https://api.kuaitu.cc/uploads/1762242661175_a3af2b0df0.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Long Strip Badge",
+      "templateId": "js76vdgqfwvpc3vts21vz2hbt97vtr1x",
+      "url": "https://api.kuaitu.cc/uploads/1762242666414_59e2fa2ccd.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Square Badge",
+      "templateId": "js7dyc3g5ger57r02mb15b73sn7vtwjp",
+      "url": "https://api.kuaitu.cc/uploads/1762242672091_1c7019fd52.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Water Drop Badge",
+      "templateId": "js718shr6vhshb1x9q8b6jk4ph7vtvme",
+      "url": "https://api.kuaitu.cc/uploads/1762242676399_b5d39a492e.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Cat Ear Badge",
+      "templateId": "js7ee36nw5sfpyn20vzk2kbstx7vvx8w",
+      "url": "https://api.kuaitu.cc/uploads/1762242716605_355b774a77.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Round Badge",
+      "templateId": "js798haws7a3884haenmjwwc157vvxn7",
+      "url": "https://api.kuaitu.cc/uploads/1762242740018_be7f2d3e54.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "T-Shirt",
+      "templateId": "js73e99m5gxwb25arqf4sywn7d7vv61q",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "T-Shirt",
+      "templateId": "js73e99m5gxwb25arqf4sywn7d7vv61q",
+      "url": "/uploads/1750069565081_7cc077ab2f.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Swimsuit",
+      "templateId": "js72g6eanqr0r3gevcxakvcgrn7vvg23",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Swimsuit",
+      "templateId": "js72g6eanqr0r3gevcxakvcgrn7vvg23",
+      "url": "/uploads/1750069452368_a7aea5e433.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Face Mask",
+      "templateId": "js750faehkfg6gwagqzheqctns7vthg3",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Face Mask",
+      "templateId": "js750faehkfg6gwagqzheqctns7vthg3",
+      "url": "/uploads/1750069393141_0f8d4e8d03.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Sweater",
+      "templateId": "js741c5tadvdnskhgw3ta7qn4h7vvzp0",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Sweater",
+      "templateId": "js741c5tadvdnskhgw3ta7qn4h7vvzp0",
+      "url": "/uploads/1750069348246_fea9c796b8.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Apron",
+      "templateId": "js74ctzswc7gpnfhez9aseqgds7vvtg1",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Apron",
+      "templateId": "js74ctzswc7gpnfhez9aseqgds7vvtg1",
+      "url": "/uploads/1750069303941_9d6a5dfd1d.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Fleece",
+      "templateId": "js750zxr72hzjdd4nc1hrmq85x7vtnvq",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Fleece",
+      "templateId": "js750zxr72hzjdd4nc1hrmq85x7vtnvq",
+      "url": "/uploads/1750069233723_9b8e775846.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Shoes",
+      "templateId": "js797kqxm29p115s6q0ycqa3n97vth18",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Shoes",
+      "templateId": "js797kqxm29p115s6q0ycqa3n97vth18",
+      "url": "/uploads/1750069171076_5d9e6a2610.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Hoodie Back",
+      "templateId": "js75ep9z56q9qqazynhz7jp0jx7vvyek",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Hoodie Back",
+      "templateId": "js75ep9z56q9qqazynhz7jp0jx7vvyek",
+      "url": "/uploads/1750069116712_a9ff481f6a.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Hoodie",
+      "templateId": "js79bp68gn5fw9snwx1w3n5rb17vt792",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Hoodie",
+      "templateId": "js79bp68gn5fw9snwx1w3n5rb17vt792",
+      "url": "/uploads/1750069060677_2cfd5564ee.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Phone Case",
+      "templateId": "js7c8m8rkt6w8tyj5x04d2fswn7vts8y",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Phone Case",
+      "templateId": "js7c8m8rkt6w8tyj5x04d2fswn7vts8y",
+      "url": "/uploads/1750068979312_d2b2d56e7d.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Racket",
+      "templateId": "js74gn2kfqfqtm6dh0zqe53qw57vtzsj",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Racket",
+      "templateId": "js74gn2kfqfqtm6dh0zqe53qw57vtzsj",
+      "url": "/uploads/1750068912723_5b553e443f.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Towel",
+      "templateId": "js7dvf0vtt322vdz0z4xn07w917vver8",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Towel",
+      "templateId": "js7dvf0vtt322vdz0z4xn07w917vver8",
+      "url": "/uploads/1750068848374_e352338e19.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Shoes",
+      "templateId": "js72qwn2j9a7taxdm4xwaebxk57vvpka",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Shoes",
+      "templateId": "js72qwn2j9a7taxdm4xwaebxk57vvpka",
+      "url": "/uploads/1750069171076_5d9e6a2610.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Sun Hat",
+      "templateId": "js7865pcrpc6sm19cfpazzn4397vvmc7",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Sun Hat",
+      "templateId": "js7865pcrpc6sm19cfpazzn4397vvmc7",
+      "url": "/uploads/1750068672353_785dd3eed3.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Racket",
+      "templateId": "js72yytgmyn3mz3n530c6fvym57vtvx8",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Racket",
+      "templateId": "js72yytgmyn3mz3n530c6fvym57vtvx8",
+      "url": "/uploads/1750068912723_5b553e443f.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Hoodie",
+      "templateId": "js77n41s7ppr81dzzzkht5rx0x7vv8r0",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Hoodie",
+      "templateId": "js77n41s7ppr81dzzzkht5rx0x7vv8r0",
+      "url": "/uploads/1750069060677_2cfd5564ee.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Silk Scarf",
+      "templateId": "js74s8rh05yv68wjkfhfx88qwn7vvvmm",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Silk Scarf",
+      "templateId": "js74s8rh05yv68wjkfhfx88qwn7vvvmm",
+      "url": "/uploads/1750068481910_06a639c836.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Underwear",
+      "templateId": "js74cez6pyt4h7xrrvqzphhm0s7vv4et",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Underwear",
+      "templateId": "js74cez6pyt4h7xrrvqzphhm0s7vv4et",
+      "url": "/uploads/1750068274504_b62eb13af2.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Cloth Bag",
+      "templateId": "js73x9h5jgm1xeea4cpkq299gh7vt5t9",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Cloth Bag",
+      "templateId": "js73x9h5jgm1xeea4cpkq299gh7vt5t9",
+      "url": "/uploads/1750068212211_affdc92d80.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Underwear",
+      "templateId": "js71gspg9xbpz25nvj44a4wp3s7vt05z",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Underwear",
+      "templateId": "js71gspg9xbpz25nvj44a4wp3s7vt05z",
+      "url": "/uploads/1750068274504_b62eb13af2.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Umbrella",
+      "templateId": "js753rtb33ad1vr43zrj0f97w57vv4yx",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Umbrella",
+      "templateId": "js753rtb33ad1vr43zrj0f97w57vv4yx",
+      "url": "/uploads/1750068090703_549753b648.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Canvas Bag",
+      "templateId": "js75qf1321f73v9jjhtbxm40vs7vt75m",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Canvas Bag",
+      "templateId": "js75qf1321f73v9jjhtbxm40vs7vt75m",
+      "url": "/uploads/1750067992861_7cca41ee4e.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Apron",
+      "templateId": "js71623dekffsc6grb5mbfs1gh7vtz09",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Apron",
+      "templateId": "js71623dekffsc6grb5mbfs1gh7vtz09",
+      "url": "/uploads/1750069303941_9d6a5dfd1d.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Children's Clothing",
+      "templateId": "js75wswa2ah7dt1wfszmxwvyn97vvwsw",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Children's Clothing",
+      "templateId": "js75wswa2ah7dt1wfszmxwvyn97vvwsw",
+      "url": "/uploads/1750067806501_f576b9a979.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Product Template",
+      "templateId": "js7ec75wmfgvrcq4sdah8937r97vv1fs",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Product Template",
+      "templateId": "js7ec75wmfgvrcq4sdah8937r97vv1fs",
+      "url": "/uploads/1750067548461_c5639d5fb5.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Women's Short Sleeve",
+      "templateId": "js76c6mxsa0wxs4h8h8d45tseh7vvs99",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Women's Short Sleeve",
+      "templateId": "js76c6mxsa0wxs4h8h8d45tseh7vvs99",
+      "url": "/uploads/1750067437001_6d9d73d27f.webp",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Daily Sign",
+      "templateId": "js7bx3mgdbvcndg2e36bxvnzf97vvkw5",
+      "url": "/uploads/1750063235302_d9044174f7.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Daily Sign",
+      "templateId": "js7bx3mgdbvcndg2e36bxvnzf97vvkw5",
+      "url": "/uploads/1750063247730_341176d5ba.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Daily Sign",
+      "templateId": "js7bx3mgdbvcndg2e36bxvnzf97vvkw5",
+      "url": "/uploads/1750063248819_36642f34f0.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Daily Sign",
+      "templateId": "js7bx3mgdbvcndg2e36bxvnzf97vvkw5",
+      "url": "/uploads/1750063250004_bc1d35cedb.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Daily Sign",
+      "templateId": "js7bx3mgdbvcndg2e36bxvnzf97vvkw5",
+      "url": "https://api.kuaitu.cc/uploads/1749978391903_13b008bfe3.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Daily Sign",
+      "templateId": "js7bx3mgdbvcndg2e36bxvnzf97vvkw5",
+      "url": "https://api.kuaitu.cc/uploads/1763352083086_7371ef865a.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Daily Sign",
+      "templateId": "js7bx3mgdbvcndg2e36bxvnzf97vvkw5",
+      "url": "https://api.kuaitu.cc/uploads/1763352083334_6599de2020.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060990292_8f1392daaf.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060990632_df377c0457.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060991770_8ec0bdd0ee.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060992542_e999c8e215.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060993537_97350b935b.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060994491_6273b0d83e.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060994860_6d56524e19.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060995515_f847ced177.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060996129_4ffd49c0b6.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060996641_2a0f5d678b.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060997257_2e6927b370.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Start of Summer",
+      "templateId": "js773gn4qz5kv0vy7ybj61x0x57vt616",
+      "url": "/uploads/1750060997770_79432e46b6.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060960273_4114c3fa15.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060960700_28eb12c2ea.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060961863_655203b9e8.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060962410_6e44b41678.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060962867_5a33aee0ae.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060963583_cbe1d2d156.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060963901_8d0bf49473.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js75aezqd1v656yy1evh5850857vv1b6",
+      "url": "/uploads/1750060964453_337c92dbeb.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060960273_4114c3fa15.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060960700_28eb12c2ea.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060961863_655203b9e8.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060962410_6e44b41678.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060962867_5a33aee0ae.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060963583_cbe1d2d156.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060963901_8d0bf49473.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "520",
+      "templateId": "js79kx674amwvj7gjxf5wxtx6d7vvvk6",
+      "url": "/uploads/1750060964453_337c92dbeb.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Face Mask",
+      "templateId": "js7ajxh6d594bde9t51a21b70d7vvnp4",
+      "url": "/uploads/1750068131805_d01a88a738.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Face Mask",
+      "templateId": "js7ajxh6d594bde9t51a21b70d7vvnp4",
+      "url": "/uploads/1750069393141_0f8d4e8d03.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "New Year's Eve",
+      "templateId": "js71zpqww7fjw1ybeq53ggb2397vvpbg",
+      "url": "/uploads/1750056881795_5f54d1f2d9.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "New Year's Eve",
+      "templateId": "js71zpqww7fjw1ybeq53ggb2397vvpbg",
+      "url": "/uploads/1750056882271_299c6251d1.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "New Year's Eve",
+      "templateId": "js71zpqww7fjw1ybeq53ggb2397vvpbg",
+      "url": "/uploads/1750056884984_c90269fa9e.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "New Year's Eve",
+      "templateId": "js71zpqww7fjw1ybeq53ggb2397vvpbg",
+      "url": "/uploads/1750056885373_f1e98aa00d.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "New Year's Eve",
+      "templateId": "js71zpqww7fjw1ybeq53ggb2397vvpbg",
+      "url": "/uploads/1750056885891_58d042a3af.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054541163_9c98648f5d.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054548496_df21267399.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054549044_fead84a2b6.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054549722_9b1365a3ea.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054550023_2673645e18.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054550299_e0772b809e.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054550744_e7156f0a23.png",
+      "objectType": "image"
+    },
+    {
+      "templateName": "Burger",
+      "templateId": "js7553ptknqv7g84mm5pb1fsds7vtbws",
+      "url": "/uploads/1750054550965_05593d9b14.png",
+      "objectType": "image"
+    }
+  ]
+}

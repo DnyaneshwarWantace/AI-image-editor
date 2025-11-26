@@ -1,0 +1,77 @@
+{
+  "comparedAt": "2025-11-21T10:57:49.429Z",
+  "comparisons": [
+    {
+      "table": "templateTypes",
+      "strapiCount": 9,
+      "convexCount": 9,
+      "match": true
+    },
+    {
+      "table": "templates",
+      "strapiCount": 150,
+      "convexCount": 150,
+      "match": true
+    },
+    {
+      "table": "materialTypes",
+      "strapiCount": 24,
+      "convexCount": 24,
+      "match": true
+    },
+    {
+      "table": "materials",
+      "strapiCount": 1234,
+      "convexCount": 1234,
+      "match": true
+    },
+    {
+      "table": "fontStyleTypes",
+      "strapiCount": 3,
+      "convexCount": 3,
+      "match": true
+    },
+    {
+      "table": "fontStyles",
+      "strapiCount": 40,
+      "convexCount": 40,
+      "match": true
+    },
+    {
+      "table": "fonts",
+      "strapiCount": 49,
+      "convexCount": 49,
+      "match": true
+    },
+    {
+      "table": "sizes",
+      "strapiCount": 11,
+      "convexCount": 11,
+      "match": true
+    },
+    {
+      "table": "banners",
+      "strapiCount": 2,
+      "convexCount": 2,
+      "match": true
+    },
+    {
+      "table": "fontBorders",
+      "strapiCount": 18,
+      "convexCount": 18,
+      "match": true
+    },
+    {
+      "table": "webSite",
+      "strapiCount": 1,
+      "convexCount": 1,
+      "match": true
+    }
+  ],
+  "summary": {
+    "totalTables": 11,
+    "matchingTables": 11,
+    "tablesWithIssues": 0,
+    "allMatch": true
+  }
+}
