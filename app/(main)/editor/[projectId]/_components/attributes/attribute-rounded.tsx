@@ -50,8 +50,8 @@ export function AttributeRounded() {
   }
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Rounded Corners</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Rounded Corners</h4>
 
       <div className="space-y-2">
         <div className="flex justify-between">

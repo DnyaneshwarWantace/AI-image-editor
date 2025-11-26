@@ -77,7 +77,7 @@ export function CanvasSizeModal({
           <DialogDescription>Set the canvas dimensions</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-3 py-4">
           <div className="space-y-2">
             <Label>Preset Size</Label>
             <Select value={preset} onValueChange={handlePresetChange}>

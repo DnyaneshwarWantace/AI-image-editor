@@ -66,7 +66,7 @@ export function AttributeShadow() {
   if (!activeObject) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -74,7 +74,7 @@ export function AttributeShadow() {
           onChange={(e) => setEnabled(e.target.checked)}
           className="w-4 h-4"
         />
-        <h4 className="text-sm font-semibold text-gray-900">Shadow</h4>
+        <h4 className="text-xs font-semibold text-gray-900">Shadow</h4>
       </div>
 
       {enabled && (

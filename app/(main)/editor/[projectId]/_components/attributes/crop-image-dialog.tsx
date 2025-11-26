@@ -218,7 +218,7 @@ export function CropImageDialog({ open, onOpenChange }: CropImageDialogProps) {
           <DialogTitle>Crop Image</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Aspect Ratio Presets */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Crop Ratio</Label>

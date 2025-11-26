@@ -8,8 +8,15 @@ import {
   Image as ImageIcon,
   Layers,
   User,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Tab Components (will create these next)
 import { TemplatesPanel } from "./tabs/templates-panel";
@@ -18,6 +25,7 @@ import { FontStylePanel } from "./tabs/font-style-panel";
 import { MaterialsPanel } from "./tabs/materials-panel";
 import { LayersPanel } from "./tabs/layers-panel";
 import { MyMaterialsPanel } from "./tabs/my-materials-panel";
+import { VariationsPanel } from "./tabs/variations-panel";
 
 const LEFT_TABS = [
   {
@@ -51,6 +59,12 @@ const LEFT_TABS = [
     component: LayersPanel,
   },
   {
+    key: "variations",
+    name: "Variations",
+    icon: Sparkles,
+    component: VariationsPanel,
+  },
+  {
     key: "myMaterial",
     name: "My Materials",
     icon: User,
@@ -65,62 +79,75 @@ export function LeftSidebar() {
   const ActiveComponent = LEFT_TABS.find((tab) => tab.key === activeTab)?.component;
 
   return (
-    <div
-      className={cn(
-        "flex relative bg-white transition-all duration-300",
-        isExpanded ? "w-[380px]" : "w-[65px]"
-      )}
-    >
-      {/* Icon Menu - 65px */}
+    <TooltipProvider delayDuration={300}>
       <div
-        className="w-[65px] border-r flex flex-col"
-        style={{ borderColor: "#eef2f8" }}
+        className={cn(
+          "flex relative bg-white transition-all duration-300",
+          isExpanded ? "w-[310px]" : "w-[42px]"
+        )}
       >
-        {LEFT_TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.key;
+        {/* Icon Menu - 42px */}
+        <div
+          className="w-[42px] border-r flex flex-col"
+          style={{ borderColor: "#eef2f8" }}
+        >
+          {LEFT_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.key;
 
-          return (
-            <button
-              key={tab.key}
-              onClick={() => {
-                setActiveTab(tab.key);
-                if (!isExpanded) setIsExpanded(true);
-              }}
-              className={cn(
-                "flex flex-col items-center justify-center p-2 py-3 text-xs transition-colors border-b",
-                isActive
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-50"
-              )}
-              style={{ borderColor: "#eef2f8" }}
-            >
-              <Icon className="h-6 w-6 mb-1" />
-              <span className="text-center leading-tight">{tab.name}</span>
-            </button>
-          );
-        })}
-      </div>
+            return (
+              <Tooltip key={tab.key}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => {
+                      setActiveTab(tab.key);
+                      if (!isExpanded) setIsExpanded(true);
+                    }}
+                    className={cn(
+                      "flex items-center justify-center p-2 transition-colors border-b",
+                      isActive
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    )}
+                    style={{ borderColor: "#eef2f8" }}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>{tab.name}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
 
-      {/* Content Panel - 315px */}
+      {/* Content Panel - 268px */}
       {isExpanded && (
-        <div className="w-[315px] overflow-y-auto bg-white">
-          <div className="p-3">
+        <div
+          className="w-[268px] overflow-y-auto bg-white scrollbar-thin"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#d1d5db transparent'
+          }}
+        >
+          <div className="p-2">
             {ActiveComponent && <ActiveComponent />}
           </div>
         </div>
       )}
 
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute right-[-20px] top-1/2 -translate-y-1/2 w-5 h-16 bg-white border rounded-r cursor-pointer hover:bg-gray-50 transition-all z-10 flex items-center justify-center"
-        style={{ borderColor: "#eef2f8" }}
-      >
-        <div className="text-gray-400">
-          {isExpanded ? "‹" : "›"}
-        </div>
-      </button>
-    </div>
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="absolute right-[-16px] top-1/2 -translate-y-1/2 w-3.5 h-12 bg-white border rounded-r cursor-pointer hover:bg-gray-50 transition-all z-10 flex items-center justify-center"
+          style={{ borderColor: "#eef2f8" }}
+        >
+          <div className="text-gray-400 text-xs">
+            {isExpanded ? "‹" : "›"}
+          </div>
+        </button>
+      </div>
+    </TooltipProvider>
   );
 }

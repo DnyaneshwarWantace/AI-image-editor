@@ -52,8 +52,8 @@ export function AttributeId() {
   if (!activeObject) return null;
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Data</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Data</h4>
 
       <div className="space-y-2">
         <Label className="text-xs font-medium text-gray-700">ID</Label>
@@ -68,7 +68,7 @@ export function AttributeId() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-gray-700">Link Type</Label>
           <Select

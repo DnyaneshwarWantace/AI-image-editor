@@ -32,8 +32,8 @@ export function FlipControls() {
   if (!activeObject) return null;
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Flip</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Flip</h4>
       <div className="flex gap-2">
         <Button
           variant="outline"

@@ -21,6 +21,16 @@ export function ImportMenu() {
 
     setIsImporting(true);
     try {
+      // Check if canvas is empty (only workspace exists)
+      const objects = canvas.getObjects();
+      const isCanvasEmpty = objects.length <= 1; // Only workspace or empty
+      
+      let offsetX = 50; // Starting offset for multiple images
+      let offsetY = 50;
+      let isFirstImage = true;
+      const imageItems: any[] = [];
+
+      // Process all images first (without rendering)
       for (const file of files) {
         // Convert file to base64 data URL
         const reader = new FileReader();
@@ -37,9 +47,11 @@ export function ImportMenu() {
           reader.readAsDataURL(file);
         });
 
-        // Create img element and load it (Vue editor pattern)
+        // Create img element and load it
         const imgEl = document.createElement('img');
         imgEl.src = imageUrl;
+        // Use hidden image instead of appending to body
+        imgEl.style.display = 'none';
         document.body.appendChild(imgEl);
 
         await new Promise((resolve, reject) => {
@@ -47,7 +59,49 @@ export function ImportMenu() {
             try {
               const imgItem = await editor.createImgByElement?.(imgEl);
               if (imgItem) {
-                editor.addBaseType?.(imgItem, { scale: true });
+                const imgWidth = imgEl.naturalWidth;
+                const imgHeight = imgEl.naturalHeight;
+
+                // For first image on empty canvas: resize canvas to match image (like Photoshop)
+                if (isFirstImage && isCanvasEmpty && imgWidth && imgHeight) {
+                  // Add padding around image (like Photoshop)
+                  const padding = 100;
+                  const canvasWidth = imgWidth + padding * 2;
+                  const canvasHeight = imgHeight + padding * 2;
+                  
+                  // Resize canvas to match image dimensions
+                  (editor as any).setSize?.(canvasWidth, canvasHeight);
+                  
+                  // Position image with padding
+                  imgItem.set({
+                    left: padding,
+                    top: padding,
+                  });
+                  
+                  isFirstImage = false;
+                } else {
+                  // For subsequent images: position with offset (like Figma)
+                  imgItem.set({
+                    left: offsetX,
+                    top: offsetY,
+                  });
+                  
+                  // Scale to reasonable size if too large (max 800px width)
+                  if (imgWidth && imgWidth > 800) {
+                    const scale = 800 / imgWidth;
+                    imgItem.scale(scale);
+                  }
+                  
+                  // Update offset for next image (stagger position)
+                  offsetX += 50;
+                  offsetY += 50;
+                }
+
+                // Set ID and prepare for batch add
+                imgItem.set({
+                  id: `image-${Date.now()}-${Math.random()}`,
+                });
+                imageItems.push(imgItem);
               }
               imgEl.remove();
               resolve(true);
@@ -62,6 +116,37 @@ export function ImportMenu() {
           };
         });
       }
+
+      // Batch add all images at once (single render)
+      if (imageItems.length > 0) {
+        // Disable rendering during batch add
+        canvas.renderOnAddRemove = false;
+        
+        imageItems.forEach((item) => {
+          canvas.add(item);
+        });
+        
+        // Set last image as active
+        canvas.setActiveObject(imageItems[imageItems.length - 1]);
+        
+        // Re-enable rendering and render once
+        canvas.renderOnAddRemove = true;
+        
+        // Use requestAnimationFrame for smooth rendering
+        requestAnimationFrame(() => {
+          canvas.requestRenderAll();
+          
+          // Save state once after all images are added
+          (editor as any).saveState?.();
+          
+          // Auto-zoom to fit after importing
+          requestAnimationFrame(() => {
+            (editor as any)?.auto?.();
+            canvas.requestRenderAll();
+          });
+        });
+      }
+
       toast.success(`Imported ${files.length} image(s)`);
     } catch (error) {
       console.error("Error importing images:", error);
@@ -72,13 +157,23 @@ export function ImportMenu() {
   };
 
   const handleImportSVG = async (files: File[]) => {
-    if (!editor || files.length === 0) return;
+    if (!editor || !canvas || files.length === 0) return;
 
     setIsImporting(true);
     try {
       // Import fabric dynamically
       const { loadSVGFromURL, util } = await import('fabric');
 
+      // Check if canvas is empty (only workspace exists)
+      const objects = canvas.getObjects();
+      const isCanvasEmpty = objects.length <= 1; // Only workspace or empty
+      
+      let offsetX = 50; // Starting offset for multiple SVGs
+      let offsetY = 50;
+      let isFirstSVG = true;
+      const svgItems: any[] = [];
+
+      // Process all SVGs first (without rendering)
       for (const file of files) {
         const reader = new FileReader();
         const svgUrl = await new Promise<string>((resolve, reject) => {
@@ -94,16 +189,92 @@ export function ImportMenu() {
           reader.readAsDataURL(file);
         });
 
-        // Use loadSVGFromURL with data URL (Vue editor pattern)
-        const { objects, options } = await loadSVGFromURL(svgUrl);
-        const filteredObjects = objects.filter((obj): obj is any => obj !== null);
+        // Use loadSVGFromURL with data URL
+        const { objects: svgObjects, options } = await loadSVGFromURL(svgUrl);
+        const filteredObjects = svgObjects.filter((obj): any => obj !== null);
         const item = util.groupSVGElements(filteredObjects, options);
+        
         if (item) {
           // Set name property after creation
           (item as any).name = 'defaultSVG';
-          editor.addBaseType?.(item, { scale: true });
+          
+          // Get SVG dimensions
+          const svgWidth = item.width || 0;
+          const svgHeight = item.height || 0;
+
+          // For first SVG on empty canvas: resize canvas to match SVG (like Photoshop)
+          if (isFirstSVG && isCanvasEmpty && svgWidth && svgHeight) {
+            // Add padding around SVG (like Photoshop)
+            const padding = 100;
+            const canvasWidth = svgWidth + padding * 2;
+            const canvasHeight = svgHeight + padding * 2;
+            
+            // Resize canvas to match SVG dimensions
+            (editor as any).setSize?.(canvasWidth, canvasHeight);
+            
+            // Position SVG with padding
+            item.set({
+              left: padding,
+              top: padding,
+            });
+            
+            isFirstSVG = false;
+          } else {
+            // For subsequent SVGs: position with offset (like Figma)
+            item.set({
+              left: offsetX,
+              top: offsetY,
+            });
+            
+            // Scale to reasonable size if too large (max 800px width)
+            if (svgWidth && svgWidth > 800) {
+              const scale = 800 / svgWidth;
+              item.scale(scale);
+            }
+            
+            // Update offset for next SVG (stagger position)
+            offsetX += 50;
+            offsetY += 50;
+          }
+
+          // Set ID and prepare for batch add
+          item.set({
+            id: `svg-${Date.now()}-${Math.random()}`,
+          });
+          svgItems.push(item);
         }
       }
+
+      // Batch add all SVGs at once (single render)
+      if (svgItems.length > 0) {
+        // Disable rendering during batch add
+        canvas.renderOnAddRemove = false;
+        
+        svgItems.forEach((item) => {
+          canvas.add(item);
+        });
+        
+        // Set last SVG as active
+        canvas.setActiveObject(svgItems[svgItems.length - 1]);
+        
+        // Re-enable rendering and render once
+        canvas.renderOnAddRemove = true;
+        
+        // Use requestAnimationFrame for smooth rendering
+        requestAnimationFrame(() => {
+          canvas.requestRenderAll();
+          
+          // Save state once after all SVGs are added
+          (editor as any).saveState?.();
+          
+          // Auto-zoom to fit after importing
+          requestAnimationFrame(() => {
+            (editor as any)?.auto?.();
+            canvas.requestRenderAll();
+          });
+        });
+      }
+
       toast.success(`Imported ${files.length} SVG(s)`);
     } catch (error) {
       console.error("Error importing SVG:", error);

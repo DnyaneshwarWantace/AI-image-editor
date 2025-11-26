@@ -143,11 +143,9 @@ class ServersPlugin implements IPluginTempl {
     const tempTransform = await this._transform(temp);
 
     jsonFile = JSON.stringify(tempTransform);
-
     // 加载前钩子
     this.editor.hooksEntity.hookImportBefore.callAsync(jsonFile, () => {
-      // In Fabric.js v6, loadFromJSON returns a Promise - use then() instead of callback
-      this.canvas.loadFromJSON(jsonFile).then(() => {
+      this.canvas.loadFromJSON(jsonFile, () => {
         // 把i-text对应的path加上
         this.renderITextPath(textPaths);
         this.canvas.renderAll();

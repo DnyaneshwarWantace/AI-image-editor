@@ -5,7 +5,6 @@ import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { CanvasBackground } from "./canvas-background";
 import { CanvasSizeModal } from "./canvas-size-modal";
@@ -16,16 +15,15 @@ export function CanvasSettings() {
   const [width, setWidth] = useState(800);
   const [height, setHeight] = useState(600);
   const [showSizeModal, setShowSizeModal] = useState(false);
-  const [workspaceMaskEnabled, setWorkspaceMaskEnabled] = useState(false);
 
   useEffect(() => {
     if (!canvas || !editor) return;
 
     const updateSize = () => {
-      const size = editor.getWorkspase?.();
-      if (size) {
-        setWidth(size.width || 800);
-        setHeight(size.height || 600);
+      const workspace = (editor as any).getWorkspace?.();
+      if (workspace) {
+        setWidth(workspace.width || 800);
+        setHeight(workspace.height || 600);
       }
     };
 
@@ -64,18 +62,12 @@ export function CanvasSettings() {
     editor.one?.();
   };
 
-  const handleWorkspaceMaskToggle = (checked: boolean) => {
-    if (!editor) return;
-    (editor as any).workspaceMaskToggle?.();
-    setWorkspaceMaskEnabled(checked);
-  };
-
   return (
     <div className="space-y-6">
       {/* Canvas Size */}
-      <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-gray-900">Canvas Size</h4>
-        <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
+        <h4 className="text-xs font-semibold text-gray-900">Canvas Size</h4>
+        <div className="grid grid-cols-2 gap-2">
           <div className="space-y-2">
             <Label className="text-xs font-medium text-gray-700">Width</Label>
             <div className="flex gap-2">
@@ -132,20 +124,6 @@ export function CanvasSettings() {
       </div>
 
       <CanvasBackground />
-
-      {/* Workspace Mask Toggle */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-medium text-gray-700">Workspace Mask</Label>
-          <Switch
-            checked={workspaceMaskEnabled}
-            onCheckedChange={handleWorkspaceMaskToggle}
-          />
-        </div>
-        <p className="text-xs text-gray-500">
-          Dim the area outside the canvas to focus on your work
-        </p>
-      </div>
 
       <CanvasSizeModal
         open={showSizeModal}

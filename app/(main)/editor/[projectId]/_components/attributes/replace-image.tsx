@@ -68,8 +68,8 @@ export function ReplaceImage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Replace Image</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Replace Image</h4>
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${

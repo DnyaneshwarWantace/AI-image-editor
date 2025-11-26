@@ -181,8 +181,8 @@ export function FiltersPanel() {
   }
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Image Filters</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Image Filters</h4>
 
       <Collapsible defaultOpen>
         <CollapsibleTrigger className="flex items-center justify-between w-full text-sm font-medium text-gray-900">
@@ -209,7 +209,7 @@ export function FiltersPanel() {
           <span>Advanced Filters</span>
           <ChevronDown className="h-4 w-4 text-gray-600" />
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-2 space-y-4">
+        <CollapsibleContent className="mt-2 space-y-3">
           {/* Brightness */}
           <div className="space-y-2">
             <div className="flex items-center space-x-2">

@@ -100,8 +100,8 @@ export function AttributeQRCode() {
   const errorLevels = ["L", "M", "Q", "H"];
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">QR Code Properties</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">QR Code Properties</h4>
 
       <div className="space-y-2">
         <Label className="text-xs font-medium text-gray-700">Content</Label>
@@ -113,7 +113,7 @@ export function AttributeQRCode() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-gray-700">Width</Label>
           <Input
@@ -136,7 +136,7 @@ export function AttributeQRCode() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-gray-700">Dots Color</Label>
           <div className="flex gap-2">
@@ -169,7 +169,7 @@ export function AttributeQRCode() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-gray-700">Outer Corner Color</Label>
           <div className="flex gap-2">
@@ -202,7 +202,7 @@ export function AttributeQRCode() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-gray-700">Inner Corner Color</Label>
           <div className="flex gap-2">
@@ -235,7 +235,7 @@ export function AttributeQRCode() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-gray-700">Background</Label>
           <div className="flex gap-2">

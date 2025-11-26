@@ -437,7 +437,7 @@ export function LayersPanel() {
       </div>
 
       {/* Layers List */}
-      <div className="flex-1 overflow-y-auto space-y-0.5 pr-1">
+      <div className="flex-1 overflow-y-auto space-y-0.5 pr-1 scrollbar-thin">
         {layers.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 text-sm">No objects on canvas</p>

@@ -61,8 +61,8 @@ export function CanvasBackground() {
   };
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Background Color</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Background Color</h4>
 
       <div className="space-y-2">
         <Label className="text-xs font-medium text-gray-700">Color</Label>

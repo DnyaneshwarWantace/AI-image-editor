@@ -63,16 +63,16 @@ export function RightSidebar() {
     <div className="relative">
       <div
         className={cn(
-          "bg-white transition-all duration-300 border-l overflow-y-auto h-full",
-          isExpanded ? "w-[380px]" : "w-0"
+          "bg-white transition-all duration-300 border-l overflow-y-auto h-full scrollbar-thin",
+          isExpanded ? "w-[310px]" : "w-0"
         )}
         style={{ borderColor: "#eef2f8" }}
       >
-        <div className="p-4">
+        <div className="p-2">
           {/* No Selection - Canvas Settings */}
           {selectionMode === "none" && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900">
+            <div className="space-y-3">
+              <h3 className="text-xs font-semibold text-gray-900">
                 Canvas Settings
               </h3>
               <CanvasSettings />
@@ -81,8 +81,8 @@ export function RightSidebar() {
 
           {/* Multiple Selection */}
           {selectionMode === "multiple" && (
-            <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-gray-900">
+            <div className="space-y-4">
+              <h3 className="text-xs font-semibold text-gray-900">
                 Multiple Objects Selected
               </h3>
               <GroupControls />
@@ -93,8 +93,8 @@ export function RightSidebar() {
 
               {/* Single Selection */}
               {selectionMode === "one" && (
-                <div className="space-y-6">
-                  <h3 className="text-sm font-semibold text-gray-900">
+                <div className="space-y-4">
+                  <h3 className="text-xs font-semibold text-gray-900">
                     Object Properties
                   </h3>
                   <QuickActions />
@@ -126,10 +126,10 @@ export function RightSidebar() {
       {/* Toggle Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute left-[-20px] top-1/2 -translate-y-1/2 w-5 h-16 bg-white border rounded-l cursor-pointer hover:bg-gray-50 transition-all z-10 flex items-center justify-center"
+        className="absolute left-[-16px] top-1/2 -translate-y-1/2 w-3.5 h-12 bg-white border rounded-l cursor-pointer hover:bg-gray-50 transition-all z-10 flex items-center justify-center"
         style={{ borderColor: "#eef2f8" }}
       >
-        <div className="text-gray-400">
+        <div className="text-gray-400 text-xs">
           {isExpanded ? "›" : "‹"}
         </div>
       </button>

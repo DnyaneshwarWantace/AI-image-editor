@@ -70,89 +70,13 @@ class WorkspacePlugin implements IPluginTempl {
     this._bindWheel()
   }
 
-  fitObjectsToWorkspace() {
-    const workspace = this.getWorkspace()
-    if (!workspace || !workspace.width || !workspace.height) return
-
-    const workspaceWidth = workspace.width
-    const workspaceHeight = workspace.height
-    const workspaceLeft = workspace.left || 0
-    const workspaceTop = workspace.top || 0
-
-    // Get all objects except workspace
-    const objects = this.canvas.getObjects().filter((obj: any) => obj.id !== 'workspace')
-    if (objects.length === 0) return
-
-    // Disable rendering during batch operations for performance
-    this.canvas.renderOnAddRemove = false
-
-    // Calculate bounding box of all objects
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
-
-    for (const obj of objects) {
-      const bounds = obj.getBoundingRect()
-      minX = Math.min(minX, bounds.left)
-      minY = Math.min(minY, bounds.top)
-      maxX = Math.max(maxX, bounds.left + bounds.width)
-      maxY = Math.max(maxY, bounds.top + bounds.height)
-    }
-
-    const contentWidth = maxX - minX
-    const contentHeight = maxY - minY
-
-    // Calculate scale to fit within workspace
-    const padding = 20
-    const scale = Math.min(
-      (workspaceWidth - padding * 2) / contentWidth,
-      (workspaceHeight - padding * 2) / contentHeight,
-      1 // Don't scale up, only down
-    )
-
-    // Calculate center offset
-    const centerX = workspaceLeft + workspaceWidth / 2
-    const centerY = workspaceTop + workspaceHeight / 2
-    const contentCenterX = minX + contentWidth / 2
-    const contentCenterY = minY + contentHeight / 2
-
-    // Apply transformations to all objects in batch
-    for (const obj of objects) {
-      const relativeX = (obj.left || 0) - contentCenterX
-      const relativeY = (obj.top || 0) - contentCenterY
-
-      obj.set({
-        scaleX: (obj.scaleX || 1) * scale,
-        scaleY: (obj.scaleY || 1) * scale,
-        left: centerX + relativeX * scale,
-        top: centerY + relativeY * scale,
-      })
-      obj.setCoords()
-    }
-
-    // Re-enable rendering and render once
-    this.canvas.renderOnAddRemove = true
-    this.canvas.requestRenderAll()
-  }
-
   hookImportAfter() {
     return new Promise((resolve) => {
       const workspace = this.canvas.getObjects().find((item) => (item as any).id === 'workspace')
       if (workspace) {
-        // Lock workspace completely - cannot be selected, moved, or edited
-        workspace.set({
-          selectable: false,
-          hasControls: false,
-          evented: false,
-          lockMovementX: true,
-          lockMovementY: true,
-          lockRotation: true,
-          lockScalingX: true,
-          lockScalingY: true,
-          hoverCursor: 'default',
-        })
-
-        // Move workspace to back to ensure it stays as background
-        this.canvas.sendObjectToBack(workspace)
-
+        workspace.set('selectable', false)
+        workspace.set('hasControls', false)
+        workspace.set('evented', false)
         if (workspace.width && workspace.height) {
           this.setSize(workspace.width, workspace.height)
           this.editor.emit('sizeChange', workspace.width, workspace.height)
@@ -192,55 +116,19 @@ class WorkspacePlugin implements IPluginTempl {
       height,
       id: 'workspace',
       strokeWidth: 0,
-      selectable: false,
-      hasControls: false,
-      evented: false,
-      lockMovementX: true,
-      lockMovementY: true,
-      lockRotation: true,
-      lockScalingX: true,
-      lockScalingY: true,
-      hoverCursor: 'default',
     })
-
+    workspace.set('selectable', false)
+    workspace.set('hasControls', false)
+    workspace.hoverCursor = 'default'
     this.canvas.add(workspace)
-    this.canvas.sendObjectToBack(workspace)
     this.canvas.renderAll()
 
     this.workspace = workspace
-
-    // Prevent workspace deletion
-    this._preventWorkspaceDeletion()
-
     // historyClear is a custom method added by fabric-history.ts
     if ((this.canvas as any).historyClear) {
       (this.canvas as any).historyClear()
     }
     this.auto()
-  }
-
-  // Prevent workspace from being deleted
-  _preventWorkspaceDeletion() {
-    this.canvas.on('before:selection:cleared', (e: any) => {
-      const workspace = this.getWorkspace()
-      if (workspace && e.deselected && e.deselected.includes(workspace)) {
-        // Prevent workspace from being removed from canvas
-        workspace.set({
-          selectable: false,
-          evented: false,
-        })
-      }
-    })
-
-    // Override delete behavior to protect workspace
-    const originalRemove = this.canvas.remove.bind(this.canvas) as any
-    this.canvas.remove = ((...objects: any[]) => {
-      const filtered = objects.filter((obj) => (obj as any).id !== 'workspace')
-      if (filtered.length > 0) {
-        return originalRemove(...filtered)
-      }
-      return originalRemove()
-    }) as any
   }
 
   // 返回workspace对象

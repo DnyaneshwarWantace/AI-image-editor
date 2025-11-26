@@ -47,7 +47,7 @@ class MaskPlugin implements IPluginTempl {
     } else {
       // 如果有 则删除
       workspaceMask && this.canvas.remove(workspaceMask)
-      this.workspace!.clone((cloned: Rect) => {
+      this.workspace!.clone().then((cloned: Rect) => {
         this.canvas.clipPath = cloned
         this.coverMask = null
         this.canvas.requestRenderAll()
@@ -67,12 +67,12 @@ class MaskPlugin implements IPluginTempl {
    * @returns object
    */
   getWorkspaceMask() {
-    return this.canvas.getObjects().find((item) => item.id === 'coverMask') as Rect
+    return this.canvas.getObjects().find((item) => (item as any).id === 'coverMask') as Rect
   }
 
   // 返回workspace对象
   getWorkspace() {
-    return this.canvas.getObjects().find((item) => item.id === 'workspace') as Rect
+    return this.canvas.getObjects().find((item) => (item as any).id === 'workspace') as Rect
   }
 
   setOverMask(hack = false) {
@@ -99,7 +99,7 @@ class MaskPlugin implements IPluginTempl {
       this.coverMask.height = cHeight
       this.coverMask.left = (this.workspace.left || 0) + (this.workspace.width! - cWidth) / 2
       this.coverMask.top = (this.workspace.top || 0) + (this.workspace.height! - cHeight) / 2
-      this.workspace.clone((clone: Rect) => {
+      this.workspace.clone().then((clone: Rect) => {
         clone.left = -clone.width! / 2
         clone.top = -clone.height! / 2
         clone.inverted = true

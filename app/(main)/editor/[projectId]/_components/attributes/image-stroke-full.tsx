@@ -70,10 +70,10 @@ export function ImageStrokeFull() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h4 className="text-sm font-semibold text-gray-900">Image Stroke</h4>
+          <h4 className="text-xs font-semibold text-gray-900">Image Stroke</h4>
           <AlertCircle className="h-4 w-4 text-orange-500" title="Only supports PNG transparent images" />
         </div>
         <Switch checked={enabled} onCheckedChange={handleToggle} />

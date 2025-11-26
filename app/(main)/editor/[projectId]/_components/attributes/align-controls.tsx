@@ -50,8 +50,8 @@ export function AlignControls() {
   if (activeObjects.length < 2) return null;
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Align</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Align</h4>
       <div className="grid grid-cols-3 gap-2">
         <Button variant="outline" size="sm" onClick={() => alignObjects("left")}>
           <AlignLeft className="h-4 w-4" />

@@ -54,8 +54,8 @@ export function ClipImage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Clip Image</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Clip Image</h4>
       <div className="space-y-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

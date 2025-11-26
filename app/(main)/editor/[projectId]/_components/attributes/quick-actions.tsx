@@ -87,7 +87,7 @@ export function QuickActions() {
 
   return (
     <div className="space-y-2">
-      <h4 className="text-sm font-semibold text-gray-900">Quick Actions</h4>
+      <h4 className="text-xs font-semibold text-gray-900">Quick Actions</h4>
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" size="sm" onClick={handleClone} title="Clone (Ctrl+C)">
           <Copy className="h-4 w-4 mr-1" />

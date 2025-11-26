@@ -52,8 +52,8 @@ export function AttributeBorder() {
   if (!activeObject) return null;
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Border</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Border</h4>
 
       <div className="space-y-2">
         <div className="flex justify-between">

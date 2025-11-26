@@ -97,8 +97,8 @@ export function AttributeBarcode() {
   ];
 
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-semibold text-gray-900">Barcode Properties</h4>
+    <div className="space-y-3">
+      <h4 className="text-xs font-semibold text-gray-900">Barcode Properties</h4>
 
       <div className="space-y-2">
         <Label className="text-xs font-medium text-gray-700">Code</Label>
@@ -174,7 +174,7 @@ export function AttributeBarcode() {
         </>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-gray-700">Barcode Color</Label>
           <div className="flex gap-2">

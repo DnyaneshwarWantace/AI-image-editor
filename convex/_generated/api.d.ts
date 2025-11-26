@@ -17,6 +17,7 @@ import type * as materials from "../materials.js";
 import type * as projects from "../projects.js";
 import type * as sizes from "../sizes.js";
 import type * as templates from "../templates.js";
+import type * as textVariations from "../textVariations.js";
 import type * as webSite from "../webSite.js";
 
 import type {
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   projects: typeof projects;
   sizes: typeof sizes;
   templates: typeof templates;
+  textVariations: typeof textVariations;
   webSite: typeof webSite;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

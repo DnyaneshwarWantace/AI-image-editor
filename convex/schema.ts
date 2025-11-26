@@ -172,5 +172,23 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
+
+  // Text Variations (for A/B testing and multi-ad generation)
+  textVariations: defineTable({
+    projectId: v.id("projects"), // Which project these variations belong to
+    elementId: v.string(), // Canvas element ID
+    originalText: v.string(), // Original text content
+    variations: v.array(
+      v.object({
+        id: v.string(),
+        text: v.string(),
+        type: v.string(), // "manual" or "ai"
+        language: v.optional(v.string()), // Language if AI-generated
+      })
+    ),
+    userId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }),
 });
 

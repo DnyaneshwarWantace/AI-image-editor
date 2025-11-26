@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
-import { Loader2, Monitor } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { EditorLayout } from "./_components/editor-layout";
 import { CanvasProvider } from "@/providers/canvas-provider";
 
@@ -60,24 +60,7 @@ export default function EditorPage() {
 
   return (
     <CanvasProvider>
-      {/* Mobile Message - Show on screens smaller than lg (1024px) */}
-      <div className="lg:hidden min-h-screen bg-black flex items-center justify-center p-6">
-        <div className="text-center max-w-md">
-          <Monitor className="h-16 w-16 text-white mx-auto mb-6" />
-          <h1 className="text-2xl font-bold text-white mb-4">
-            Desktop Required
-          </h1>
-          <p className="text-white/70 text-lg mb-2">
-            This editor is only usable on desktop.
-          </p>
-          <p className="text-white/50 text-sm">
-            Please use a larger screen to access the full editing experience.
-          </p>
-        </div>
-      </div>
-
-      {/* Desktop Editor - Show on lg screens and above */}
-      <div className="hidden lg:block h-screen">
+      <div className="h-screen">
         <EditorLayout project={currentProject} />
       </div>
     </CanvasProvider>

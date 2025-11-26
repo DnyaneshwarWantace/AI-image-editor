@@ -21,8 +21,8 @@ export function CropImage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-gray-900">Crop Image</h4>
+      <div className="space-y-3">
+        <h4 className="text-xs font-semibold text-gray-900">Crop Image</h4>
         <Button variant="outline" size="sm" onClick={handleCrop} className="w-full">
           <Crop className="h-4 w-4 mr-2" />
           Crop Image
