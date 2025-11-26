@@ -68,25 +68,17 @@ export function TemplatesPanel() {
 
     try {
       if (template.json) {
-        const jsonData = typeof template.json === "string" ? JSON.parse(template.json) : template.json;
-        // In Fabric.js v6, loadFromJSON returns a Promise
-        await canvas.loadFromJSON(jsonData);
+        const jsonString = typeof template.json === "string" ? template.json : JSON.stringify(template.json);
 
-        // Find and update workspace size from loaded template
-        const workspace = canvas.getObjects().find((obj: any) => obj.id === "workspace");
-        if (workspace && workspace.width && workspace.height) {
-          (editor as any)?.setSize?.(workspace.width, workspace.height);
-        }
-
-        canvas.requestRenderAll();
-
-        // Auto-zoom to fit the workspace after loading template with longer delay
-        setTimeout(() => {
-          (editor as any)?.auto?.();
-          canvas.requestRenderAll();
-        }, 300);
-
-        toast.success("Template loaded");
+        // Use editor.loadJSON instead of canvas.loadFromJSON to trigger hooks
+        (editor as any).loadJSON?.(jsonString, () => {
+          // Give a small delay for rendering to complete, then auto-zoom
+          setTimeout(() => {
+            (editor as any)?.auto?.();
+            canvas.requestRenderAll();
+          }, 50);
+          toast.success("Template loaded");
+        });
       } else {
         toast.error("Template data not available");
       }

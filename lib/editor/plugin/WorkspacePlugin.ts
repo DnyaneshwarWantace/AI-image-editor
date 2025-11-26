@@ -70,6 +70,69 @@ class WorkspacePlugin implements IPluginTempl {
     this._bindWheel()
   }
 
+  fitObjectsToWorkspace() {
+    const workspace = this.getWorkspace()
+    if (!workspace || !workspace.width || !workspace.height) return
+
+    const workspaceWidth = workspace.width
+    const workspaceHeight = workspace.height
+    const workspaceLeft = workspace.left || 0
+    const workspaceTop = workspace.top || 0
+
+    // Get all objects except workspace
+    const objects = this.canvas.getObjects().filter((obj: any) => obj.id !== 'workspace')
+    if (objects.length === 0) return
+
+    // Disable rendering during batch operations for performance
+    this.canvas.renderOnAddRemove = false
+
+    // Calculate bounding box of all objects
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+
+    for (const obj of objects) {
+      const bounds = obj.getBoundingRect()
+      minX = Math.min(minX, bounds.left)
+      minY = Math.min(minY, bounds.top)
+      maxX = Math.max(maxX, bounds.left + bounds.width)
+      maxY = Math.max(maxY, bounds.top + bounds.height)
+    }
+
+    const contentWidth = maxX - minX
+    const contentHeight = maxY - minY
+
+    // Calculate scale to fit within workspace
+    const padding = 20
+    const scale = Math.min(
+      (workspaceWidth - padding * 2) / contentWidth,
+      (workspaceHeight - padding * 2) / contentHeight,
+      1 // Don't scale up, only down
+    )
+
+    // Calculate center offset
+    const centerX = workspaceLeft + workspaceWidth / 2
+    const centerY = workspaceTop + workspaceHeight / 2
+    const contentCenterX = minX + contentWidth / 2
+    const contentCenterY = minY + contentHeight / 2
+
+    // Apply transformations to all objects in batch
+    for (const obj of objects) {
+      const relativeX = (obj.left || 0) - contentCenterX
+      const relativeY = (obj.top || 0) - contentCenterY
+
+      obj.set({
+        scaleX: (obj.scaleX || 1) * scale,
+        scaleY: (obj.scaleY || 1) * scale,
+        left: centerX + relativeX * scale,
+        top: centerY + relativeY * scale,
+      })
+      obj.setCoords()
+    }
+
+    // Re-enable rendering and render once
+    this.canvas.renderOnAddRemove = true
+    this.canvas.requestRenderAll()
+  }
+
   hookImportAfter() {
     return new Promise((resolve) => {
       const workspace = this.canvas.getObjects().find((item) => (item as any).id === 'workspace')
