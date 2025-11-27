@@ -41,7 +41,7 @@ export function WatermarkButton() {
 
   useEffect(() => {
     if (editor) {
-      editor.getFontList?.().then((fontList: any[]) => {
+      (editor as any).getFontList?.().then((fontList: any[]) => {
         setFonts(fontList.map((f: any) => f.name || f));
       });
     }
@@ -75,7 +75,7 @@ export function WatermarkButton() {
   const handleClear = () => {
     if (!editor) return;
     try {
-      editor.clearWaterMMatk?.();
+      (editor as any).clearWaterMark?.();
       setText("");
       setSize(24);
       setFontFamily("Arial");

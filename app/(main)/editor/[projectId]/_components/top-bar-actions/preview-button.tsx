@@ -27,6 +27,7 @@ export function PreviewButton() {
       const dataURL = canvas.toDataURL({
         format: "png",
         quality: 1.0,
+        multiplier: 1,
       });
       setPreviewUrl(dataURL);
       setPreviewOpen(true);

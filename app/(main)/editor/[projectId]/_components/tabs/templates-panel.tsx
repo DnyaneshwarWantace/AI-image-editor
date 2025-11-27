@@ -8,9 +8,12 @@ import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useParams } from "next/navigation";
 
 export function TemplatesPanel() {
   const { canvas, editor } = useCanvasContext();
+  const params = useParams();
+  const projectId = params.projectId as string;
   const [selectedType, setSelectedType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -69,22 +72,117 @@ export function TemplatesPanel() {
     try {
       if (template.json) {
         const jsonData = typeof template.json === "string" ? JSON.parse(template.json) : template.json;
+
+        // Get template dimensions BEFORE loading
+        let templateWidth = jsonData.width || canvas.getWidth();
+        let templateHeight = jsonData.height || canvas.getHeight();
+
+        // Also check if there's a workspace object with dimensions
+        if (jsonData.objects) {
+          const workspace = jsonData.objects.find((obj: any) => obj.id === "workspace");
+          if (workspace && workspace.width && workspace.height) {
+            templateWidth = workspace.width;
+            templateHeight = workspace.height;
+          }
+        }
+
+        // Mark canvas as loading to prevent interference
+        (canvas as any)._isLoadingFromJSON = true;
+
+        // Clear existing canvas objects first (except workspace if it exists)
+        const existingObjects = canvas.getObjects();
+        const workspace = existingObjects.find((obj: any) => (obj as any).id === 'workspace');
+        
+        // Remove all objects except workspace
+        existingObjects.forEach((obj: any) => {
+          if ((obj as any).id !== 'workspace') {
+            canvas.remove(obj);
+          }
+        });
+
+        // Emit canvas size change event FIRST (before resize)
+        window.dispatchEvent(new CustomEvent('canvasSizeChange', {
+          detail: { width: templateWidth, height: templateHeight }
+        }));
+
+        // Resize canvas to match template dimensions
+        canvas.setDimensions({
+          width: templateWidth,
+          height: templateHeight,
+        });
+
+        // Wait for canvas to be ready after resize
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => {
+            // Ensure canvas context is ready
+            if (canvas.getContext()) {
+              resolve();
+            } else {
+              setTimeout(() => resolve(), 50);
+            }
+          });
+        });
+
+        // Wait a bit more for size change to propagate
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Load fonts BEFORE loading template JSON (if hookImportBefore exists)
+        const templateJsonString = typeof template.json === "string" ? template.json : JSON.stringify(template.json);
+        if ((editor as any).hooksEntity?.hookImportBefore) {
+          await new Promise<void>((resolve) => {
+            (editor as any).hooksEntity.hookImportBefore.callAsync(templateJsonString, () => {
+              resolve();
+            });
+          });
+        }
+
         // In Fabric.js v6, loadFromJSON returns a Promise
         await canvas.loadFromJSON(jsonData);
 
-        // Find and update workspace size from loaded template
-        const workspace = canvas.getObjects().find((obj: any) => obj.id === "workspace");
-        if (workspace && workspace.width && workspace.height) {
-          (editor as any)?.setSize?.(workspace.width, workspace.height);
+        // Ensure workspace is configured after load
+        const loadedObjects = canvas.getObjects();
+        const loadedWorkspace = loadedObjects.find((obj: any) => (obj as any).id === 'workspace');
+        if (loadedWorkspace) {
+          loadedWorkspace.set({
+            selectable: false,
+            hasControls: false,
+            evented: false,
+            excludeFromExport: false,
+          });
         }
 
+        // Clear loading flag after a short delay
+        setTimeout(() => {
+          delete (canvas as any)._isLoadingFromJSON;
+        }, 200);
+
+        // Force render
         canvas.requestRenderAll();
 
-        // Auto-zoom to fit the workspace after loading template with longer delay
-        setTimeout(() => {
-          (editor as any)?.auto?.();
-          canvas.requestRenderAll();
-        }, 300);
+        // Save updated canvas state and metadata to localStorage
+        try {
+          const canvasJSON = canvas.toJSON();
+          localStorage.setItem(`project-${projectId}`, JSON.stringify(canvasJSON));
+          
+          // Update project metadata with new dimensions
+          const existingMeta = localStorage.getItem(`project-meta-${projectId}`);
+          let meta: any = {};
+          if (existingMeta) {
+            try {
+              meta = JSON.parse(existingMeta);
+            } catch (e) {
+              // Ignore parse errors
+            }
+          }
+          
+          meta.width = templateWidth;
+          meta.height = templateHeight;
+          meta.updatedAt = Date.now();
+          
+          localStorage.setItem(`project-meta-${projectId}`, JSON.stringify(meta));
+        } catch (saveError) {
+          console.warn('Could not save template dimensions to metadata:', saveError);
+        }
 
         toast.success("Template loaded");
       } else {

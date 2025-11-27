@@ -19,47 +19,88 @@ export function CanvasSettings() {
   useEffect(() => {
     if (!canvas || !editor) return;
 
-    const updateSize = () => {
-      const workspace = (editor as any).getWorkspace?.();
-      if (workspace) {
-        setWidth(workspace.width || 800);
-        setHeight(workspace.height || 600);
-      }
+    // Get current canvas size
+    const currentSize = (editor as any).getCanvasSize?.();
+    if (currentSize) {
+      setWidth(currentSize.width || 800);
+      setHeight(currentSize.height || 600);
+    } else {
+      // Fallback to canvas dimensions
+      setWidth(canvas.getWidth() || 800);
+      setHeight(canvas.getHeight() || 600);
+    }
+
+    // Listen for canvas size change events
+    const handleSizeChange = (event: CustomEvent) => {
+      const { width, height } = event.detail;
+      setWidth(width);
+      setHeight(height);
     };
 
-    updateSize();
-    editor.on?.("sizeChange", (w: number, h: number) => {
-      setWidth(w);
-      setHeight(h);
-    });
+    window.addEventListener('canvasSizeChange' as any, handleSizeChange);
+
+    return () => {
+      window.removeEventListener('canvasSizeChange' as any, handleSizeChange);
+    };
   }, [canvas, editor]);
 
   const handleSizeChange = (w: number, h: number) => {
-    if (editor) {
-      editor.setSize?.(w, h);
+    if (editor && canvas) {
+      // Use the new setCanvasSize method
+      (editor as any).setCanvasSize?.(w, h);
       setWidth(w);
       setHeight(h);
+
+      // Save to localStorage for persistence
+      try {
+        const projectId = window.location.pathname.split('/').pop();
+        if (projectId) {
+          const storedMeta = localStorage.getItem(`project-meta-${projectId}`);
+          let meta: any = {};
+
+          if (storedMeta) {
+            try {
+              meta = JSON.parse(storedMeta);
+            } catch (e) {
+              console.error('Error parsing stored metadata:', e);
+            }
+          }
+
+          meta.width = w;
+          meta.height = h;
+          meta.updatedAt = Date.now();
+
+          localStorage.setItem(`project-meta-${projectId}`, JSON.stringify(meta));
+        }
+      } catch (error) {
+        console.error('Error saving canvas dimensions:', error);
+      }
+
+      // Emit custom event for other components
+      window.dispatchEvent(new CustomEvent('canvasSizeChange', {
+        detail: { width: w, height: h }
+      }));
     }
   };
 
   const handleZoomIn = () => {
-    if (!editor) return;
-    editor.big?.();
+    // Zoom is now handled by ZoomControls component
+    window.dispatchEvent(new CustomEvent('canvasZoom', { detail: { action: 'in' } }));
   };
 
   const handleZoomOut = () => {
-    if (!editor) return;
-    editor.small?.();
+    // Zoom is now handled by ZoomControls component
+    window.dispatchEvent(new CustomEvent('canvasZoom', { detail: { action: 'out' } }));
   };
 
   const handleZoomFit = () => {
-    if (!editor) return;
-    editor.auto?.();
+    // Zoom is now handled by ZoomControls component
+    window.dispatchEvent(new CustomEvent('canvasZoom', { detail: { action: 'fit' } }));
   };
 
   const handleZoom100 = () => {
-    if (!editor) return;
-    editor.one?.();
+    // Zoom is now handled by ZoomControls component
+    window.dispatchEvent(new CustomEvent('canvasZoom', { detail: { action: '100' } }));
   };
 
   return (

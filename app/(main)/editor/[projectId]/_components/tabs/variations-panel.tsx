@@ -20,14 +20,23 @@ interface TextElement {
   variationCount: number;
 }
 
+// Helper function to check if a string looks like a valid Convex ID
+function isValidConvexId(id: string): boolean {
+  if (!id || typeof id !== 'string') return false;
+  // Convex IDs are base32 encoded: start with letter, followed by alphanumeric
+  // Typical format: j1234567890abcdefghijklmnopqrstuv
+  const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
+  return convexIdPattern.test(id) && id.length >= 16;
+}
+
 export function VariationsPanel() {
   const { canvas } = useCanvasContext();
   const params = useParams();
   const projectIdParam = params.projectId as string;
 
-  // Check if projectId is a valid Convex ID (starts with a table prefix)
-  const isValidConvexId = projectIdParam && projectIdParam.startsWith("j");
-  const projectId = isValidConvexId ? (projectIdParam as Id<"projects">) : null;
+  // Check if projectId is a valid Convex ID
+  const isValidId = isValidConvexId(projectIdParam);
+  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
 
   const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -48,18 +57,16 @@ export function VariationsPanel() {
     const objects = canvas.getObjects();
     const texts: TextElement[] = [];
 
-    // Load localStorage variations if no Convex data
+    // Load localStorage variations as fallback
     let localVariations: Record<string, any> = {};
-    if (!projectId) {
-      try {
-        const storageKey = `variations-${projectIdParam}`;
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-          localVariations = JSON.parse(stored);
-        }
-      } catch (error) {
-        console.error("Error loading localStorage variations:", error);
+    try {
+      const storageKey = `variations-${projectIdParam}`;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        localVariations = JSON.parse(stored);
       }
+    } catch (error) {
+      console.error("Error loading localStorage variations:", error);
     }
 
     objects.forEach((obj: any, index: number) => {
@@ -76,8 +83,10 @@ export function VariationsPanel() {
 
       if (isTextObject) {
         const textId = obj.id || `text-${index}`;
-        // Get count from Convex or localStorage
-        const count = variationCounts?.[textId] || localVariations[textId]?.variations?.length || 0;
+        // Prioritize Convex data, fallback to localStorage
+        const count = projectId && variationCounts
+          ? (variationCounts[textId] || 0)
+          : (localVariations[textId]?.variations?.length || 0);
 
         texts.push({
           id: textId,
@@ -141,44 +150,84 @@ export function VariationsPanel() {
   };
 
   const handleSaveVariations = async (variations: string[]) => {
-    if (!selectedElement) return;
+    if (!selectedElement || !canvas) return;
 
     try {
+      // Ensure the canvas object has an ID - assign one if missing
+      const canvasObject = selectedElement.object;
+      if (!canvasObject.id) {
+        // Import uuid if not already imported
+        const { v4: uuid } = await import('uuid');
+        const newId = uuid();
+        canvasObject.set('id', newId);
+        // Update selectedElement to use the new ID
+        selectedElement.id = newId;
+        canvas.requestRenderAll();
+        console.log(`✅ Assigned ID to text object: ${newId}`);
+      }
+
+      // Use the actual canvas object ID (now guaranteed to exist)
+      const elementId = canvasObject.id || selectedElement.id;
+
       // Convert variations to the format expected by Convex
       const variationsData = variations.map((text, index) => ({
-        id: `${selectedElement.id}-var-${index}-${Date.now()}`,
+        id: `${elementId}-var-${index}-${Date.now()}`,
         text,
         type: "manual", // We can enhance this to distinguish between manual and AI
         language: undefined,
       }));
 
+      // Always try to save to Convex if we have a valid project ID
       if (projectId) {
-        // Save to Convex if we have a valid project ID
-        await saveVariationsMutation({
-          projectId,
-          elementId: selectedElement.id,
-          originalText: selectedElement.text,
-          variations: variationsData,
-          userId: undefined, // TODO: Get from auth context
-        });
-        console.log("✅ Variations saved to Convex");
+        try {
+          await saveVariationsMutation({
+            projectId,
+            elementId: elementId, // Use the guaranteed ID
+            originalText: selectedElement.text,
+            variations: variationsData,
+            userId: undefined, // TODO: Get from auth context
+          });
+          console.log("✅ Variations saved to Convex backend");
+          
+          // Also save to localStorage as backup
+          const storageKey = `variations-${projectIdParam}`;
+          const stored = localStorage.getItem(storageKey);
+          const allVariations = stored ? JSON.parse(stored) : {};
+          allVariations[elementId] = { // Use the guaranteed ID
+            originalText: selectedElement.text,
+            variations: variationsData,
+          };
+          localStorage.setItem(storageKey, JSON.stringify(allVariations));
+        } catch (convexError) {
+          console.error("❌ Failed to save to Convex, falling back to localStorage:", convexError);
+          // Fallback to localStorage if Convex save fails
+          const storageKey = `variations-${projectIdParam}`;
+          const stored = localStorage.getItem(storageKey);
+          const allVariations = stored ? JSON.parse(stored) : {};
+          allVariations[elementId] = { // Use the guaranteed ID
+            originalText: selectedElement.text,
+            variations: variationsData,
+          };
+          localStorage.setItem(storageKey, JSON.stringify(allVariations));
+          console.log("✅ Variations saved to localStorage (fallback)");
+        }
       } else {
         // Store in localStorage for non-Convex projects
         const storageKey = `variations-${projectIdParam}`;
         const stored = localStorage.getItem(storageKey);
         const allVariations = stored ? JSON.parse(stored) : {};
-        allVariations[selectedElement.id] = {
+        allVariations[elementId] = { // Use the guaranteed ID
           originalText: selectedElement.text,
           variations: variationsData,
         };
         localStorage.setItem(storageKey, JSON.stringify(allVariations));
-        console.log("✅ Variations saved to localStorage");
+        console.log("✅ Variations saved to localStorage (non-Convex project)");
       }
 
       // Update local state to show variation count immediately
       setTextElements((prev) =>
         prev.map((el) =>
-          el.id === selectedElement.id
+          el.id === elementId // Use the guaranteed ID
             ? { ...el, variationCount: variations.length }
             : el
         )

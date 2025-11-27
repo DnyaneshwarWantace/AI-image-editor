@@ -23,6 +23,8 @@ import {
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
 import type { ExportFormat } from "@/types/editor";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { ImportMenu } from "./top-bar-actions/import-menu";
 import { PreviewButton } from "./top-bar-actions/preview-button";
 import { WatermarkButton } from "./top-bar-actions/watermark-button";
@@ -75,10 +77,8 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
-  // TODO: Enable Convex once it's set up with ConvexProvider
-  // const { mutate: updateProject, isLoading: isSaving } = useConvexMutation(
-  //   api.projects.updateProject
-  // );
+  // Convex mutation for saving projects
+  const updateProjectMutation = useMutation(api.projects.updateProject);
 
   // Undo/Redo
   const handleUndo = () => {
@@ -158,7 +158,7 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
   };
 
   // Clear Canvas
-  const handleClearCanvas = () => {
+  const handleClearCanvas = async () => {
     if (!canvas) {
       toast.error("Canvas not ready");
       return;
@@ -172,12 +172,55 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
     if (confirmed) {
       try {
         editor?.clear?.();
-        toast.success("Canvas cleared");
+
+        // Save cleared state
+        const canvasJSON = canvas.toJSON();
+
+        // Generate thumbnail (will be empty/white after clear)
+        const thumbnail = canvas.toDataURL({
+          format: 'png',
+          quality: 0.8,
+          multiplier: 0.3,
+        });
+
+        // Always save to localStorage as backup
+        localStorage.setItem(`project-${project._id}`, JSON.stringify(canvasJSON));
+        const meta = {
+          width: canvas.getWidth(),
+          height: canvas.getHeight(),
+          title: project.title || 'Untitled Project',
+          updatedAt: Date.now(),
+        };
+        localStorage.setItem(`project-meta-${project._id}`, JSON.stringify(meta));
+
+        // Save to Convex backend only if project ID is a valid Convex ID
+        if (project._id && typeof project._id === 'string' && isValidConvexId(project._id)) {
+          try {
+            await updateProjectMutation({
+              projectId: project._id as any,
+              canvasState: canvasJSON,
+              width: canvas.getWidth(),
+              height: canvas.getHeight(),
+              imageUrl: thumbnail,
+            });
+          } catch (saveError) {
+            console.warn('Could not save to Convex, saved to localStorage:', saveError);
+          }
+        }
+
+        toast.success("Canvas cleared and saved");
       } catch (error) {
         console.error("Error clearing canvas:", error);
         toast.error("Failed to clear canvas");
       }
     }
+  };
+
+  // Helper to check if ID is valid Convex ID
+  const isValidConvexId = (id: string): boolean => {
+    if (!id || typeof id !== 'string') return false;
+    const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
+    return convexIdPattern.test(id) && id.length >= 16;
   };
 
   // Save
@@ -190,17 +233,43 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
     try {
       setIsSaving(true);
       const canvasJSON = canvas.toJSON();
-      
-      // TODO: Enable Convex saving once it's set up
-      // await updateProject({
-      //   projectId: project._id,
-      //   canvasState: canvasJSON,
-      // });
-      
-      // For now, just save to localStorage as a fallback
+
+      // Generate thumbnail for preview (smaller size for better performance)
+      const thumbnail = canvas.toDataURL({
+        format: 'png',
+        quality: 0.8,
+        multiplier: 0.3, // 30% of original size for thumbnail
+      });
+
+      // Always save to localStorage as backup
       localStorage.setItem(`project-${project._id}`, JSON.stringify(canvasJSON));
-      
-      toast.success("Project saved to local storage!");
+      const meta = {
+        width: canvas.getWidth(),
+        height: canvas.getHeight(),
+        title: project.title || 'Untitled Project',
+        updatedAt: Date.now(),
+      };
+      localStorage.setItem(`project-meta-${project._id}`, JSON.stringify(meta));
+
+      // Save to Convex backend only if project ID is a valid Convex ID
+      if (project._id && typeof project._id === 'string' && isValidConvexId(project._id)) {
+        try {
+          await updateProjectMutation({
+            projectId: project._id as any,
+            canvasState: canvasJSON,
+            width: canvas.getWidth(),
+            height: canvas.getHeight(),
+            imageUrl: thumbnail, // Save thumbnail for preview
+          });
+          toast.success("Project saved!");
+        } catch (convexError) {
+          console.warn('Could not save to Convex, saved to localStorage:', convexError);
+          toast.success("Project saved to local storage (backend unavailable)");
+        }
+      } else {
+        // Not a valid Convex ID, just save to localStorage
+        toast.success("Project saved to local storage!");
+      }
     } catch (error) {
       console.error("Error saving project:", error);
       toast.error("Failed to save project");
@@ -238,17 +307,105 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
 
       // SVG export
       if (exportConfig.isVector) {
-        const svgString = canvas.toSVG();
-        const blob = new Blob([svgString], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.download = `${project.title}.${exportConfig.extension}`;
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        toast.success("Image exported as SVG!");
+        try {
+          // Get workspace for proper dimensions
+          const workspace = canvas.getObjects().find((item: any) => item.id === 'workspace');
+          
+          // Get all text objects to find fonts used
+          const textObjects = canvas.getObjects().filter((item: any) => 
+            item.type === 'textbox' || item.type === 'i-text' || item.type === 'text'
+          );
+          
+          // Collect unique font families
+          const fontFamilies = Array.from(new Set(
+            textObjects
+              .map((item: any) => item.fontFamily)
+              .filter((font: any) => font && font !== 'Arial' && font !== 'arial')
+          ));
+          
+          // Get font plugin to access font URLs
+          const fontPlugin = (editor as any)?.getPlugin?.('FontPlugin');
+          const fontList = fontPlugin?.cacheList || [];
+          
+          // Build font entry map
+          const fontEntry: Record<string, string> = {};
+          for (const fontFamily of fontFamilies) {
+            const fontItem = fontList.find((item: any) => item.name === fontFamily);
+            if (fontItem?.file) {
+              fontEntry[fontFamily] = fontItem.file;
+            }
+          }
+          
+          // Set font paths if available (for Fabric.js v6)
+          if (Object.keys(fontEntry).length > 0 && typeof (canvas as any).fontPaths !== 'undefined') {
+            (canvas as any).fontPaths = fontEntry;
+          }
+          
+          // Build SVG options
+          let svgOptions: any = {};
+          
+          if (workspace && workspace.width && workspace.height) {
+            svgOptions = {
+              width: String(workspace.width),
+              height: String(workspace.height),
+              viewBox: {
+                x: workspace.left || 0,
+                y: workspace.top || 0,
+                width: workspace.width,
+                height: workspace.height,
+              },
+            };
+          } else {
+            // Fallback to canvas dimensions
+            svgOptions = {
+              width: String(canvas.getWidth()),
+              height: String(canvas.getHeight()),
+            };
+          }
+          
+          // Generate SVG with proper options
+          const svgString = canvas.toSVG(svgOptions);
+          
+          if (!svgString || svgString.trim().length === 0) {
+            throw new Error('SVG generation returned empty string');
+          }
+          
+          // Create blob and download
+          const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.download = `${project.title || 'export'}.${exportConfig.extension}`;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          toast.success("Image exported as SVG!");
+        } catch (svgError) {
+          console.error("SVG export error:", svgError);
+          // Fallback: try simple SVG export
+          try {
+            const svgString = canvas.toSVG();
+            if (svgString && svgString.trim().length > 0) {
+              const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.download = `${project.title || 'export'}.${exportConfig.extension}`;
+              link.href = url;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+              toast.success("Image exported as SVG!");
+            } else {
+              throw new Error('SVG generation failed');
+            }
+          } catch (fallbackError) {
+            console.error("SVG export fallback error:", fallbackError);
+            toast.error("Failed to export SVG. Please try again.");
+          }
+        }
         return;
       }
 

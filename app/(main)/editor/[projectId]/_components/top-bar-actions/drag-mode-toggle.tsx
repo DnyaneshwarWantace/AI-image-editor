@@ -15,12 +15,12 @@ export function DragModeToggle() {
     const handleStartDring = () => setEnabled(true);
     const handleEndDring = () => setEnabled(false);
 
-    editor.on?.("startDring", handleStartDring);
-    editor.on?.("endDring", handleEndDring);
+    (editor as any).on?.("startDring", handleStartDring);
+    (editor as any).on?.("endDring", handleEndDring);
 
     return () => {
-      editor.off?.("startDring", handleStartDring);
-      editor.off?.("endDring", handleEndDring);
+      (editor as any).off?.("startDring", handleStartDring);
+      (editor as any).off?.("endDring", handleEndDring);
     };
   }, [editor]);
 
@@ -28,9 +28,9 @@ export function DragModeToggle() {
     if (!editor) return;
     setEnabled(checked);
     if (checked) {
-      editor.startDring?.();
+      (editor as any).startDring?.();
     } else {
-      editor.endDring?.();
+      (editor as any).endDring?.();
     }
   };
 

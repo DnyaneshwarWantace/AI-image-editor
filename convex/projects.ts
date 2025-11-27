@@ -6,11 +6,17 @@ import type { Id } from "./_generated/dataModel";
 export const getProject = query({
   args: { projectId: v.union(v.id("projects"), v.string()) },
   handler: async (ctx, args) => {
-    // Convert string ID to Convex ID if needed
-    const id = typeof args.projectId === "string" 
-      ? (args.projectId as any as Id<"projects">)
-      : args.projectId;
-    return await ctx.db.get(id);
+    try {
+      // Convert string ID to Convex ID if needed
+      const id = typeof args.projectId === "string" 
+        ? (args.projectId as any as Id<"projects">)
+        : args.projectId;
+      return await ctx.db.get(id);
+    } catch (error) {
+      // If ID is invalid, return null instead of throwing
+      console.warn('Invalid project ID:', args.projectId, error);
+      return null;
+    }
   },
 });
 

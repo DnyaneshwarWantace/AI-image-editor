@@ -47,20 +47,23 @@ export function VariationsManagerModal({
   projectId,
   projectIdParam,
 }: VariationsManagerModalProps) {
-  const { canvas } = useCanvasContext();
+  const { canvas, editor } = useCanvasContext();
   const [generatedAds, setGeneratedAds] = useState<GeneratedAd[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [localVariationsData, setLocalVariationsData] = useState<any[]>([]);
 
-  // Fetch all text variations from database
+  // Fetch all text variations from database (always try Convex first)
   const textVariationsData = useQuery(
     api.textVariations.getTextVariationsByProject,
     projectId ? { projectId } : "skip"
   );
 
-  // Load from localStorage if no Convex project
+  // Load from localStorage as fallback or for non-Convex projects
   useEffect(() => {
-    if (!projectId && projectIdParam) {
+    // Only load from localStorage if:
+    // 1. No Convex project ID, OR
+    // 2. Convex query returned undefined/null (still loading or error)
+    if (!projectId) {
       try {
         const storageKey = `variations-${projectIdParam}`;
         const stored = localStorage.getItem(storageKey);
@@ -73,15 +76,43 @@ export function VariationsManagerModal({
             variations: data.variations,
           }));
           setLocalVariationsData(converted);
+        } else {
+          setLocalVariationsData([]);
         }
       } catch (error) {
         console.error("Error loading localStorage variations:", error);
+        setLocalVariationsData([]);
       }
+    } else if (textVariationsData === null || (textVariationsData && textVariationsData.length === 0)) {
+      // If Convex returned empty/null, try localStorage as fallback
+      try {
+        const storageKey = `variations-${projectIdParam}`;
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const converted = Object.entries(parsed).map(([elementId, data]: [string, any]) => ({
+            elementId,
+            originalText: data.originalText,
+            variations: data.variations,
+          }));
+          setLocalVariationsData(converted);
+        } else {
+          setLocalVariationsData([]);
+        }
+      } catch (error) {
+        console.error("Error loading localStorage variations:", error);
+        setLocalVariationsData([]);
+      }
+    } else {
+      // Clear localStorage data if we have Convex data
+      setLocalVariationsData([]);
     }
-  }, [projectId, projectIdParam]);
+  }, [projectId, projectIdParam, textVariationsData]);
 
-  // Use either Convex or localStorage data
-  const variationsData = projectId ? textVariationsData : localVariationsData;
+  // Use Convex data if available, otherwise use localStorage
+  const variationsData = projectId && textVariationsData && textVariationsData.length > 0 
+    ? textVariationsData 
+    : localVariationsData;
 
   // Calculate total combinations
   const totalCombinations = variationsData
@@ -96,19 +127,63 @@ export function VariationsManagerModal({
 
     setIsGenerating(true);
 
+    // Get all text elements from canvas to get their current text
+    const canvasJSON = canvas.toJSON();
+    const findAllTextObjects = (objects: any[]): Array<{id: string | undefined, text: string}> => {
+      const textObjects: Array<{id: string | undefined, text: string}> = [];
+      const traverse = (obj: any) => {
+        if (obj.type === "textbox" || obj.type === "i-text" || obj.type === "text") {
+          textObjects.push({ id: obj.id, text: obj.text || "" });
+        }
+        if (obj.type === "group" && obj.objects && Array.isArray(obj.objects)) {
+          obj.objects.forEach((nestedObj: any) => traverse(nestedObj));
+        }
+        if (obj.type === "activeSelection" && obj.objects && Array.isArray(obj.objects)) {
+          obj.objects.forEach((nestedObj: any) => traverse(nestedObj));
+        }
+      };
+      objects.forEach((obj: any) => traverse(obj));
+      return textObjects;
+    };
+    
+    const allTextElements = findAllTextObjects(canvasJSON.objects || []);
+    
+    // Create a map of elementId -> current text for elements WITHOUT variations
+    const elementsWithoutVariations = new Map<string, string>();
+    const variationElementIds = new Set(variationsData.map(v => v.elementId));
+    
+    allTextElements.forEach(({ id, text }) => {
+      if (id && !variationElementIds.has(id)) {
+        elementsWithoutVariations.set(id, text);
+      }
+    });
+
+    // Filter to only elements that have variations
+    const elementsWithVariations = variationsData.filter(v => v.variations.length > 0);
+
+    console.log("📊 Generating combinations:", {
+      elementsWithVariations: elementsWithVariations.length,
+      elementsWithoutVariations: elementsWithoutVariations.size,
+      totalTextElements: allTextElements.length,
+    });
+
     const combinations: Array<Record<string, string>> = [];
 
-    // Build combinations recursively
+    // Build combinations recursively - only for elements WITH variations
     const buildCombinations = (
       index: number,
       current: Record<string, string>
     ) => {
-      if (index === variationsData.length) {
+      if (index === elementsWithVariations.length) {
+        // Add all elements without variations (keep their original text)
+        elementsWithoutVariations.forEach((text, elementId) => {
+          current[elementId] = text;
+        });
         combinations.push({ ...current });
         return;
       }
 
-      const variation = variationsData[index];
+      const variation = elementsWithVariations[index];
 
       // Add original text
       current[variation.elementId] = variation.originalText;
@@ -122,6 +197,8 @@ export function VariationsManagerModal({
     };
 
     buildCombinations(0, {});
+
+    console.log(`✅ Generated ${combinations.length} combinations`);
 
     // Create ad objects for each combination
     const ads: GeneratedAd[] = combinations.map((combo, index) => ({
@@ -145,51 +222,283 @@ export function VariationsManagerModal({
     if (!canvas) return;
 
     try {
+      // Get canvas dimensions properly
+      const canvasWidth = canvas.getWidth() || 800;
+      const canvasHeight = canvas.getHeight() || 600;
+
       // Clone canvas
       const canvasJSON = canvas.toJSON();
+
+      // Helper to recursively find all text objects
+      const findAllTextObjects = (objects: any[]): any[] => {
+        const textObjects: any[] = [];
+        
+        const traverse = (obj: any) => {
+          if (obj.type === "textbox" || obj.type === "i-text" || obj.type === "text") {
+            textObjects.push(obj);
+          }
+          // Handle groups
+          if (obj.type === "group" && obj.objects && Array.isArray(obj.objects)) {
+            obj.objects.forEach((nestedObj: any) => traverse(nestedObj));
+          }
+          // Handle activeSelection
+          if (obj.type === "activeSelection" && obj.objects && Array.isArray(obj.objects)) {
+            obj.objects.forEach((nestedObj: any) => traverse(nestedObj));
+          }
+        };
+        
+        objects.forEach((obj: any) => traverse(obj));
+        return textObjects;
+      };
+
+      // Find all text objects (including nested ones)
+      const allTextObjects = findAllTextObjects(canvasJSON.objects || []);
+
+      // Debug: Log combination and available text IDs
+      console.log("🔍 Generating ad image:", {
+        combination: ad.combination,
+        availableTextIds: allTextObjects.map((obj: any) => ({ 
+          id: obj.id, 
+          text: obj.text,
+          type: obj.type 
+        })),
+        totalObjects: canvasJSON.objects?.length || 0,
+      });
+
+      // Build a map of elementId -> originalText from variationsData for matching
+      const elementIdToOriginalTextMap = new Map<string, string>();
+      if (variationsData) {
+        variationsData.forEach(v => {
+          elementIdToOriginalTextMap.set(v.elementId, v.originalText);
+        });
+      }
+
+      // Helper function to recursively update text in objects (including nested groups)
+      const updateTextInObject = (obj: any): any => {
+        // Check if this is a text object
+        const isTextObject =
+          obj.type === "textbox" ||
+          obj.type === "i-text" ||
+          obj.type === "text";
+
+        if (isTextObject) {
+          const elementId = obj.id;
+          let updated = false;
+          let newText = obj.text;
+          
+          // Try exact ID match first
+          if (elementId && ad.combination[elementId]) {
+            newText = ad.combination[elementId];
+            console.log(`✅ [JSON] Updating text for element ${elementId}: "${obj.text}" -> "${newText}"`);
+            updated = true;
+          } else if (elementIdToOriginalTextMap.size > 0) {
+            // Try to match by original text content
+            for (const [varElementId, originalText] of elementIdToOriginalTextMap.entries()) {
+              if (obj.text === originalText && ad.combination[varElementId]) {
+                newText = ad.combination[varElementId];
+                console.log(`✅ [JSON Content Match] Updating text (matched ${varElementId}): "${obj.text}" -> "${newText}"`);
+                updated = true;
+                break;
+              }
+            }
+          }
+          
+          if (updated) {
+            return {
+              ...obj,
+              text: newText,
+            };
+          } else if (elementId) {
+            console.log(`⚠️ [JSON] No variation found for element ${elementId}, keeping original: "${obj.text}"`);
+          }
+        }
+
+        // Handle groups - recursively update nested objects
+        if (obj.type === "group" && obj.objects && Array.isArray(obj.objects)) {
+          return {
+            ...obj,
+            objects: obj.objects.map((nestedObj: any) => updateTextInObject(nestedObj)),
+          };
+        }
+
+        // Handle activeSelection (multi-select)
+        if (obj.type === "activeSelection" && obj.objects && Array.isArray(obj.objects)) {
+          return {
+            ...obj,
+            objects: obj.objects.map((nestedObj: any) => updateTextInObject(nestedObj)),
+          };
+        }
+
+        return obj;
+      };
 
       // Replace text content with variations
       const modifiedJSON = {
         ...canvasJSON,
-        objects: canvasJSON.objects.map((obj: any) => {
-          if (
-            (obj.type === "textbox" ||
-              obj.type === "i-text" ||
-              obj.type === "text") &&
-            ad.combination[obj.id]
-          ) {
-            return {
-              ...obj,
-              text: ad.combination[obj.id],
-            };
-          }
-          return obj;
-        }),
+        objects: canvasJSON.objects.map((obj: any) => updateTextInObject(obj)),
       };
 
-      // Create a temporary canvas to render the variation
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = canvas.width || 800;
-      tempCanvas.height = canvas.height || 600;
+      // Create a temporary canvas element
+      const tempCanvasEl = document.createElement("canvas");
+      tempCanvasEl.width = canvasWidth;
+      tempCanvasEl.height = canvasHeight;
 
       // Load fabric dynamically
       const { Canvas: FabricCanvas } = await import("fabric");
-      const fabricCanvas = new FabricCanvas(tempCanvas);
+      const fabricCanvas = new FabricCanvas(tempCanvasEl, {
+        width: canvasWidth,
+        height: canvasHeight,
+      });
 
-      // Load the modified JSON
-      await new Promise((resolve) => {
-        fabricCanvas.loadFromJSON(modifiedJSON, () => {
-          fabricCanvas.renderAll();
-          resolve(null);
+      // Wait for canvas context to be ready
+      await new Promise<void>((resolve) => {
+        const checkContext = () => {
+          try {
+            const ctx = fabricCanvas.getContext();
+            if (ctx) {
+              resolve();
+            } else {
+              setTimeout(checkContext, 50);
+            }
+          } catch (e) {
+            setTimeout(checkContext, 50);
+          }
+        };
+        checkContext();
+      });
+
+      // Load fonts before loading JSON (if editor has font plugin)
+      if (editor && (editor as any).hooksEntity?.hookImportBefore) {
+        const jsonString = JSON.stringify(modifiedJSON);
+        await new Promise<void>((resolve) => {
+          (editor as any).hooksEntity.hookImportBefore.callAsync(jsonString, () => {
+            resolve();
+          });
+        });
+      }
+
+      // Load the modified JSON (Fabric.js v6 returns a Promise)
+      await fabricCanvas.loadFromJSON(modifiedJSON);
+
+      // After loading, ensure text is updated (in case JSON modification didn't work)
+      const loadedObjects = fabricCanvas.getObjects();
+      
+      // Build a map of elementId -> originalText from variationsData for matching
+      const elementIdToOriginalText = new Map<string, string>();
+      if (variationsData) {
+        variationsData.forEach(v => {
+          elementIdToOriginalText.set(v.elementId, v.originalText);
+        });
+      }
+      
+      // Helper to recursively find and update all text objects
+      const updateTextAfterLoad = (obj: any) => {
+        const isTextObject =
+          obj.type === "textbox" ||
+          obj.type === "i-text" ||
+          obj.type === "text";
+
+        if (isTextObject) {
+          const elementId = obj.id;
+          
+          // Check if this element is in the combination (either has variation or should keep original)
+          if (elementId && ad.combination[elementId] !== undefined) {
+            const newText = ad.combination[elementId];
+            if (obj.text !== newText) {
+              console.log(`🔄 [Exact ID] Updating text for ${elementId}: "${obj.text}" -> "${newText}"`);
+              obj.set("text", newText);
+              obj.setCoords();
+            }
+          } else if (elementId) {
+            // Try to find by matching original text content (for elements without IDs)
+            let matched = false;
+            if (elementIdToOriginalText.size > 0) {
+              for (const [varElementId, originalText] of elementIdToOriginalText.entries()) {
+                // Check if this object's current text matches the original text for this variation
+                if (obj.text === originalText && ad.combination[varElementId] !== undefined) {
+                  const newText = ad.combination[varElementId];
+                  console.log(`🔄 [Content Match] Updating text for element (ID: ${elementId || 'none'}, matched to var: ${varElementId}): "${obj.text}" -> "${newText}"`);
+                  obj.set("text", newText);
+                  obj.setCoords();
+                  matched = true;
+                  break;
+                }
+              }
+            }
+            
+            if (!matched) {
+              // This element doesn't have variations, keep it as is (it should already be in combination)
+              console.log(`ℹ️ Keeping text unchanged for ${elementId}: "${obj.text}"`);
+            }
+          }
+        }
+
+        // Handle groups - recursively update nested objects
+        if (obj.type === "group" && obj.getObjects) {
+          obj.getObjects().forEach((nestedObj: any) => updateTextAfterLoad(nestedObj));
+        }
+        
+        // Handle activeSelection
+        if (obj.type === "activeSelection" && obj.getObjects) {
+          obj.getObjects().forEach((nestedObj: any) => updateTextAfterLoad(nestedObj));
+        }
+      };
+
+      // Update all objects
+      loadedObjects.forEach((obj: any) => updateTextAfterLoad(obj));
+      
+      // Collect all objects for logging
+      const allCanvasObjects: any[] = [];
+      const collectAllObjects = (objs: any[]) => {
+        objs.forEach(obj => {
+          allCanvasObjects.push(obj);
+          if (obj.type === "group" && obj.getObjects) {
+            collectAllObjects(obj.getObjects());
+          }
+        });
+      };
+      collectAllObjects(loadedObjects);
+      
+      // Log all text objects found
+      const foundTextObjects = allCanvasObjects.filter(obj => 
+        obj.type === "textbox" || obj.type === "i-text" || obj.type === "text"
+      );
+      console.log(`📝 Found ${foundTextObjects.length} text objects after load:`, 
+        foundTextObjects.map(obj => ({ id: obj.id, text: obj.text }))
+      );
+
+      // Wait for all objects to be loaded and rendered
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          try {
+            // Force render all objects
+            fabricCanvas.renderAll();
+
+            // Wait a bit more for fonts to render and text to update
+            setTimeout(() => {
+              // Update text one more time to ensure it's correct
+              const finalObjects = fabricCanvas.getObjects();
+              finalObjects.forEach((obj: any) => updateTextAfterLoad(obj));
+              fabricCanvas.renderAll();
+              resolve();
+            }, 300);
+          } catch (e) {
+            console.warn("Error during render:", e);
+            resolve();
+          }
         });
       });
 
-      // Export as image
+      // Export as image with proper options
       const dataURL = fabricCanvas.toDataURL({
         format: "png",
-        quality: 1,
-        multiplier: 2, // Higher resolution
+        quality: 1.0,
+        multiplier: 1, // Use 1 for proper sizing
       });
+
+      if (!dataURL || dataURL === "data:,") {
+        throw new Error("Failed to generate image data URL");
+      }
 
       // Update the generated ad
       setGeneratedAds((prev) =>
@@ -201,7 +510,11 @@ export function VariationsManagerModal({
       );
 
       // Cleanup
-      fabricCanvas.dispose();
+      try {
+        fabricCanvas.dispose();
+      } catch (e) {
+        console.warn("Error disposing canvas:", e);
+      }
     } catch (error) {
       console.error("Error generating ad image:", error);
       setGeneratedAds((prev) =>

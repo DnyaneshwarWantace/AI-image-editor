@@ -3,48 +3,23 @@
 import React, { useState } from "react";
 import { ZoomIn, ZoomOut, Maximize, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCanvasContext } from "@/providers/canvas-provider";
-import { toast } from "sonner";
 
-export function ZoomControls() {
-  const { editor } = useCanvasContext();
+interface ZoomControlsProps {
+  zoom: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onZoomFit: () => void;
+  onZoom100: () => void;
+}
+
+export function ZoomControls({
+  zoom,
+  onZoomIn,
+  onZoomOut,
+  onZoomFit,
+  onZoom100,
+}: ZoomControlsProps) {
   const [showHelp, setShowHelp] = useState(false);
-
-  const handleZoomIn = () => {
-    if (!editor) return;
-    try {
-      editor.big?.();
-    } catch (error) {
-      console.error("Error zooming in:", error);
-    }
-  };
-
-  const handleZoomOut = () => {
-    if (!editor) return;
-    try {
-      editor.small?.();
-    } catch (error) {
-      console.error("Error zooming out:", error);
-    }
-  };
-
-  const handleZoomFit = () => {
-    if (!editor) return;
-    try {
-      editor.auto?.();
-    } catch (error) {
-      console.error("Error fitting:", error);
-    }
-  };
-
-  const handleZoom100 = () => {
-    if (!editor) return;
-    try {
-      editor.one?.();
-    } catch (error) {
-      console.error("Error setting 100%:", error);
-    }
-  };
 
   return (
     <>
@@ -52,7 +27,7 @@ export function ZoomControls() {
         <Button
           variant="default"
           size="sm"
-          onClick={handleZoomIn}
+          onClick={onZoomIn}
           className="shadow-lg"
           title="Zoom In"
         >
@@ -61,7 +36,7 @@ export function ZoomControls() {
         <Button
           variant="default"
           size="sm"
-          onClick={handleZoomOut}
+          onClick={onZoomOut}
           className="shadow-lg"
           title="Zoom Out"
         >
@@ -70,7 +45,7 @@ export function ZoomControls() {
         <Button
           variant="default"
           size="sm"
-          onClick={handleZoomFit}
+          onClick={onZoomFit}
           className="shadow-lg"
           title="Fit to Screen"
         >
@@ -79,9 +54,9 @@ export function ZoomControls() {
         <Button
           variant="default"
           size="sm"
-          onClick={handleZoom100}
+          onClick={onZoom100}
           className="shadow-lg"
-          title="100%"
+          title={`100% (Current: ${Math.round(zoom * 100)}%)`}
         >
           100%
         </Button>

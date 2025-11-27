@@ -377,7 +377,10 @@ class ServersPlugin implements IPluginTempl {
         this.canvas.remove(obj);
       }
     });
-    this.editor?.setWorkspaseBg('#fff');
+    // Use optional chaining since WorkspacePlugin might not be loaded
+    if (this.editor?.setWorkspaceBg) {
+      this.editor.setWorkspaceBg('#fff');
+    }
     this.canvas.discardActiveObject();
     this.canvas.renderAll();
   }
