@@ -8,7 +8,6 @@ import {
   Image as ImageIcon,
   Layers,
   User,
-  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -25,7 +24,8 @@ import { FontStylePanel } from "./tabs/font-style-panel";
 import { MaterialsPanel } from "./tabs/materials-panel";
 import { LayersPanel } from "./tabs/layers-panel";
 import { MyMaterialsPanel } from "./tabs/my-materials-panel";
-import { VariationsPanel } from "./tabs/variations-panel";
+import { TextVariationsPanel } from "./tabs/text-variations-panel";
+import { ImageVariationsPanel } from "./tabs/image-variations-panel";
 
 const LEFT_TABS = [
   {
@@ -59,10 +59,16 @@ const LEFT_TABS = [
     component: LayersPanel,
   },
   {
-    key: "variations",
-    name: "Variations",
-    icon: Sparkles,
-    component: VariationsPanel,
+    key: "textVariations",
+    name: "Text Variations",
+    icon: Type,
+    component: TextVariationsPanel,
+  },
+  {
+    key: "imageVariations",
+    name: "Image Variations",
+    icon: ImageIcon,
+    component: ImageVariationsPanel,
   },
   {
     key: "myMaterial",

@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Type, Plus, Sparkles, Eye } from "lucide-react";
+import { Type, Plus, Sparkles, Eye, Image as ImageIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { TextVariationModal } from "../text-variation-modal";
+import { ImageVariationModal } from "../image-variation-modal";
 import { VariationsManagerModal } from "../variations-manager-modal";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
@@ -16,6 +18,13 @@ import type { Id } from "@/convex/_generated/dataModel";
 interface TextElement {
   id: string;
   text: string;
+  object: any;
+  variationCount: number;
+}
+
+interface ImageElement {
+  id: string;
+  src: string;
   object: any;
   variationCount: number;
 }
@@ -39,17 +48,28 @@ export function VariationsPanel() {
   const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
 
   const [textElements, setTextElements] = useState<TextElement[]>([]);
+  const [imageElements, setImageElements] = useState<ImageElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedElement, setSelectedElement] = useState<TextElement | null>(null);
+  const [isTextModalOpen, setIsTextModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [selectedTextElement, setSelectedTextElement] = useState<TextElement | null>(null);
+  const [selectedImageElement, setSelectedImageElement] = useState<ImageElement | null>(null);
   const [isManagerModalOpen, setIsManagerModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"text" | "image">("text");
 
-  // Convex hooks
-  const variationCounts = useQuery(
+  // Convex hooks for text variations
+  const textVariationCounts = useQuery(
     api.textVariations.getVariationCounts,
     projectId ? { projectId } : "skip"
   );
-  const saveVariationsMutation = useMutation(api.textVariations.saveTextVariations);
+  const saveTextVariationsMutation = useMutation(api.textVariations.saveTextVariations);
+
+  // Convex hooks for image variations
+  const imageVariationCounts = useQuery(
+    api.imageVariations.getImageVariationCounts,
+    projectId ? { projectId } : "skip"
+  );
+  const saveImageVariationsMutation = useMutation(api.imageVariations.saveImageVariations);
 
   const extractTextElements = useCallback(() => {
     if (!canvas) return [];
@@ -87,8 +107,8 @@ export function VariationsPanel() {
         }
 
         // Get variation count from Convex backend
-        const count = projectId && variationCounts
-          ? (variationCounts[textId] || 0)
+        const count = projectId && textVariationCounts
+          ? (textVariationCounts[textId] || 0)
           : 0;
 
         texts.push({
@@ -105,14 +125,58 @@ export function VariationsPanel() {
     console.log(`📝 Found ${texts.length} text elements on canvas:`, texts.map(t => ({ id: t.id, text: t.text })));
 
     return texts;
-  }, [canvas, variationCounts, projectId]);
+  }, [canvas, textVariationCounts, projectId]);
+
+  const extractImageElements = useCallback(() => {
+    if (!canvas) return [];
+
+    const liveObjects = canvas.getObjects();
+    const images: ImageElement[] = [];
+
+    liveObjects.forEach((obj: any) => {
+      if (obj.id === "workspace" || obj.constructor.name === "GuideLine") {
+        return;
+      }
+
+      const isImageObject = obj.type === "image";
+
+      if (isImageObject) {
+        let imageId = obj.id;
+
+        if (!imageId) {
+          const { v4: uuid } = require('uuid');
+          imageId = uuid();
+          obj.set('id', imageId);
+          canvas.requestRenderAll();
+        }
+
+        const count = projectId && imageVariationCounts
+          ? (imageVariationCounts[imageId] || 0)
+          : 0;
+
+        const src = obj.getSrc ? obj.getSrc() : (obj.src || obj._originalElement?.src || '');
+
+        images.push({
+          id: imageId,
+          src,
+          object: obj,
+          variationCount: count,
+        });
+      }
+    });
+
+    return images;
+  }, [canvas, imageVariationCounts, projectId]);
 
   useEffect(() => {
     if (!canvas) return;
 
-    const updateTextElements = () => {
+    const updateElements = () => {
       const texts = extractTextElements();
       setTextElements(texts);
+
+      const images = extractImageElements();
+      setImageElements(images);
 
       // Update selected
       const activeObject = canvas.getActiveObject();
@@ -123,25 +187,25 @@ export function VariationsPanel() {
       }
     };
 
-    updateTextElements();
+    updateElements();
 
     // Listen to canvas changes
-    canvas.on("object:added", updateTextElements);
-    canvas.on("object:removed", updateTextElements);
-    canvas.on("object:modified", updateTextElements);
-    canvas.on("selection:created", updateTextElements);
-    canvas.on("selection:updated", updateTextElements);
-    canvas.on("selection:cleared", updateTextElements);
+    canvas.on("object:added", updateElements);
+    canvas.on("object:removed", updateElements);
+    canvas.on("object:modified", updateElements);
+    canvas.on("selection:created", updateElements);
+    canvas.on("selection:updated", updateElements);
+    canvas.on("selection:cleared", updateElements);
 
     return () => {
-      canvas.off("object:added", updateTextElements);
-      canvas.off("object:removed", updateTextElements);
-      canvas.off("object:modified", updateTextElements);
-      canvas.off("selection:created", updateTextElements);
-      canvas.off("selection:updated", updateTextElements);
-      canvas.off("selection:cleared", updateTextElements);
+      canvas.off("object:added", updateElements);
+      canvas.off("object:removed", updateElements);
+      canvas.off("object:modified", updateElements);
+      canvas.off("selection:created", updateElements);
+      canvas.off("selection:updated", updateElements);
+      canvas.off("selection:cleared", updateElements);
     };
-  }, [canvas, extractTextElements]);
+  }, [canvas, extractTextElements, extractImageElements]);
 
   const selectTextElement = (element: TextElement) => {
     if (!canvas || !element.object) return;
@@ -150,23 +214,36 @@ export function VariationsPanel() {
     canvas.requestRenderAll();
   };
 
-  const handleAddVariations = (element: TextElement, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedElement(element);
-    setIsModalOpen(true);
+  const selectImageElement = (element: ImageElement) => {
+    if (!canvas || !element.object) return;
+    canvas.discardActiveObject();
+    canvas.setActiveObject(element.object);
+    canvas.requestRenderAll();
   };
 
-  const handleSaveVariations = async (variations: string[]) => {
-    if (!selectedElement || !canvas || !projectId) {
+  const handleAddTextVariations = (element: TextElement, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedTextElement(element);
+    setIsTextModalOpen(true);
+  };
+
+  const handleAddImageVariations = (element: ImageElement, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedImageElement(element);
+    setIsImageModalOpen(true);
+  };
+
+  const handleSaveTextVariations = async (variations: string[]) => {
+    if (!selectedTextElement || !canvas || !projectId) {
       console.error("❌ Cannot save variations: missing required data");
       return;
     }
 
     try {
       // ALWAYS use the element's current ID from the canvas object
-      const elementId = selectedElement.id;
+      const elementId = selectedTextElement.id;
 
-      console.log(`💾 Saving ${variations.length} variations for element ID: ${elementId} (text: "${selectedElement.text}")`);
+      console.log(`💾 Saving ${variations.length} variations for element ID: ${elementId} (text: "${selectedTextElement.text}")`);
 
       // Convert variations to the format expected by Convex
       const variationsData = variations.map((text, index) => ({
@@ -178,10 +255,10 @@ export function VariationsPanel() {
 
       // Save to Convex backend (only source of truth)
       try {
-        await saveVariationsMutation({
+        await saveTextVariationsMutation({
           projectId,
           elementId, // Use stable ID from canvas
-          originalText: selectedElement.text,
+          originalText: selectedTextElement.text,
           variations: variationsData,
           userId: undefined, // TODO: Get from auth context
         });
@@ -205,6 +282,37 @@ export function VariationsPanel() {
     }
   };
 
+  const handleSaveImageVariations = async (variations: Array<{ id: string; imageUrl: string; type: string }>) => {
+    if (!selectedImageElement || !canvas || !projectId) {
+      console.error("❌ Cannot save image variations: missing required data");
+      return;
+    }
+
+    try {
+      const elementId = selectedImageElement.id;
+      console.log(`💾 Saving ${variations.length} image variations for element ID: ${elementId}`);
+
+      await saveImageVariationsMutation({
+        projectId,
+        elementId,
+        originalImageUrl: selectedImageElement.src,
+        variations,
+        userId: undefined,
+      });
+
+      setImageElements((prev) =>
+        prev.map((el) =>
+          el.id === elementId
+            ? { ...el, variationCount: variations.length }
+            : el
+        )
+      );
+    } catch (error) {
+      console.error("❌ Error saving image variations:", error);
+      alert("Failed to save image variations. Please try again.");
+    }
+  };
+
   if (!canvas) {
     return (
       <div className="p-4">
@@ -217,12 +325,27 @@ export function VariationsPanel() {
     <div className="space-y-3 h-full flex flex-col">
       {/* Header */}
       <div>
-        <h4 className="text-sm font-semibold text-gray-900">Text Variations</h4>
+        <h4 className="text-sm font-semibold text-gray-900">Variations</h4>
         <p className="text-xs text-gray-500 mt-1">
-          Create variations of your text elements to generate multiple ads
+          Create text and image variations to generate multiple ads
         </p>
       </div>
 
+      {/* Tabs for Text and Image Variations */}
+      <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v as "text" | "image")} className="flex-1 flex flex-col">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="text" className="flex items-center gap-2">
+            <Type className="h-3.5 w-3.5" />
+            Text ({textElements.length})
+          </TabsTrigger>
+          <TabsTrigger value="image" className="flex items-center gap-2">
+            <ImageIcon className="h-3.5 w-3.5" />
+            Images ({imageElements.length})
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Text Variations Tab */}
+        <TabsContent value="text" className="flex-1 flex flex-col mt-3 space-y-2">
       {/* Text Elements List */}
       <div className="flex-1 overflow-y-auto space-y-2 scrollbar-thin">
         {textElements.length === 0 ? (
@@ -270,7 +393,7 @@ export function VariationsPanel() {
 
               {/* Add Variations Button */}
               <Button
-                onClick={(e) => handleAddVariations(element, e)}
+                onClick={(e) => handleAddTextVariations(element, e)}
                 size="sm"
                 variant="outline"
                 className="w-full mt-2 text-xs h-8"
@@ -311,15 +434,108 @@ export function VariationsPanel() {
           )}
         </div>
       )}
+        </TabsContent>
+
+        {/* Image Variations Tab */}
+        <TabsContent value="image" className="flex-1 flex flex-col mt-3 space-y-2">
+          <div className="flex-1 overflow-y-auto space-y-2 scrollbar-thin">
+            {imageElements.length === 0 ? (
+              <div className="text-center py-8">
+                <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium">No image elements</p>
+                <p className="text-gray-400 text-xs mt-1">
+                  Add images to your canvas to create variations
+                </p>
+              </div>
+            ) : (
+              imageElements.map((element) => (
+                <div
+                  key={element.id}
+                  onClick={() => selectImageElement(element)}
+                  className={cn(
+                    "border rounded-lg p-3 cursor-pointer transition-all hover:shadow-sm",
+                    selectedId === element.id
+                      ? "bg-blue-50 border-blue-300 ring-2 ring-blue-200"
+                      : "bg-white border-gray-200 hover:border-gray-300"
+                  )}
+                >
+                  <div className="flex items-start gap-3 mb-2">
+                    <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {element.src ? (
+                        <img
+                          src={element.src}
+                          alt="Preview"
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      ) : (
+                        <ImageIcon className="h-6 w-6 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">Image Element</p>
+                      <Badge variant="secondary" className="text-xs font-normal mt-1">
+                        {element.variationCount} variations
+                      </Badge>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={(e) => handleAddImageVariations(element, e)}
+                    size="sm"
+                    variant="outline"
+                    className="w-full mt-2 text-xs h-8"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    {element.variationCount > 0 ? 'Edit Variations' : 'Add Variations'}
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {imageElements.length > 0 && (
+            <div className="border-t pt-3 mt-3 space-y-3">
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <Sparkles className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                <p>
+                  <span className="font-medium">Total combinations:</span>{" "}
+                  {imageElements.reduce((acc, el) => acc * Math.max(el.variationCount, 1), 1)} unique ads
+                </p>
+              </div>
+
+              {imageElements.some((el) => el.variationCount > 0) && (
+                <Button
+                  onClick={() => setIsManagerModalOpen(true)}
+                  className="w-full"
+                  size="sm"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  View All Variations ({imageElements.reduce((sum, el) => sum + el.variationCount, 0)} total)
+                </Button>
+              )}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Text Variation Modal */}
-      {selectedElement && (
+      {selectedTextElement && (
         <TextVariationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          originalText={selectedElement.text}
-          elementId={selectedElement.id}
-          onSave={handleSaveVariations}
+          isOpen={isTextModalOpen}
+          onClose={() => setIsTextModalOpen(false)}
+          originalText={selectedTextElement.text}
+          elementId={selectedTextElement.id}
+          onSave={handleSaveTextVariations}
+        />
+      )}
+
+      {/* Image Variation Modal */}
+      {selectedImageElement && (
+        <ImageVariationModal
+          isOpen={isImageModalOpen}
+          onClose={() => setIsImageModalOpen(false)}
+          originalImageUrl={selectedImageElement.src}
+          elementId={selectedImageElement.id}
+          onSave={handleSaveImageVariations}
         />
       )}
 

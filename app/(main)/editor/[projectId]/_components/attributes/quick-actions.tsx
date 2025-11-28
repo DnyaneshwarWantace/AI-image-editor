@@ -57,7 +57,7 @@ export function QuickActions() {
     try {
       const activeObject = canvas?.getActiveObject();
       if (activeObject && activeObject.type === "polygon") {
-        editor.activeEdit?.();
+        (editor as any).activeEdit?.();
         toast.success("Edit mode activated");
       } else {
         toast.error("Please select a polygon to edit");
@@ -82,7 +82,7 @@ export function QuickActions() {
     toast.success("Object deleted");
   };
 
-  const activeObject = canvas?.getActiveObject();
+  const activeObject = canvas?.getActiveObject() as any;
   if (!activeObject) return null;
 
   return (

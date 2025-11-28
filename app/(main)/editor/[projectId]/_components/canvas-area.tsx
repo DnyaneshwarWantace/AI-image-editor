@@ -179,7 +179,21 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         selection: true,
         // Allow selection of multiple objects
         allowTouchScrolling: false,
+        // Drag selection box styling - darker blue
+        selectionColor: 'rgba(37, 99, 235, 0.15)', // Darker blue with transparency (blue-600)
+        selectionBorderColor: '#2563eb', // Darker solid blue border (blue-600)
+        selectionLineWidth: 2, // Thicker selection border
       });
+
+      // Customize selection colors - darker blue and thicker borders
+      FabricObject.ownDefaults.borderColor = '#2563eb'; // Darker blue (blue-600)
+      FabricObject.ownDefaults.borderScaleFactor = 2.5; // Thicker border (default is 1)
+      FabricObject.ownDefaults.cornerColor = '#2563eb'; // Darker blue corners
+      FabricObject.ownDefaults.cornerStrokeColor = '#1e40af'; // Even darker blue stroke (blue-800)
+      FabricObject.ownDefaults.cornerStyle = 'circle'; // Circular corners (easier to see)
+      FabricObject.ownDefaults.cornerSize = 12; // Larger corner controls (default is 7)
+      FabricObject.ownDefaults.transparentCorners = false; // Solid corners (easier to see)
+      FabricObject.ownDefaults.borderDashArray = null; // Solid line instead of dashed
 
       // Mark canvas as initialized
       (canvasRef.current as any).__fabricCanvas = fabricCanvas;

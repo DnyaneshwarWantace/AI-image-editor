@@ -33,6 +33,7 @@ import { DragModeToggle } from "./top-bar-actions/drag-mode-toggle";
 import { VariationsManagerModal } from "./variations-manager-modal";
 import { useParams } from "next/navigation";
 import type { Id } from "@/convex/_generated/dataModel";
+import { useQuery } from "convex/react";
 
 const EXPORT_FORMATS: ExportFormat[] = [
   {
@@ -87,6 +88,37 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
 
   // Convex mutation for saving projects
   const updateProjectMutation = useMutation(api.projects.updateProject);
+
+  // Helper to check if ID is valid Convex ID
+  const isValidConvexId = (id: string): boolean => {
+    if (!id || typeof id !== 'string') return false;
+    const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
+    return convexIdPattern.test(id) && id.length >= 16;
+  };
+
+  // Check if projectId is valid Convex ID
+  const projectIdParam = params.projectId as string;
+  const isValidId = isValidConvexId(projectIdParam);
+  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+
+  // Query variation counts
+  const textVariationCounts = useQuery(
+    api.textVariations.getVariationCounts,
+    projectId ? { projectId } : "skip"
+  );
+  const imageVariationCounts = useQuery(
+    api.imageVariations.getImageVariationCounts,
+    projectId ? { projectId } : "skip"
+  );
+
+  // Calculate total variations
+  const totalTextVariations = textVariationCounts
+    ? Object.values(textVariationCounts).reduce((sum, count) => sum + count, 0)
+    : 0;
+  const totalImageVariations = imageVariationCounts
+    ? Object.values(imageVariationCounts).reduce((sum, count) => sum + count, 0)
+    : 0;
+  const totalVariations = totalTextVariations + totalImageVariations;
 
   // Listen to history updates
   React.useEffect(() => {
@@ -242,13 +274,6 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
         toast.error("Failed to clear canvas");
       }
     }
-  };
-
-  // Helper to check if ID is valid Convex ID
-  const isValidConvexId = (id: string): boolean => {
-    if (!id || typeof id !== 'string') return false;
-    const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-    return convexIdPattern.test(id) && id.length >= 16;
   };
 
   // Save
@@ -552,6 +577,11 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
             >
               <Sparkles className="h-4 w-4" />
               <span>Variations</span>
+              {totalVariations > 0 && (
+                <span className="ml-1 px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">
+                  {totalVariations}
+                </span>
+              )}
             </Button>
 
             <div className="h-6 w-px bg-gray-300" />
