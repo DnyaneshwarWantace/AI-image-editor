@@ -12,6 +12,7 @@ import {
   Loader2,
   Clipboard,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,9 @@ import { ImportMenu } from "./top-bar-actions/import-menu";
 import { PreviewButton } from "./top-bar-actions/preview-button";
 import { WatermarkButton } from "./top-bar-actions/watermark-button";
 import { DragModeToggle } from "./top-bar-actions/drag-mode-toggle";
+import { VariationsManagerModal } from "./variations-manager-modal";
+import { useParams } from "next/navigation";
+import type { Id } from "@/convex/_generated/dataModel";
 
 const EXPORT_FORMATS: ExportFormat[] = [
   {
@@ -73,12 +77,14 @@ interface TopBarProps {
 
 export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
   const router = useRouter();
+  const params = useParams();
   const { canvas, editor } = useCanvasContext();
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
-  
+  const [isVariationsModalOpen, setIsVariationsModalOpen] = useState(false);
+
   // Convex mutation for saving projects
   const updateProjectMutation = useMutation(api.projects.updateProject);
 
@@ -536,6 +542,20 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
 
             <div className="h-6 w-px bg-gray-300" />
 
+            {/* Variations Manager */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsVariationsModalOpen(true)}
+              className="text-gray-700 hover:bg-gray-100 gap-2"
+              title="Manage Variations"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>Variations</span>
+            </Button>
+
+            <div className="h-6 w-px bg-gray-300" />
+
         {/* Ruler Toggle */}
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -691,6 +711,14 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Variations Manager Modal */}
+      <VariationsManagerModal
+        isOpen={isVariationsModalOpen}
+        onClose={() => setIsVariationsModalOpen(false)}
+        projectId={project?._id as Id<"projects"> | null}
+        projectIdParam={params.projectId as string}
+      />
     </header>
   );
 }

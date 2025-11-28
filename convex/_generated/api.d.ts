@@ -13,6 +13,7 @@ import type * as banners from "../banners.js";
 import type * as files from "../files.js";
 import type * as fontBorders from "../fontBorders.js";
 import type * as fonts from "../fonts.js";
+import type * as imageVariations from "../imageVariations.js";
 import type * as materials from "../materials.js";
 import type * as projects from "../projects.js";
 import type * as sizes from "../sizes.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   fontBorders: typeof fontBorders;
   fonts: typeof fonts;
+  imageVariations: typeof imageVariations;
   materials: typeof materials;
   projects: typeof projects;
   sizes: typeof sizes;

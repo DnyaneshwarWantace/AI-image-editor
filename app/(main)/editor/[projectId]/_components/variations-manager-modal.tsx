@@ -35,9 +35,19 @@ interface TextVariation {
   }>;
 }
 
+interface ImageVariation {
+  elementId: string;
+  originalImageUrl: string;
+  variations: Array<{
+    id: string;
+    imageUrl: string;
+    type: string;
+  }>;
+}
+
 interface GeneratedAd {
   id: string;
-  combination: Record<string, string>; // elementId -> variation text
+  combination: Record<string, string | { type: 'text'; value: string } | { type: 'image'; value: string }>; // elementId -> variation (text or image)
   imageUrl: string | null;
   isGenerating: boolean;
 }
@@ -59,6 +69,12 @@ export function VariationsManagerModal({
   // Fetch all text variations from Convex backend (single source of truth)
   const textVariationsData = useQuery(
     api.textVariations.getTextVariationsByProject,
+    projectId ? { projectId } : "skip"
+  );
+
+  // Fetch all image variations from Convex backend
+  const imageVariationsData = useQuery(
+    api.imageVariations.getImageVariationsByProject,
     projectId ? { projectId } : "skip"
   );
 
@@ -95,9 +111,44 @@ export function VariationsManagerModal({
 
     const totalCombos = filtered.reduce((acc, v) => acc * (v.variations.length + 1), 1);
     console.log(`✅ [variationsData] Filtered: ${filtered.length} of ${textVariationsData.length} match canvas. Will generate ${totalCombos} ads.`);
-    
+
     return filtered;
   }, [textVariationsData, canvas]);
+
+  // Filter image variations to only include image elements that exist on current canvas
+  const imageVariationsFiltered = useMemo(() => {
+    if (!imageVariationsData || !canvas) {
+      console.log('⚠️ imageVariationsFiltered: Missing imageVariationsData or canvas');
+      return [];
+    }
+
+    // Get all image element IDs from CURRENT canvas state (fresh check)
+    const canvasObjects = canvas.getObjects();
+    const canvasImageIds = new Set<string>();
+
+    canvasObjects.forEach((obj: any) => {
+      const isImageObject = obj.type === 'image';
+      if (isImageObject && obj.id) {
+        canvasImageIds.add(obj.id);
+      }
+    });
+
+    console.log('🔍 [imageVariationsFiltered] Current canvas image IDs:', Array.from(canvasImageIds));
+    console.log('🔍 [imageVariationsFiltered] Total image variations from backend:', imageVariationsData.length);
+
+    // Filter variations to only include elements that exist on canvas
+    const filtered = imageVariationsData.filter((variation: ImageVariation) => {
+      const exists = canvasImageIds.has(variation.elementId);
+      if (!exists) {
+        console.log(`⚠️ [imageVariationsFiltered] Variation for ${variation.elementId} - element not on canvas, excluding`);
+      }
+      return exists;
+    });
+
+    console.log(`✅ [imageVariationsFiltered] Filtered: ${filtered.length} of ${imageVariationsData.length} match canvas.`);
+
+    return filtered;
+  }, [imageVariationsData, canvas]);
 
   // Reset state and cleanup when modal opens
   useEffect(() => {
@@ -192,24 +243,42 @@ export function VariationsManagerModal({
     return () => clearTimeout(timer);
   }, [isOpen, variationsData]); // Removed isGenerating and canvas from deps to prevent re-runs
 
-  // Calculate total combinations
-  const totalCombinations = variationsData
-    ? variationsData.reduce((acc, variation) => {
+  // Calculate total combinations (text variations × image variations)
+  const totalCombinations = useMemo(() => {
+    let total = 1;
+
+    // Multiply by text variations
+    if (variationsData && variationsData.length > 0) {
+      total = variationsData.reduce((acc, variation) => {
         return acc * (variation.variations.length + 1); // +1 for original
-      }, 1)
-    : 0;
+      }, total);
+    }
+
+    // Multiply by image variations
+    if (imageVariationsFiltered && imageVariationsFiltered.length > 0) {
+      total = imageVariationsFiltered.reduce((acc: number, variation: ImageVariation) => {
+        return acc * (variation.variations.length + 1); // +1 for original
+      }, total);
+    }
+
+    return total;
+  }, [variationsData, imageVariationsFiltered]);
 
   // Generate all possible combinations
   // This function uses the latest variationsData from closure
   const generateAllCombinations = () => {
     // Get fresh variationsData and canvas state
     const currentVariationsData = variationsData;
+    const currentImageVariations = imageVariationsFiltered;
     const currentCanvas = canvas;
-    
-    if (!currentVariationsData || !currentVariationsData.length || !currentCanvas) {
+
+    const hasTextVariations = currentVariationsData && currentVariationsData.length > 0;
+    const hasImageVariations = currentImageVariations && currentImageVariations.length > 0;
+
+    if ((!hasTextVariations && !hasImageVariations) || !currentCanvas) {
       console.error("❌ Cannot generate: missing variations or canvas", {
-        hasVariations: !!currentVariationsData,
-        variationsLength: currentVariationsData?.length || 0,
+        hasTextVariations,
+        hasImageVariations,
         hasCanvas: !!currentCanvas
       });
       setIsGenerating(false);
@@ -218,8 +287,9 @@ export function VariationsManagerModal({
     }
 
     console.log('🚀 Starting generation with:', {
-      variationsCount: currentVariationsData.length,
-      totalCombinations: currentVariationsData.reduce((acc, v) => acc * (v.variations.length + 1), 1),
+      textVariationsCount: currentVariationsData?.length || 0,
+      imageVariationsCount: currentImageVariations?.length || 0,
+      totalCombinations,
       canvasObjectCount: currentCanvas.getObjects().length
     });
 
@@ -258,55 +328,110 @@ export function VariationsManagerModal({
     // Extract text elements from saved canvasState
     const allTextElements = findAllTextObjects(canvasState.objects || []);
 
-    // Create a map of elementId -> current text for elements WITHOUT variations
-    const elementsWithoutVariations = new Map<string, string>();
-    const variationElementIds = new Set(currentVariationsData.map(v => v.elementId));
+    // Create a map of elementId -> current text for elements WITHOUT text variations
+    const elementsWithoutTextVariations = new Map<string, string>();
+    const textVariationElementIds = new Set(currentVariationsData?.map(v => v.elementId) || []);
 
     allTextElements.forEach(({ id, text }) => {
-      if (id && !variationElementIds.has(id)) {
-        elementsWithoutVariations.set(id, text);
+      if (id && !textVariationElementIds.has(id)) {
+        elementsWithoutTextVariations.set(id, text);
+      }
+    });
+
+    // Helper to find all image objects
+    const findAllImageObjects = (objects: any[]): Array<{id: string | undefined, src: string}> => {
+      const imageObjects: Array<{id: string | undefined, src: string}> = [];
+      const traverse = (obj: any) => {
+        if (obj.type === "image") {
+          imageObjects.push({ id: obj.id, src: obj.src || "" });
+        }
+        if (obj.type === "group" && obj.objects && Array.isArray(obj.objects)) {
+          obj.objects.forEach((nestedObj: any) => traverse(nestedObj));
+        }
+      };
+      objects.forEach((obj: any) => traverse(obj));
+      return imageObjects;
+    };
+
+    // Extract image elements from saved canvasState
+    const allImageElements = findAllImageObjects(canvasState.objects || []);
+
+    // Create a map of elementId -> current image URL for elements WITHOUT image variations
+    const elementsWithoutImageVariations = new Map<string, string>();
+    const imageVariationElementIds = new Set(currentImageVariations?.map((v: ImageVariation) => v.elementId) || []);
+
+    allImageElements.forEach(({ id, src }) => {
+      if (id && !imageVariationElementIds.has(id)) {
+        elementsWithoutImageVariations.set(id, src);
       }
     });
 
     // Filter to only elements that have variations
-    const elementsWithVariations = currentVariationsData.filter(v => v.variations.length > 0);
+    const textElementsWithVariations = currentVariationsData?.filter((v: TextVariation) => v.variations.length > 0) || [];
+    const imageElementsWithVariations = currentImageVariations?.filter((v: ImageVariation) => v.variations.length > 0) || [];
 
     console.log("📊 Generating combinations:", {
-      elementsWithVariations: elementsWithVariations.length,
-      elementsWithoutVariations: elementsWithoutVariations.size,
+      textElementsWithVariations: textElementsWithVariations.length,
+      imageElementsWithVariations: imageElementsWithVariations.length,
+      elementsWithoutTextVariations: elementsWithoutTextVariations.size,
+      elementsWithoutImageVariations: elementsWithoutImageVariations.size,
       totalTextElements: allTextElements.length,
+      totalImageElements: allImageElements.length,
     });
 
-    const combinations: Array<Record<string, string>> = [];
+    const combinations: Array<Record<string, any>> = [];
 
-    // Build combinations recursively - only for elements WITH variations
+    // Build combinations recursively - for both text AND image variations
     const buildCombinations = (
-      index: number,
-      current: Record<string, string>
+      textIndex: number,
+      imageIndex: number,
+      current: Record<string, any>
     ) => {
-      if (index === elementsWithVariations.length) {
-        // Add all elements without variations (keep their original text)
-        elementsWithoutVariations.forEach((text, elementId) => {
-          current[elementId] = text;
-        });
-        combinations.push({ ...current });
+      // If we've processed all text variations, move to image variations
+      if (textIndex === textElementsWithVariations.length) {
+        // If we've processed all image variations too, save this combination
+        if (imageIndex === imageElementsWithVariations.length) {
+          // Add all elements without variations (keep their original values)
+          elementsWithoutTextVariations.forEach((text, elementId) => {
+            current[elementId] = text;
+          });
+          elementsWithoutImageVariations.forEach((src, elementId) => {
+            current[elementId] = src;
+          });
+          combinations.push({ ...current });
+          return;
+        }
+
+        // Process image variation
+        const imageVariation = imageElementsWithVariations[imageIndex];
+
+        // Add original image
+        current[imageVariation.elementId] = imageVariation.originalImageUrl;
+        buildCombinations(textIndex, imageIndex + 1, current);
+
+        // Add each image variation
+        for (const v of imageVariation.variations) {
+          current[imageVariation.elementId] = v.imageUrl;
+          buildCombinations(textIndex, imageIndex + 1, current);
+        }
         return;
       }
 
-      const variation = elementsWithVariations[index];
+      // Process text variation
+      const textVariation = textElementsWithVariations[textIndex];
 
       // Add original text
-      current[variation.elementId] = variation.originalText;
-      buildCombinations(index + 1, current);
+      current[textVariation.elementId] = textVariation.originalText;
+      buildCombinations(textIndex + 1, imageIndex, current);
 
-      // Add each variation
-      for (const v of variation.variations) {
-        current[variation.elementId] = v.text;
-        buildCombinations(index + 1, current);
+      // Add each text variation
+      for (const v of textVariation.variations) {
+        current[textVariation.elementId] = v.text;
+        buildCombinations(textIndex + 1, imageIndex, current);
       }
     };
 
-    buildCombinations(0, {});
+    buildCombinations(0, 0, {});
 
     console.log(`✅ Generated ${combinations.length} combinations`);
 
@@ -321,15 +446,20 @@ export function VariationsManagerModal({
     setGeneratedAds(ads);
 
     // Generate images for each combination asynchronously
-    // Pass currentVariationsData to ensure we use the latest data
+    // Pass current variations data to ensure we use the latest data
     ads.forEach((ad, index) => {
       setTimeout(() => {
-        generateAdImage(ad, index, currentVariationsData);
+        generateAdImage(ad, index, currentVariationsData, currentImageVariations);
       }, index * 500); // Stagger generation
     });
   };
 
-  const generateAdImage = async (ad: GeneratedAd, index: number, currentVariationsDataForAd: typeof variationsData) => {
+  const generateAdImage = async (
+    ad: GeneratedAd,
+    index: number,
+    currentVariationsDataForAd: typeof variationsData,
+    currentImageVariationsForAd: typeof imageVariationsFiltered
+  ) => {
     if (!canvas) {
       console.error("❌ Cannot generate image: missing canvas");
       return;
@@ -387,19 +517,30 @@ export function VariationsManagerModal({
         });
       }
 
-      // Helper function to recursively update text in objects (including nested groups)
-      const updateTextInObject = (obj: any): any => {
+      // Build a map of elementId -> originalImageUrl from currentImageVariationsForAd for matching
+      const elementIdToOriginalImageMap = new Map<string, string>();
+      if (currentImageVariationsForAd) {
+        currentImageVariationsForAd.forEach((v: any) => {
+          elementIdToOriginalImageMap.set(v.elementId, v.originalImageUrl);
+        });
+      }
+
+      // Helper function to recursively update text and images in objects (including nested groups)
+      const updateObjectVariations = (obj: any): any => {
         // Check if this is a text object
         const isTextObject =
           obj.type === "textbox" ||
           obj.type === "i-text" ||
           obj.type === "text";
 
+        // Check if this is an image object
+        const isImageObject = obj.type === "image";
+
         if (isTextObject) {
           const elementId = obj.id;
           let updated = false;
           let newText = obj.text;
-          
+
           // Try exact ID match first
           if (elementId && ad.combination[elementId]) {
             newText = ad.combination[elementId];
@@ -416,7 +557,7 @@ export function VariationsManagerModal({
               }
             }
           }
-          
+
           if (updated) {
             return {
               ...obj,
@@ -425,13 +566,43 @@ export function VariationsManagerModal({
           } else if (elementId) {
             console.log(`⚠️ [JSON] No variation found for element ${elementId}, keeping original: "${obj.text}"`);
           }
+        } else if (isImageObject) {
+          const elementId = obj.id;
+          let updated = false;
+          let newImageUrl = obj.src;
+
+          // Try exact ID match first
+          if (elementId && ad.combination[elementId]) {
+            newImageUrl = ad.combination[elementId];
+            console.log(`✅ [JSON] Updating image for element ${elementId}: "${obj.src?.substring(0, 50)}..." -> "${newImageUrl?.substring(0, 50)}..."`);
+            updated = true;
+          } else if (elementIdToOriginalImageMap.size > 0) {
+            // Try to match by original image URL
+            for (const [varElementId, originalImageUrl] of elementIdToOriginalImageMap.entries()) {
+              if (obj.src === originalImageUrl && ad.combination[varElementId]) {
+                newImageUrl = ad.combination[varElementId];
+                console.log(`✅ [JSON Content Match] Updating image (matched ${varElementId})`);
+                updated = true;
+                break;
+              }
+            }
+          }
+
+          if (updated) {
+            return {
+              ...obj,
+              src: newImageUrl,
+            };
+          } else if (elementId) {
+            console.log(`⚠️ [JSON] No image variation found for element ${elementId}, keeping original`);
+          }
         }
 
         // Handle groups - recursively update nested objects
         if (obj.type === "group" && obj.objects && Array.isArray(obj.objects)) {
           return {
             ...obj,
-            objects: obj.objects.map((nestedObj: any) => updateTextInObject(nestedObj)),
+            objects: obj.objects.map((nestedObj: any) => updateObjectVariations(nestedObj)),
           };
         }
 
@@ -439,17 +610,17 @@ export function VariationsManagerModal({
         if (obj.type === "activeSelection" && obj.objects && Array.isArray(obj.objects)) {
           return {
             ...obj,
-            objects: obj.objects.map((nestedObj: any) => updateTextInObject(nestedObj)),
+            objects: obj.objects.map((nestedObj: any) => updateObjectVariations(nestedObj)),
           };
         }
 
         return obj;
       };
 
-      // Replace text content with variations
+      // Replace text and image content with variations
       const modifiedJSON = {
         ...canvasJSON,
-        objects: canvasJSON.objects.map((obj: any) => updateTextInObject(obj)),
+        objects: canvasJSON.objects.map((obj: any) => updateObjectVariations(obj)),
       };
 
       // Create a temporary canvas element
@@ -641,15 +812,17 @@ export function VariationsManagerModal({
       };
 
       // Helper to recursively find and update all text objects
-      const updateTextAfterLoad = (obj: any) => {
+      const updateVariationsAfterLoad = (obj: any) => {
         const isTextObject =
           obj.type === "textbox" ||
           obj.type === "i-text" ||
           obj.type === "text";
 
+        const isImageObject = obj.type === "image";
+
         if (isTextObject) {
           const elementId = obj.id;
-          
+
           // Check if this element is in the combination (either has variation or should keep original)
           if (elementId && ad.combination[elementId] !== undefined) {
             const newText = ad.combination[elementId];
@@ -678,27 +851,65 @@ export function VariationsManagerModal({
                 }
               }
             }
-            
+
             if (!matched) {
               // This element doesn't have variations, keep it as is (it should already be in combination)
               console.log(`ℹ️ Keeping text unchanged for ${elementId}: "${obj.text}"`);
+            }
+          }
+        } else if (isImageObject) {
+          const elementId = obj.id;
+
+          // Check if this element is in the combination (either has variation or should keep original)
+          if (elementId && ad.combination[elementId] !== undefined) {
+            const newImageUrl = ad.combination[elementId];
+            if (obj.getSrc && obj.getSrc() !== newImageUrl) {
+              console.log(`🔄 [Exact ID] Updating image for ${elementId}`);
+              // Load new image
+              obj.setSrc(newImageUrl, () => {
+                obj.setCoords();
+                fabricCanvas.renderAll();
+              });
+            }
+          } else if (elementId) {
+            // Try to find by matching original image URL
+            let matched = false;
+            if (elementIdToOriginalImageMap.size > 0) {
+              for (const [varElementId, originalImageUrl] of elementIdToOriginalImageMap.entries()) {
+                const currentSrc = obj.getSrc ? obj.getSrc() : obj.src;
+                if (currentSrc === originalImageUrl && ad.combination[varElementId] !== undefined) {
+                  const newImageUrl = ad.combination[varElementId];
+                  console.log(`🔄 [Content Match] Updating image for element (ID: ${elementId || 'none'}, matched to var: ${varElementId})`);
+                  obj.setSrc(newImageUrl, () => {
+                    obj.setCoords();
+                    fabricCanvas.renderAll();
+                  });
+                  matched = true;
+                  break;
+                }
+              }
+            }
+
+            if (!matched) {
+              // This element doesn't have variations, keep it as is
+              console.log(`ℹ️ Keeping image unchanged for ${elementId}`);
             }
           }
         }
 
         // Handle groups - recursively update nested objects
         if (obj.type === "group" && obj.getObjects) {
-          obj.getObjects().forEach((nestedObj: any) => updateTextAfterLoad(nestedObj));
+          obj.getObjects().forEach((nestedObj: any) => updateVariationsAfterLoad(nestedObj));
         }
-        
+
         // Handle activeSelection
         if (obj.type === "activeSelection" && obj.getObjects) {
-          obj.getObjects().forEach((nestedObj: any) => updateTextAfterLoad(nestedObj));
+          obj.getObjects().forEach((nestedObj: any) => updateVariationsAfterLoad(nestedObj));
         }
       };
 
       // Update all objects
-      loadedObjects.forEach((obj: any) => updateTextAfterLoad(obj));
+      loadedObjects.forEach((obj: any) => updateVariationsAfterLoad(obj));
       
       // Collect all objects for logging
       const allCanvasObjects: any[] = [];
@@ -734,7 +945,7 @@ export function VariationsManagerModal({
                 try {
                   // Update text one more time to ensure it's correct
                   const finalObjects = fabricCanvas.getObjects();
-                  finalObjects.forEach((obj: any) => updateTextAfterLoad(obj));
+                  finalObjects.forEach((obj: any) => updateVariationsAfterLoad(obj));
                   fabricCanvas.renderAll();
                   resolve();
                 } catch (e) {
@@ -882,7 +1093,7 @@ export function VariationsManagerModal({
         <div className="space-y-6 py-4">
           {/* Summary Section */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Text Elements</p>
                 <p className="text-2xl font-bold text-gray-900">
@@ -890,12 +1101,21 @@ export function VariationsManagerModal({
                 </p>
               </div>
               <div>
+                <p className="text-sm text-gray-600">Image Elements</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {imageVariationsFiltered?.length || 0}
+                </p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-600">Total Variations</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {variationsData?.reduce(
+                  {(variationsData?.reduce(
                     (sum, v) => sum + v.variations.length,
                     0
-                  ) || 0}
+                  ) || 0) + (imageVariationsFiltered?.reduce(
+                    (sum: number, v: any) => sum + v.variations.length,
+                    0
+                  ) || 0)}
                 </p>
               </div>
               <div>
@@ -923,6 +1143,46 @@ export function VariationsManagerModal({
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">
                           {variation.originalText}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary" className="text-xs">
+                            {variation.variations.length} variations
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            ID: {variation.elementId.substring(0, 8)}...
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Image Elements with Variations */}
+          {imageVariationsFiltered && imageVariationsFiltered.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                Image Elements ({imageVariationsFiltered.length})
+              </h3>
+              <div className="space-y-2">
+                {imageVariationsFiltered.map((variation: any, idx: number) => (
+                  <div
+                    key={`${variation.elementId}-${idx}`}
+                    className="border rounded-lg p-3 bg-white"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded border flex items-center justify-center overflow-hidden">
+                        <img
+                          src={variation.originalImageUrl}
+                          alt="Original"
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 mb-1">
+                          Image Element
                         </p>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="secondary" className="text-xs">
@@ -1010,18 +1270,22 @@ export function VariationsManagerModal({
                         </Button>
                       </div>
 
-                      {/* Show which texts are used */}
+                      {/* Show which texts/images are used */}
                       <div className="mt-2 space-y-1">
                         {Object.entries(ad.combination).map(
-                          ([elementId, text]) => (
-                            <p
-                              key={elementId}
-                              className="text-xs text-gray-500 truncate"
-                              title={text}
-                            >
-                              {text}
-                            </p>
-                          )
+                          ([elementId, value]) => {
+                            const displayValue = typeof value === 'string' ? value : String(value);
+                            const isShortText = displayValue.length < 50;
+                            return (
+                              <p
+                                key={elementId}
+                                className="text-xs text-gray-500 truncate"
+                                title={displayValue}
+                              >
+                                {isShortText ? displayValue : `${displayValue.substring(0, 30)}...`}
+                              </p>
+                            );
+                          }
                         )}
                       </div>
                     </div>

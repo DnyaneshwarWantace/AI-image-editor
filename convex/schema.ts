@@ -190,5 +190,23 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
+
+  // Image Variations (for A/B testing and multi-ad generation with images)
+  imageVariations: defineTable({
+    projectId: v.id("projects"), // Which project these variations belong to
+    elementId: v.string(), // Canvas element ID (image object ID)
+    originalImageUrl: v.string(), // Original image URL
+    variations: v.array(
+      v.object({
+        id: v.string(),
+        imageUrl: v.string(), // Variation image URL
+        storageId: v.optional(v.id("_storage")), // Convex storage ID if stored
+        type: v.string(), // "uploaded"
+      })
+    ),
+    userId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }),
 });
 
