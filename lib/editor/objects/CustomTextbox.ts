@@ -1,6 +1,7 @@
 /*
  * Custom Textbox with modified justify alignment logic
  * Converted to Fabric.js v6
+ * Prevents word breaking - ensures words stay together when wrapping
  */
 import { Textbox, FabricObject } from 'fabric';
 
@@ -8,6 +9,110 @@ class CustomTextbox extends Textbox {
   constructor(options?: any) {
     super(options);
     (this as any).type = 'textbox';
+    // Ensure splitByGrapheme is false to prevent character-level splitting
+    // This helps prevent words from breaking in the middle
+    if (options?.splitByGrapheme === undefined) {
+      (this as any).splitByGrapheme = false;
+    }
+  }
+
+  /**
+   * Override set method to ensure splitByGrapheme is false when text is set
+   * This prevents words from breaking in the middle
+   */
+  set(key: string | any, value?: any): this {
+    if (key === 'text' || (typeof key === 'object' && key.text !== undefined)) {
+      // Ensure splitByGrapheme is false to prevent word breaking
+      if (typeof key === 'object') {
+        key.splitByGrapheme = false;
+      } else {
+        // If setting text property directly, also ensure splitByGrapheme is false
+        (this as any).splitByGrapheme = false;
+      }
+    }
+    return super.set(key as any, value);
+  }
+
+  /**
+   * Override the method that handles text wrapping to prevent word breaking
+   * This ensures words stay together when text wraps
+   * Note: This method may not exist in all Fabric.js versions, so we use a try-catch
+   */
+  _wrapText(text: string, maxWidth: number): string[] {
+    try {
+      if (!text || !maxWidth) {
+        // Try parent implementation if it exists
+        if (super._wrapText) {
+          return super._wrapText(text, maxWidth);
+        }
+        return [text];
+      }
+      
+      // Get canvas context for text measurement
+      const canvas = (this as any).canvas;
+      if (!canvas) {
+        if (super._wrapText) {
+          return super._wrapText(text, maxWidth);
+        }
+        return [text];
+      }
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        if (super._wrapText) {
+          return super._wrapText(text, maxWidth);
+        }
+        return [text];
+      }
+      
+      // Set font properties for accurate measurement
+      const fontSize = this.fontSize || 20;
+      const fontFamily = this.fontFamily || 'Arial';
+      const fontWeight = this.fontWeight || 'normal';
+      const fontStyle = this.fontStyle || 'normal';
+      ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+      
+      // Split text into words (including spaces and punctuation as separate tokens)
+      // This regex preserves spaces and splits on word boundaries
+      const tokens = text.match(/\S+|\s+/g) || [text];
+      const lines: string[] = [];
+      let currentLine = '';
+      
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const testLine = currentLine + token;
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        
+        // If adding this token would exceed the width and we have content, start new line
+        if (testWidth > maxWidth && currentLine.trim().length > 0) {
+          // Only break if current line has content (prevents breaking on first word)
+          lines.push(currentLine.trim());
+          // If the token itself is too wide, we have to break it (rare case)
+          if (ctx.measureText(token).width > maxWidth) {
+            // Token is too wide - fall back to character-level breaking for this token only
+            currentLine = token;
+          } else {
+            currentLine = token;
+          }
+        } else {
+          currentLine = testLine;
+        }
+      }
+      
+      // Add the last line if it has content
+      if (currentLine.trim().length > 0) {
+        lines.push(currentLine.trim());
+      }
+      
+      return lines.length > 0 ? lines : [''];
+    } catch (error) {
+      // Fallback to parent implementation if override fails
+      if (super._wrapText) {
+        return super._wrapText(text, maxWidth);
+      }
+      return [text];
+    }
   }
 
   _renderChars(

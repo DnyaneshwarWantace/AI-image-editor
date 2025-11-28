@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,10 +11,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Download, Loader2, Sparkles, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useCanvasContext } from "@/providers/canvas-provider";
+import { Canvas } from "fabric";
 
 interface VariationsManagerModalProps {
   isOpen: boolean;
@@ -50,69 +51,146 @@ export function VariationsManagerModal({
   const { canvas, editor } = useCanvasContext();
   const [generatedAds, setGeneratedAds] = useState<GeneratedAd[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [localVariationsData, setLocalVariationsData] = useState<any[]>([]);
+  const hasGeneratedRef = useRef(false); // Track if we've already generated for this modal open
 
-  // Fetch all text variations from database (always try Convex first)
+  // Mutation to clean up orphaned variations
+  const cleanupOrphanedVariationsMutation = useMutation(api.textVariations.cleanupOrphanedVariations);
+
+  // Fetch all text variations from Convex backend (single source of truth)
   const textVariationsData = useQuery(
     api.textVariations.getTextVariationsByProject,
     projectId ? { projectId } : "skip"
   );
 
-  // Load from localStorage as fallback or for non-Convex projects
-  useEffect(() => {
-    // Only load from localStorage if:
-    // 1. No Convex project ID, OR
-    // 2. Convex query returned undefined/null (still loading or error)
-    if (!projectId) {
-      try {
-        const storageKey = `variations-${projectIdParam}`;
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          // Convert localStorage format to match Convex format
-          const converted = Object.entries(parsed).map(([elementId, data]: [string, any]) => ({
-            elementId,
-            originalText: data.originalText,
-            variations: data.variations,
-          }));
-          setLocalVariationsData(converted);
-        } else {
-          setLocalVariationsData([]);
-        }
-      } catch (error) {
-        console.error("Error loading localStorage variations:", error);
-        setLocalVariationsData([]);
-      }
-    } else if (textVariationsData === null || (textVariationsData && textVariationsData.length === 0)) {
-      // If Convex returned empty/null, try localStorage as fallback
-      try {
-        const storageKey = `variations-${projectIdParam}`;
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          const converted = Object.entries(parsed).map(([elementId, data]: [string, any]) => ({
-            elementId,
-            originalText: data.originalText,
-            variations: data.variations,
-          }));
-          setLocalVariationsData(converted);
-        } else {
-          setLocalVariationsData([]);
-        }
-      } catch (error) {
-        console.error("Error loading localStorage variations:", error);
-        setLocalVariationsData([]);
-      }
-    } else {
-      // Clear localStorage data if we have Convex data
-      setLocalVariationsData([]);
+  // Filter variations to only include text elements that exist on current canvas
+  // This recalculates whenever canvas or textVariationsData changes
+  const variationsData = useMemo(() => {
+    if (!textVariationsData || !canvas) {
+      console.log('⚠️ variationsData: Missing textVariationsData or canvas');
+      return [];
     }
-  }, [projectId, projectIdParam, textVariationsData]);
 
-  // Use Convex data if available, otherwise use localStorage
-  const variationsData = projectId && textVariationsData && textVariationsData.length > 0 
-    ? textVariationsData 
-    : localVariationsData;
+    // Get all text element IDs from CURRENT canvas state (fresh check)
+    const canvasObjects = canvas.getObjects();
+    const canvasTextIds = new Set<string>();
+
+    canvasObjects.forEach((obj: any) => {
+      const isTextObject = obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text';
+      if (isTextObject && obj.id) {
+        canvasTextIds.add(obj.id);
+      }
+    });
+
+    console.log('🔍 [variationsData] Current canvas text IDs:', Array.from(canvasTextIds));
+    console.log('🔍 [variationsData] Total variations from backend:', textVariationsData.length);
+
+    // Filter variations to only include elements that exist on canvas
+    const filtered = textVariationsData.filter(variation => {
+      const exists = canvasTextIds.has(variation.elementId);
+      if (!exists) {
+        console.log(`⚠️ [variationsData] Variation for ${variation.elementId} (${variation.originalText}) - element not on canvas, excluding`);
+      }
+      return exists;
+    });
+
+    const totalCombos = filtered.reduce((acc, v) => acc * (v.variations.length + 1), 1);
+    console.log(`✅ [variationsData] Filtered: ${filtered.length} of ${textVariationsData.length} match canvas. Will generate ${totalCombos} ads.`);
+    
+    return filtered;
+  }, [textVariationsData, canvas]);
+
+  // Reset state and cleanup when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🔄 Modal opened - resetting state and loading fresh data...');
+      // Clear old generated ads immediately when modal opens
+      setGeneratedAds([]);
+      setIsGenerating(false);
+      hasGeneratedRef.current = false; // Reset generation flag
+    } else {
+      // Clear state when modal closes
+      setGeneratedAds([]);
+      setIsGenerating(false);
+      hasGeneratedRef.current = false; // Reset generation flag
+    }
+  }, [isOpen]);
+
+  // Clean up orphaned variations when modal opens
+  useEffect(() => {
+    if (isOpen && canvas && projectId) {
+      const cleanupOrphaned = async () => {
+        // Get all text element IDs from current canvas
+        const canvasObjects = canvas.getObjects();
+        const canvasTextIds: string[] = [];
+
+        canvasObjects.forEach((obj: any) => {
+          const isTextObject = obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text';
+          if (isTextObject && obj.id) {
+            canvasTextIds.push(obj.id);
+          }
+        });
+
+        console.log('🧹 Cleaning up orphaned variations for canvas text IDs:', canvasTextIds);
+
+        try {
+          const result = await cleanupOrphanedVariationsMutation({
+            projectId,
+            canvasTextIds,
+          });
+
+          if (result.deletedCount > 0) {
+            console.log(`🗑️ Cleaned up ${result.deletedCount} orphaned variations:`, result.deletedElements);
+          }
+        } catch (error) {
+          console.error('Failed to cleanup orphaned variations:', error);
+        }
+      };
+
+      cleanupOrphaned();
+    }
+  }, [isOpen, canvas, projectId, cleanupOrphanedVariationsMutation]);
+
+  // Auto-generate ads when modal opens with fresh data
+  // This runs AFTER cleanup and state reset
+  // Only generate ONCE per modal open session
+  useEffect(() => {
+    // Only generate if:
+    // 1. Modal is open
+    // 2. We have variations data
+    // 3. We haven't already generated for this modal open
+    // 4. We're not currently generating
+    if (!isOpen || !variationsData || variationsData.length === 0 || hasGeneratedRef.current || isGenerating) {
+      return;
+    }
+
+    // Mark that we're about to generate (prevent re-triggering)
+    hasGeneratedRef.current = true;
+
+    // Small delay to ensure cleanup, state reset, and data refresh are complete
+    const timer = setTimeout(() => {
+      // Double-check canvas is still available and variations are still valid
+      if (!canvas || !variationsData || variationsData.length === 0) {
+        console.warn('⚠️ Cannot generate: canvas or variations not available');
+        hasGeneratedRef.current = false; // Reset flag if generation fails
+        return;
+      }
+
+      const totalCombos = variationsData.reduce((acc, v) => acc * (v.variations.length + 1), 1);
+      console.log('🎬 Auto-generating ads with fresh data (ONCE)...', {
+        variationsCount: variationsData.length,
+        totalCombinations: totalCombos,
+        variationDetails: variationsData.map(v => ({
+          elementId: v.elementId,
+          originalText: v.originalText,
+          variationCount: v.variations.length
+        }))
+      });
+      
+      generateAllCombinations();
+    }, 300); // Increased delay to ensure all state updates are complete
+    
+    return () => clearTimeout(timer);
+  }, [isOpen, variationsData]); // Removed isGenerating and canvas from deps to prevent re-runs
 
   // Calculate total combinations
   const totalCombinations = variationsData
@@ -122,13 +200,44 @@ export function VariationsManagerModal({
     : 0;
 
   // Generate all possible combinations
+  // This function uses the latest variationsData from closure
   const generateAllCombinations = () => {
-    if (!variationsData || !canvas) return;
+    // Get fresh variationsData and canvas state
+    const currentVariationsData = variationsData;
+    const currentCanvas = canvas;
+    
+    if (!currentVariationsData || !currentVariationsData.length || !currentCanvas) {
+      console.error("❌ Cannot generate: missing variations or canvas", {
+        hasVariations: !!currentVariationsData,
+        variationsLength: currentVariationsData?.length || 0,
+        hasCanvas: !!currentCanvas
+      });
+      setIsGenerating(false);
+      hasGeneratedRef.current = false; // Reset flag so it can retry
+      return;
+    }
+
+    console.log('🚀 Starting generation with:', {
+      variationsCount: currentVariationsData.length,
+      totalCombinations: currentVariationsData.reduce((acc, v) => acc * (v.variations.length + 1), 1),
+      canvasObjectCount: currentCanvas.getObjects().length
+    });
 
     setIsGenerating(true);
 
-    // Get all text elements from canvas to get their current text
-    const canvasJSON = canvas.toJSON();
+    // Use editor's getJson() which properly includes custom properties like 'id'
+    // Get FRESH canvas state at generation time
+    const canvasState = (editor as any)?.getJson?.() || currentCanvas.toJSON();
+
+    console.log('🎨 Using current canvas state for generation:', {
+      objectCount: canvasState.objects?.length || 0,
+      textObjects: canvasState.objects?.filter((obj: any) =>
+        obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text'
+      ).length || 0,
+      sampleTextWithId: canvasState.objects?.find((obj: any) =>
+        obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text'
+      )
+    });
     const findAllTextObjects = (objects: any[]): Array<{id: string | undefined, text: string}> => {
       const textObjects: Array<{id: string | undefined, text: string}> = [];
       const traverse = (obj: any) => {
@@ -145,13 +254,14 @@ export function VariationsManagerModal({
       objects.forEach((obj: any) => traverse(obj));
       return textObjects;
     };
-    
-    const allTextElements = findAllTextObjects(canvasJSON.objects || []);
-    
+
+    // Extract text elements from saved canvasState
+    const allTextElements = findAllTextObjects(canvasState.objects || []);
+
     // Create a map of elementId -> current text for elements WITHOUT variations
     const elementsWithoutVariations = new Map<string, string>();
-    const variationElementIds = new Set(variationsData.map(v => v.elementId));
-    
+    const variationElementIds = new Set(currentVariationsData.map(v => v.elementId));
+
     allTextElements.forEach(({ id, text }) => {
       if (id && !variationElementIds.has(id)) {
         elementsWithoutVariations.set(id, text);
@@ -159,7 +269,7 @@ export function VariationsManagerModal({
     });
 
     // Filter to only elements that have variations
-    const elementsWithVariations = variationsData.filter(v => v.variations.length > 0);
+    const elementsWithVariations = currentVariationsData.filter(v => v.variations.length > 0);
 
     console.log("📊 Generating combinations:", {
       elementsWithVariations: elementsWithVariations.length,
@@ -211,23 +321,27 @@ export function VariationsManagerModal({
     setGeneratedAds(ads);
 
     // Generate images for each combination asynchronously
+    // Pass currentVariationsData to ensure we use the latest data
     ads.forEach((ad, index) => {
       setTimeout(() => {
-        generateAdImage(ad, index);
+        generateAdImage(ad, index, currentVariationsData);
       }, index * 500); // Stagger generation
     });
   };
 
-  const generateAdImage = async (ad: GeneratedAd, index: number) => {
-    if (!canvas) return;
+  const generateAdImage = async (ad: GeneratedAd, index: number, currentVariationsDataForAd: typeof variationsData) => {
+    if (!canvas) {
+      console.error("❌ Cannot generate image: missing canvas");
+      return;
+    }
 
     try {
-      // Get canvas dimensions properly
+      // Get CURRENT canvas state with custom properties (like 'id')
+      const canvasJSON = (editor as any)?.getJson?.() || canvas.toJSON();
+
+      // Get canvas dimensions
       const canvasWidth = canvas.getWidth() || 800;
       const canvasHeight = canvas.getHeight() || 600;
-
-      // Clone canvas
-      const canvasJSON = canvas.toJSON();
 
       // Helper to recursively find all text objects
       const findAllTextObjects = (objects: any[]): any[] => {
@@ -265,10 +379,10 @@ export function VariationsManagerModal({
         totalObjects: canvasJSON.objects?.length || 0,
       });
 
-      // Build a map of elementId -> originalText from variationsData for matching
+      // Build a map of elementId -> originalText from currentVariationsDataForAd for matching
       const elementIdToOriginalTextMap = new Map<string, string>();
-      if (variationsData) {
-        variationsData.forEach(v => {
+      if (currentVariationsDataForAd) {
+        currentVariationsDataForAd.forEach(v => {
           elementIdToOriginalTextMap.set(v.elementId, v.originalText);
         });
       }
@@ -355,13 +469,13 @@ export function VariationsManagerModal({
         const checkContext = () => {
           try {
             const ctx = fabricCanvas.getContext();
-            if (ctx) {
+            if (ctx && (ctx as any).canvas) {
               resolve();
             } else {
-              setTimeout(checkContext, 50);
+              requestAnimationFrame(checkContext);
             }
           } catch (e) {
-            setTimeout(checkContext, 50);
+            requestAnimationFrame(checkContext);
           }
         };
         checkContext();
@@ -378,19 +492,154 @@ export function VariationsManagerModal({
       }
 
       // Load the modified JSON (Fabric.js v6 returns a Promise)
-      await fabricCanvas.loadFromJSON(modifiedJSON);
+      try {
+        await fabricCanvas.loadFromJSON(modifiedJSON);
+      } catch (loadError) {
+        console.error('Failed to load JSON for ad generation:', loadError);
+        throw loadError;
+      }
 
       // After loading, ensure text is updated (in case JSON modification didn't work)
       const loadedObjects = fabricCanvas.getObjects();
       
-      // Build a map of elementId -> originalText from variationsData for matching
+      // Store original dimensions of text objects before updating (for auto-fit)
+      const originalTextDimensions = new Map<string, { width: number; height: number; fontSize: number }>();
+      const storeOriginalDimensions = (obj: any) => {
+        if (obj.type === "textbox" || obj.type === "i-text" || obj.type === "text") {
+          if (obj.id) {
+            originalTextDimensions.set(obj.id, {
+              width: obj.getScaledWidth() || obj.width || 200,
+              height: obj.getScaledHeight() || obj.height || 100,
+              fontSize: obj.fontSize || 20
+            });
+          }
+        }
+        if (obj.type === "group" && obj.getObjects) {
+          obj.getObjects().forEach((nestedObj: any) => storeOriginalDimensions(nestedObj));
+        }
+      };
+      loadedObjects.forEach((obj: any) => storeOriginalDimensions(obj));
+      
+      // Build a map of elementId -> originalText from currentVariationsDataForAd for matching
       const elementIdToOriginalText = new Map<string, string>();
-      if (variationsData) {
-        variationsData.forEach(v => {
+      if (currentVariationsDataForAd) {
+        currentVariationsDataForAd.forEach(v => {
           elementIdToOriginalText.set(v.elementId, v.originalText);
         });
       }
       
+      // Helper function to auto-fit text within its bounding box
+      const autoFitText = (textObj: any) => {
+        if (!textObj || !textObj.text) return;
+        
+        try {
+          // Get original dimensions from stored map (before text was updated)
+          const elementId = textObj.id;
+          const originalDims = elementId ? originalTextDimensions.get(elementId) : null;
+          
+          // Use original dimensions if available, otherwise use current dimensions
+          const originalFontSize = originalDims?.fontSize || textObj.fontSize || 20;
+          
+          // Get the original bounding box dimensions (before text change)
+          // For textbox, width is the max width constraint
+          // For i-text and text, we use the original dimensions as the constraint
+          const isTextBox = textObj.type === 'textbox';
+          const constraintWidth = originalDims 
+            ? originalDims.width
+            : (isTextBox 
+              ? (textObj.width || textObj.getScaledWidth() || 200)
+              : (textObj.getScaledWidth() || 200));
+          const constraintHeight = originalDims 
+            ? originalDims.height
+            : (textObj.getScaledHeight() || 100);
+          
+          // Get current font size
+          let currentFontSize = originalFontSize;
+          const minFontSize = 8; // Minimum font size to prevent text from being too small
+          const maxFontSize = Math.max(originalFontSize * 2, 100); // Maximum font size
+          
+          // Function to check if text fits with given font size
+          const checkTextFits = (fontSize: number): boolean => {
+            // Temporarily set font size
+            const prevFontSize = textObj.fontSize;
+            textObj.set('fontSize', fontSize);
+            textObj.setCoords();
+            
+            // Get actual rendered dimensions
+            const actualWidth = textObj.getScaledWidth();
+            const actualHeight = textObj.getScaledHeight();
+            
+            // Restore font size
+            textObj.set('fontSize', prevFontSize);
+            textObj.setCoords();
+            
+            // Check if it fits (with 5% tolerance for rounding)
+            const fitsWidth = actualWidth <= constraintWidth * 1.05;
+            const fitsHeight = actualHeight <= constraintHeight * 1.05;
+            
+            return fitsWidth && fitsHeight;
+          };
+          
+          // Check if current text fits
+          const currentFits = checkTextFits(currentFontSize);
+          
+          if (currentFits) {
+            // Text fits, try to find optimal larger size
+            let optimalFontSize = currentFontSize;
+            
+            // Binary search for largest font size that fits
+            let minSize = currentFontSize;
+            let maxSize = maxFontSize;
+            
+            while (maxSize - minSize > 0.5) {
+              const testSize = (minSize + maxSize) / 2;
+              if (checkTextFits(testSize)) {
+                optimalFontSize = testSize;
+                minSize = testSize;
+              } else {
+                maxSize = testSize;
+              }
+            }
+            
+            if (Math.abs(optimalFontSize - currentFontSize) > 1) {
+              textObj.set('fontSize', Math.round(optimalFontSize));
+              textObj.setCoords();
+              console.log(`📏 [Auto-fit] Optimized font size from ${currentFontSize} to ${Math.round(optimalFontSize)}`);
+            }
+          } else {
+            // Text doesn't fit, need to reduce font size
+            let optimalFontSize = currentFontSize;
+            
+            // Binary search for largest font size that fits
+            let minSize = minFontSize;
+            let maxSize = currentFontSize;
+            
+            while (maxSize - minSize > 0.5) {
+              const testSize = (minSize + maxSize) / 2;
+              if (checkTextFits(testSize)) {
+                optimalFontSize = testSize;
+                minSize = testSize;
+              } else {
+                maxSize = testSize;
+              }
+            }
+            
+            if (optimalFontSize < currentFontSize) {
+              textObj.set('fontSize', Math.round(optimalFontSize));
+              textObj.setCoords();
+              console.log(`📏 [Auto-fit] Reduced font size from ${currentFontSize} to ${Math.round(optimalFontSize)} to fit within bounds`);
+            } else {
+              // Even minimum doesn't fit, use minimum anyway
+              textObj.set('fontSize', minFontSize);
+              textObj.setCoords();
+              console.log(`📏 [Auto-fit] Set to minimum ${minFontSize} (text may overflow)`);
+            }
+          }
+        } catch (error) {
+          console.warn('Error in auto-fit text:', error);
+        }
+      };
+
       // Helper to recursively find and update all text objects
       const updateTextAfterLoad = (obj: any) => {
         const isTextObject =
@@ -408,6 +657,8 @@ export function VariationsManagerModal({
               console.log(`🔄 [Exact ID] Updating text for ${elementId}: "${obj.text}" -> "${newText}"`);
               obj.set("text", newText);
               obj.setCoords();
+              // Auto-fit the text to ensure it fits within its bounds
+              autoFitText(obj);
             }
           } else if (elementId) {
             // Try to find by matching original text content (for elements without IDs)
@@ -420,6 +671,8 @@ export function VariationsManagerModal({
                   console.log(`🔄 [Content Match] Updating text for element (ID: ${elementId || 'none'}, matched to var: ${varElementId}): "${obj.text}" -> "${newText}"`);
                   obj.set("text", newText);
                   obj.setCoords();
+                  // Auto-fit the text to ensure it fits within its bounds
+                  autoFitText(obj);
                   matched = true;
                   break;
                 }
@@ -471,17 +724,28 @@ export function VariationsManagerModal({
       await new Promise<void>((resolve) => {
         requestAnimationFrame(() => {
           try {
-            // Force render all objects
-            fabricCanvas.renderAll();
-
-            // Wait a bit more for fonts to render and text to update
-            setTimeout(() => {
-              // Update text one more time to ensure it's correct
-              const finalObjects = fabricCanvas.getObjects();
-              finalObjects.forEach((obj: any) => updateTextAfterLoad(obj));
+            const ctx = fabricCanvas.getContext();
+            if (ctx && (ctx as any).canvas) {
+              // Force render all objects
               fabricCanvas.renderAll();
+
+              // Wait a bit more for fonts to render and text to update
+              setTimeout(() => {
+                try {
+                  // Update text one more time to ensure it's correct
+                  const finalObjects = fabricCanvas.getObjects();
+                  finalObjects.forEach((obj: any) => updateTextAfterLoad(obj));
+                  fabricCanvas.renderAll();
+                  resolve();
+                } catch (e) {
+                  console.warn("Error updating text:", e);
+                  resolve();
+                }
+              }, 300);
+            } else {
+              console.warn("Canvas context not ready for render");
               resolve();
-            }, 300);
+            }
           } catch (e) {
             console.warn("Error during render:", e);
             resolve();
@@ -490,11 +754,17 @@ export function VariationsManagerModal({
       });
 
       // Export as image with proper options
-      const dataURL = fabricCanvas.toDataURL({
-        format: "png",
-        quality: 1.0,
-        multiplier: 1, // Use 1 for proper sizing
-      });
+      let dataURL;
+      try {
+        dataURL = fabricCanvas.toDataURL({
+          format: "png",
+          quality: 1.0,
+          multiplier: 1, // Use 1 for proper sizing
+        });
+      } catch (e) {
+        console.error('Failed to export canvas to data URL:', e);
+        throw new Error("Failed to generate image data URL");
+      }
 
       if (!dataURL || dataURL === "data:,") {
         throw new Error("Failed to generate image data URL");
@@ -537,18 +807,63 @@ export function VariationsManagerModal({
   const downloadAd = (ad: GeneratedAd, index: number) => {
     if (!ad.imageUrl) return;
 
+    // Convert data URL to blob for better download handling
+    const dataURL = ad.imageUrl;
+    const blob = dataURLToBlob(dataURL);
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
     link.download = `ad-variation-${index + 1}.png`;
-    link.href = ad.imageUrl;
+    link.href = url;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the object URL after a delay
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 100);
   };
 
-  const downloadAllAds = () => {
-    generatedAds.forEach((ad, index) => {
-      setTimeout(() => {
-        downloadAd(ad, index);
-      }, index * 100);
-    });
+  // Helper function to convert data URL to blob
+  const dataURLToBlob = (dataURL: string): Blob => {
+    const arr = dataURL.split(',');
+    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  };
+
+  const downloadAllAds = async () => {
+    // Filter to only ads that have images ready
+    const adsToDownload = generatedAds.filter(ad => ad.imageUrl && !ad.isGenerating);
+    
+    if (adsToDownload.length === 0) {
+      console.warn('No ads ready to download');
+      return;
+    }
+
+    console.log(`📥 Starting download of ${adsToDownload.length} ads...`);
+
+    // Download sequentially with proper delays to avoid browser blocking
+    for (let i = 0; i < adsToDownload.length; i++) {
+      const ad = adsToDownload[i];
+      const index = generatedAds.indexOf(ad);
+      
+      // Wait before each download (except the first one)
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 800)); // 800ms delay between downloads
+      }
+      
+      downloadAd(ad, index);
+      console.log(`✅ Downloaded variation ${index + 1}/${adsToDownload.length}`);
+    }
+
+    console.log(`🎉 Finished downloading all ${adsToDownload.length} ads`);
   };
 
   return (
@@ -596,12 +911,12 @@ export function VariationsManagerModal({
           {variationsData && variationsData.length > 0 && (
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                Text Elements
+                Text Elements ({variationsData.length})
               </h3>
               <div className="space-y-2">
-                {variationsData.map((variation) => (
+                {variationsData.map((variation, idx) => (
                   <div
-                    key={variation.elementId}
+                    key={`${variation.elementId}-${idx}`}
                     className="border rounded-lg p-3 bg-white"
                   >
                     <div className="flex items-start justify-between">
@@ -611,8 +926,11 @@ export function VariationsManagerModal({
                         </p>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="secondary" className="text-xs">
-                            Original + {variation.variations.length} variations
+                            {variation.variations.length} variations
                           </Badge>
+                          <span className="text-xs text-gray-500">
+                            ID: {variation.elementId.substring(0, 8)}...
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -622,27 +940,13 @@ export function VariationsManagerModal({
             </div>
           )}
 
-          {/* Generate Button */}
-          {!generatedAds.length && (
+          {/* Auto-generating status */}
+          {isGenerating && generatedAds.length === 0 && (
             <div className="flex justify-center pt-4">
-              <Button
-                onClick={generateAllCombinations}
-                disabled={isGenerating || !variationsData?.length}
-                size="lg"
-                className="gap-2"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-5 w-5" />
-                    Generate All {totalCombinations} Ads
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-2 text-blue-600">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span className="text-sm font-medium">Generating {totalCombinations} ad variations...</span>
+              </div>
             </div>
           )}
 

@@ -11,7 +11,7 @@ type callback = () => void;
 
 class HistoryPlugin implements IPluginTempl {
   static pluginName = 'HistoryPlugin';
-  static apis = ['undo', 'redo', 'historyUpdate', 'clearAndSaveState', 'saveState'];
+  static apis = ['undo', 'redo', 'canUndo', 'canRedo', 'historyUpdate', 'clearAndSaveState', 'saveState'];
   static events = [];
 
   // History-related properties
@@ -80,20 +80,27 @@ class HistoryPlugin implements IPluginTempl {
   }
 
   // Load state
-  private _loadState(state: string, eventName: string, callback?: callback) {
+  private _loadState(state: string | object, eventName: string, callback?: callback) {
     this.isLoading = true;
     this.isProcessing = true;
 
     // Handle workspace special case
-    const parsedState = JSON.parse(state);
+    const parsedState = typeof state === 'string' ? JSON.parse(state) : state;
     const workspace = parsedState.objects?.find((item: any) => item.id === 'workspace');
     if (workspace) {
       workspace.evented = false;
     }
 
-    this.canvas.loadFromJSON(state, () => {
+    // Fabric.js v6 loadFromJSON returns a Promise
+    const stateToLoad = typeof state === 'string' ? state : JSON.stringify(state);
+    this.canvas.loadFromJSON(stateToLoad).then(() => {
       this.canvas.requestRenderAll();
       (this.canvas as any).fire(eventName);
+      this.isProcessing = false;
+      this.isLoading = false;
+      callback?.();
+    }).catch((error) => {
+      console.error('Error loading history state:', error);
       this.isProcessing = false;
       this.isLoading = false;
       callback?.();
@@ -133,8 +140,13 @@ class HistoryPlugin implements IPluginTempl {
     this.currentIndex--;
     const state = this.stack[this.currentIndex - 1];
     if (state) {
-      this._loadState(JSON.stringify(state), 'history:undo');
-      this.historyUpdate();
+      this._loadState(state, 'history:undo', () => {
+        // Update history state after loading is complete
+        this.historyUpdate();
+      });
+    } else {
+      // If no state found, restore index
+      this.currentIndex++;
     }
   }
 
@@ -143,10 +155,22 @@ class HistoryPlugin implements IPluginTempl {
 
     const state = this.stack[this.currentIndex];
     if (state) {
-      this._loadState(JSON.stringify(state), 'history:redo');
+      // Increment index before loading so state calculation is correct
       this.currentIndex++;
-      this.historyUpdate();
+      
+      this._loadState(state, 'history:redo', () => {
+        // Update history state after loading is complete
+        this.historyUpdate();
+      });
     }
+  }
+
+  canUndo(): boolean {
+    return !this.isLoading && this.currentIndex > 1;
+  }
+
+  canRedo(): boolean {
+    return !this.isLoading && this.currentIndex < this.stack.length;
   }
 
   hotkeyEvent(eventName: string, e: KeyboardEvent) {

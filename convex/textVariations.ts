@@ -55,7 +55,7 @@ export const saveTextVariations = mutation({
   },
 });
 
-// Get all text variations for a project
+// Get all text variations for a project (deduplicated by elementId)
 export const getTextVariationsByProject = query({
   args: {
     projectId: v.id("projects"),
@@ -66,7 +66,25 @@ export const getTextVariationsByProject = query({
       .filter((q) => q.eq(q.field("projectId"), args.projectId))
       .collect();
 
-    return variations;
+    // Deduplicate by elementId - keep only the most recent one
+    const deduped = new Map();
+    variations.forEach(v => {
+      const existing = deduped.get(v.elementId);
+      if (!existing || v.updatedAt > existing.updatedAt) {
+        deduped.set(v.elementId, v);
+      }
+    });
+
+    const result = Array.from(deduped.values());
+
+    // Log for debugging
+    console.log(`📊 Variations for project ${args.projectId}:`, {
+      total: variations.length,
+      unique: result.length,
+      elementIds: result.map(v => ({ id: v.elementId, text: v.originalText, count: v.variations.length }))
+    });
+
+    return result;
   },
 });
 
@@ -113,6 +131,36 @@ export const deleteTextVariations = mutation({
       return true;
     }
     return false;
+  },
+});
+
+// Clean up variations for text elements that no longer exist on canvas
+export const cleanupOrphanedVariations = mutation({
+  args: {
+    projectId: v.id("projects"),
+    canvasTextIds: v.array(v.string()), // Array of text element IDs currently on canvas
+  },
+  handler: async (ctx, args) => {
+    // Get all variations for this project
+    const variations = await ctx.db
+      .query("textVariations")
+      .filter((q) => q.eq(q.field("projectId"), args.projectId))
+      .collect();
+
+    // Find variations whose elements are not on canvas anymore
+    const canvasIdsSet = new Set(args.canvasTextIds);
+    const orphaned = variations.filter(v => !canvasIdsSet.has(v.elementId));
+
+    // Delete orphaned variations
+    for (const variation of orphaned) {
+      await ctx.db.delete(variation._id);
+    }
+
+    return {
+      success: true,
+      deletedCount: orphaned.length,
+      deletedElements: orphaned.map(v => ({ id: v.elementId, text: v.originalText }))
+    };
   },
 });
 

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 
@@ -25,6 +25,9 @@ export function TemplatesPanel() {
     isPublic: true,
     limit: 10000,
   });
+
+  // Mutation for saving project after loading template
+  const updateProjectMutation = useMutation(api.projects.updateProject);
 
   // Filter templates based on search and type
   const templates = useMemo(() => {
@@ -159,29 +162,49 @@ export function TemplatesPanel() {
         // Force render
         canvas.requestRenderAll();
 
-        // Save updated canvas state and metadata to localStorage
+        // Save updated canvas state to Convex backend immediately
         try {
           const canvasJSON = canvas.toJSON();
+
+          // Generate thumbnail for preview
+          const thumbnail = canvas.toDataURL({
+            format: 'png',
+            quality: 0.8,
+            multiplier: 0.3,
+          });
+
+          // Save to localStorage as backup
           localStorage.setItem(`project-${projectId}`, JSON.stringify(canvasJSON));
-          
-          // Update project metadata with new dimensions
-          const existingMeta = localStorage.getItem(`project-meta-${projectId}`);
-          let meta: any = {};
-          if (existingMeta) {
+          const meta = {
+            width: templateWidth,
+            height: templateHeight,
+            updatedAt: Date.now(),
+          };
+          localStorage.setItem(`project-meta-${projectId}`, JSON.stringify(meta));
+
+          // Save to Convex backend if valid Convex ID
+          const isValidConvexId = (id: string): boolean => {
+            if (!id || typeof id !== 'string') return false;
+            const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
+            return convexIdPattern.test(id) && id.length >= 16;
+          };
+
+          if (isValidConvexId(projectId)) {
             try {
-              meta = JSON.parse(existingMeta);
-            } catch (e) {
-              // Ignore parse errors
+              await updateProjectMutation({
+                projectId: projectId as any,
+                canvasState: canvasJSON,
+                width: templateWidth,
+                height: templateHeight,
+                imageUrl: thumbnail,
+              });
+              console.log('✅ Template saved to Convex backend');
+            } catch (convexError) {
+              console.warn('Could not save to Convex, saved to localStorage:', convexError);
             }
           }
-          
-          meta.width = templateWidth;
-          meta.height = templateHeight;
-          meta.updatedAt = Date.now();
-          
-          localStorage.setItem(`project-meta-${projectId}`, JSON.stringify(meta));
         } catch (saveError) {
-          console.warn('Could not save template dimensions to metadata:', saveError);
+          console.warn('Could not save template:', saveError);
         }
 
         toast.success("Template loaded");

@@ -37,7 +37,7 @@ export function DragModeToggle() {
   return (
     <div className="flex items-center gap-2">
       <Switch checked={enabled} onCheckedChange={handleToggle} id="drag-mode" />
-      <Label htmlFor="drag-mode" className="text-sm cursor-pointer">
+      <Label htmlFor="drag-mode" className="text-sm text-gray-700 cursor-pointer">
         Drag Mode
       </Label>
     </div>

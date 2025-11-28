@@ -16,6 +16,7 @@ import {
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
 import { IText, Textbox, Rect, Circle as FabricCircle, Triangle as FabricTriangle, Polygon } from "fabric";
+import { CustomTextbox } from "@/lib/editor";
 // Import to ensure TypeScript loads the module augmentation
 import "@/lib/editor/plugin/DrawPolygonPlugin";
 import "@/lib/editor/plugin/PathTextPlugin";
@@ -73,12 +74,13 @@ export function ElementsPanel() {
     if (!canvas || !editor) return;
     stopAllDrawingModes(); // Stop any active drawing
     try {
-      const textbox = new Textbox("Type your text here", {
+      // Use CustomTextbox which prevents word breaking
+      const textbox = new CustomTextbox("Type your text here", {
         width: 400,
         fontSize: 80,
         fill: "#000000",
         fontFamily: "Arial",
-        splitByGrapheme: true,
+        splitByGrapheme: false, // Set to false to prevent word breaking
       });
       (editor as any).addBaseType?.(textbox, { center: true });
       toast.success("Text box added");

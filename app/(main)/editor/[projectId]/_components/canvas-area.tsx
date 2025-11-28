@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Canvas } from "fabric";
+import { Canvas, FabricObject } from "fabric";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { ZoomControls } from "./canvas/zoom-controls";
 import Editor from "@/lib/editor/Editor";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 // Import all plugins (removed WorkspacePlugin, ResizePlugin, MaskPlugin)
@@ -59,6 +59,9 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
   const convexFonts = useQuery(api.fonts.getFonts, {
     limit: 10000,
   });
+
+  // Mutation for auto-saving to Convex
+  const updateProjectMutation = useMutation(api.projects.updateProject);
 
 
   // Calculate zoom to fit canvas in container
@@ -139,6 +142,19 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
     }
   }, [canvasSize.width, canvasSize.height]);
 
+  // Prevent body/html scrolling when editor is active
+  useEffect(() => {
+    // Add editor-mode class to body and html to prevent scrolling
+    document.body.classList.add('editor-mode');
+    document.documentElement.classList.add('editor-mode');
+    
+    return () => {
+      // Remove editor-mode class when component unmounts
+      document.body.classList.remove('editor-mode');
+      document.documentElement.classList.remove('editor-mode');
+    };
+  }, []);
+
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -167,6 +183,31 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
 
       // Mark canvas as initialized
       (canvasRef.current as any).__fabricCanvas = fabricCanvas;
+
+      // Register custom properties for serialization (Fabric.js v6)
+      // Ensure 'id' and other custom properties are included in toJSON()
+      const customProps = [
+        'id',
+        'selectable',
+        'hasControls',
+        'linkData',
+        'editable',
+        'extensionType',
+        'extension',
+        'verticalAlign',
+        'gradientAngle',
+        'roundValue'
+      ];
+
+      // Override toObject for all object types to include custom properties
+      // Only override once to prevent multiple overrides
+      if (!(FabricObject.prototype.toObject as any)._customPropsAdded) {
+        const originalToObject = FabricObject.prototype.toObject;
+        FabricObject.prototype.toObject = function(propertiesToInclude?: string[]) {
+          return originalToObject.call(this, [...customProps, ...(propertiesToInclude || [])]);
+        };
+        (FabricObject.prototype.toObject as any)._customPropsAdded = true;
+      }
 
       // Initialize Editor
       const canvasEditor = new Editor();
@@ -293,20 +334,28 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
               if (fabricCanvas) {
                 try {
                   const context = fabricCanvas.getContext();
-                  if (context && fabricCanvas.width && fabricCanvas.height) {
-                    resolve();
-                    return;
+                  // Check if context exists and has canvas property
+                  if (context && (context as any).canvas && fabricCanvas.width && fabricCanvas.height) {
+                    // Additional check: ensure Fabric.js internal elements are ready
+                    const fabricCanvasAny = fabricCanvas as any;
+                    if (fabricCanvasAny.elements && fabricCanvasAny.elements.lower && fabricCanvasAny.elements.lower.ctx) {
+                      // Wait one more frame to ensure everything is fully initialized
+                      requestAnimationFrame(() => {
+                        setTimeout(() => resolve(), 50);
+                      });
+                      return;
+                    }
                   }
                 } catch (e) {
                   // Context not ready yet
                 }
               }
               
-              if (attempts < 10) {
-                // Retry up to 10 times (500ms total)
+              if (attempts < 20) {
+                // Retry up to 20 times (1 second total)
                 setTimeout(() => checkCanvasReady(attempts + 1), 50);
               } else {
-                // Give up after 10 attempts
+                // Give up after 20 attempts
                 console.warn('Canvas not ready after retries, proceeding anyway');
                 resolve();
               }
@@ -321,16 +370,20 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
               return;
             }
             
-            // Double-check context before loading
+            // Double-check context before loading - ensure Fabric.js internal elements are ready
             try {
               const context = fabricCanvas.getContext();
-              if (!context) {
+              const fabricCanvasAny = fabricCanvas as any;
+              
+              if (!context || !(context as any).canvas) {
                 console.warn('Canvas context not ready, waiting...');
                 await new Promise<void>((resolve) => {
                   setTimeout(() => {
                     try {
                       const ctx = fabricCanvas?.getContext();
-                      if (ctx && fabricCanvas) {
+                      const fcAny = fabricCanvas as any;
+                      if (ctx && (ctx as any).canvas && fabricCanvas && 
+                          fcAny.elements && fcAny.elements.lower && fcAny.elements.lower.ctx) {
                         fabricCanvas.loadFromJSON(project.canvasState).then(() => resolve()).catch(() => resolve());
                       } else {
                         resolve();
@@ -343,14 +396,47 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
                 });
                 return;
               }
+              
+              // Ensure Fabric.js internal elements are ready
+              if (!fabricCanvasAny.elements || !fabricCanvasAny.elements.lower || !fabricCanvasAny.elements.lower.ctx) {
+                console.warn('Fabric.js internal elements not ready, waiting...');
+                await new Promise<void>((resolve) => {
+                  const checkElements = (attempts = 0) => {
+                    const fcAny = fabricCanvas as any;
+                    if (fcAny.elements && fcAny.elements.lower && fcAny.elements.lower.ctx) {
+                      resolve();
+                    } else if (attempts < 10) {
+                      setTimeout(() => checkElements(attempts + 1), 50);
+                    } else {
+                      console.warn('Fabric.js elements not ready after retries');
+                      resolve();
+                    }
+                  };
+                  checkElements();
+                });
+              }
             } catch (e) {
               console.error('Error checking canvas context:', e);
               return;
             }
             
-            // Load canvas state
+            // Load canvas state with additional delay to ensure everything is ready
             try {
-              await fabricCanvas.loadFromJSON(project.canvasState);
+              await new Promise<void>((resolve) => {
+                requestAnimationFrame(() => {
+                  setTimeout(async () => {
+                    try {
+                      if (fabricCanvas && project.canvasState) {
+                        await fabricCanvas.loadFromJSON(project.canvasState);
+                      }
+                      resolve();
+                    } catch (loadError) {
+                      console.error('Error loading canvas state:', loadError);
+                      resolve();
+                    }
+                  }, 50);
+                });
+              });
             } catch (loadError) {
               console.error('Error loading canvas state:', loadError);
             }
@@ -395,19 +481,28 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
                 obj.type === 'text' || obj.type === 'i-text' || obj.type === 'textbox'
               );
               
-              // Update each text object to trigger font re-render
+              // Update each text object to trigger font re-render and prevent word breaking
               textObjects.forEach((obj: any) => {
                 const fontFamily = obj.fontFamily;
                 if (fontFamily && fontFamily !== 'Arial') {
                   // Force font reload by temporarily changing and restoring
                   obj.set('fontFamily', fontFamily);
                 }
+                // Ensure splitByGrapheme is false to prevent word breaking
+                if (obj.splitByGrapheme !== false) {
+                  obj.set('splitByGrapheme', false);
+                }
               });
               
               // Use requestAnimationFrame to ensure canvas context is ready
               requestAnimationFrame(() => {
-                if (fabricCanvas && fabricCanvas.getContext()) {
-                  fabricCanvas.requestRenderAll();
+                try {
+                  const ctx = fabricCanvas?.getContext();
+                  if (fabricCanvas && ctx && (ctx as any).canvas) {
+                    fabricCanvas.requestRenderAll();
+                  }
+                } catch (e) {
+                  console.warn('Could not render canvas:', e);
                 }
               });
             }
@@ -417,18 +512,48 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
             // Fallback: try loading without font preloading after a delay
             if (fabricCanvas && project.canvasState) {
               setTimeout(() => {
-                if (fabricCanvas && fabricCanvas.getContext()) {
-                  fabricCanvas.loadFromJSON(project.canvasState).then(() => {
-                    fabricCanvas?.requestRenderAll();
-                  }).catch((fallbackError: any) => {
-                    console.error('Fallback loading also failed:', fallbackError);
-                  });
+                try {
+                  const ctx = fabricCanvas?.getContext();
+                  const fabricCanvasAny = fabricCanvas as any;
+                  // Ensure both context and internal elements are ready
+                  if (fabricCanvas && ctx && (ctx as any).canvas && 
+                      fabricCanvasAny.elements && fabricCanvasAny.elements.lower && 
+                      fabricCanvasAny.elements.lower.ctx && project.canvasState) {
+                    requestAnimationFrame(() => {
+                      setTimeout(() => {
+                        if (fabricCanvas && project.canvasState) {
+                          fabricCanvas.loadFromJSON(project.canvasState).then(() => {
+                            requestAnimationFrame(() => {
+                              if (fabricCanvas && fabricCanvas.getContext()) {
+                                fabricCanvas.requestRenderAll();
+                              }
+                            });
+                          }).catch((fallbackError: any) => {
+                            console.error('Error in fallback load:', fallbackError);
+                          });
+                        }
+                      }, 50);
+                    });
+                  } else {
+                    console.warn('Canvas not ready for fallback load');
+                  }
+                } catch (e) {
+                  console.error('Error in fallback load:', e);
                 }
-              }, 100);
+              }, 500);
             }
           });
       } else if (fabricCanvas) {
-        fabricCanvas.requestRenderAll();
+        requestAnimationFrame(() => {
+          try {
+            const ctx = fabricCanvas?.getContext();
+            if (fabricCanvas && ctx && (ctx as any).canvas) {
+              fabricCanvas.requestRenderAll();
+            }
+          } catch (e) {
+            console.warn('Could not render canvas:', e);
+          }
+        });
       }
 
       // Ensure workspace doesn't interfere with selection
@@ -470,9 +595,26 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
           return;
         }
 
+        // Assign UUID to new objects that don't have an ID
+        if (!(obj as any).id) {
+          const { v4: uuid } = require('uuid');
+          const newId = uuid();
+          (obj as any).id = newId;
+          obj.set('id', newId);
+          console.log(`✅ Auto-assigned ID to new object: ${newId} (type: ${obj.type})`);
+        }
+
         // Ensure all other objects are selectable
         if (obj.selectable === false && !obj.lockMovementX) {
           obj.set('selectable', true);
+        }
+
+        // Ensure textboxes prevent word breaking
+        if (obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text') {
+          // Set splitByGrapheme to false to prevent words from breaking in the middle
+          if ((obj as any).splitByGrapheme !== false) {
+            obj.set('splitByGrapheme', false);
+          }
         }
 
         // Skip if object already has proper position (not at 0,0 or already centered)
@@ -515,7 +657,13 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         });
 
         obj.setCoords();
-        fabricCanvas.requestRenderAll();
+
+        // Only render if context is ready
+        requestAnimationFrame(() => {
+          if (fabricCanvas && fabricCanvas.getContext()) {
+            fabricCanvas.requestRenderAll();
+          }
+        });
       });
 
       // Override loadFromJSON to prevent auto-centering during load
@@ -535,16 +683,16 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         });
       };
 
-      // Auto-save to localStorage when canvas changes (backend save happens on manual save)
+      // Auto-save to Convex backend when canvas changes
       let autoSaveTimeout: NodeJS.Timeout;
       const autoSave = () => {
         clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
+        autoSaveTimeout = setTimeout(async () => {
           if (!fabricCanvas || !project._id) return;
-          
+
           // Skip auto-save if we're loading from JSON
           if ((fabricCanvas as any)._isLoadingFromJSON) return;
-          
+
           // Ensure canvas context is ready before accessing canvas methods
           try {
             const context = fabricCanvas.getContext();
@@ -552,12 +700,34 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
               console.warn('Canvas context not ready for auto-save');
               return;
             }
-            
-            const canvasJSON = fabricCanvas.toJSON();
-            
-            // Save to localStorage as backup
-            localStorage.setItem(`project-${project._id}`, JSON.stringify(canvasJSON));
-            
+
+            // Serialize canvas with all custom properties
+            let canvasJSON;
+            try {
+              canvasJSON = fabricCanvas.toJSON();
+            } catch (e) {
+              console.error('Failed to serialize canvas:', e);
+              return;
+            }
+
+            // Log what we're saving to verify all properties are captured
+            console.log('📦 Canvas data being saved:', {
+              objectCount: canvasJSON.objects?.length || 0,
+              sampleObject: canvasJSON.objects?.[0] ? {
+                type: canvasJSON.objects[0].type,
+                hasId: !!canvasJSON.objects[0].id,
+                hasFill: !!canvasJSON.objects[0].fill,
+                hasStroke: !!canvasJSON.objects[0].stroke,
+                hasFontFamily: !!(canvasJSON.objects[0] as any).fontFamily,
+                hasFontWeight: !!(canvasJSON.objects[0] as any).fontWeight,
+                hasFontSize: !!(canvasJSON.objects[0] as any).fontSize,
+                hasSrc: !!(canvasJSON.objects[0] as any).src,
+                allPropertiesCount: Object.keys(canvasJSON.objects[0]).length
+              } : null,
+              backgroundImage: !!canvasJSON.backgroundImage,
+              backgroundColor: canvasJSON.backgroundColor
+            });
+
             // Safely get dimensions
             let width = 800;
             let height = 600;
@@ -566,11 +736,12 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
               height = fabricCanvas.getHeight();
             } catch (dimError) {
               console.warn('Could not get canvas dimensions:', dimError);
-              // Use canvasSize state as fallback
               width = canvasSize.width;
               height = canvasSize.height;
             }
-            
+
+            // Save to localStorage as backup
+            localStorage.setItem(`project-${project._id}`, JSON.stringify(canvasJSON));
             const meta = {
               width,
               height,
@@ -578,10 +749,40 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
               updatedAt: Date.now(),
             };
             localStorage.setItem(`project-meta-${project._id}`, JSON.stringify(meta));
+
+            // Save to Convex backend if valid Convex ID
+            const isValidConvexId = (id: string): boolean => {
+              if (!id || typeof id !== 'string') return false;
+              const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
+              return convexIdPattern.test(id) && id.length >= 16;
+            };
+
+            if (isValidConvexId(project._id)) {
+              try {
+                // Generate thumbnail (smaller for auto-save performance)
+                const thumbnail = fabricCanvas.toDataURL({
+                  format: 'png',
+                  quality: 0.7,
+                  multiplier: 0.25, // 25% size for auto-save
+                });
+
+                // Save to Convex backend
+                await updateProjectMutation({
+                  projectId: project._id as any,
+                  canvasState: canvasJSON,
+                  width,
+                  height,
+                  imageUrl: thumbnail,
+                });
+                console.log('✅ Auto-saved to Convex backend');
+              } catch (convexError) {
+                console.warn('Auto-save to Convex failed, saved to localStorage:', convexError);
+              }
+            }
           } catch (error) {
-            console.warn('Auto-save to localStorage failed:', error);
+            console.warn('Auto-save failed:', error);
           }
-        }, 1000); // 1 second debounce
+        }, 2000); // 2 second debounce for auto-save
       };
 
       // Listen to canvas changes for auto-save
@@ -599,6 +800,69 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
       });
       fabricCanvas.on('selection:cleared', () => {
         ensureWorkspaceConfig();
+      });
+
+      // Prevent viewport shifts when text editing starts
+      const handleTextEditingEntered = () => {
+        // Prevent body scrolling when text is being edited
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        
+        // Find and contain Fabric.js text editing inputs
+        const fixTextInputs = () => {
+          const textInputs = document.querySelectorAll('textarea, input[type="text"]');
+          textInputs.forEach((input: any) => {
+            if (input && input.style) {
+              // Ensure inputs are contained and don't cause scroll
+              input.style.position = 'absolute';
+              input.style.contain = 'strict';
+              input.style.willChange = 'transform';
+              
+              // Prevent input from causing viewport scroll
+              const preventScroll = (e: Event) => {
+                e.stopPropagation();
+              };
+              
+              input.addEventListener('focus', preventScroll, { passive: false });
+              input.addEventListener('blur', preventScroll, { passive: false });
+              
+              // Override scrollIntoView to prevent viewport scrolling
+              const originalScrollIntoView = input.scrollIntoView;
+              input.scrollIntoView = function(options?: any) {
+                // Only scroll within canvas container, not the viewport
+                const container = containerRef.current;
+                if (container) {
+                  const rect = input.getBoundingClientRect();
+                  const containerRect = container.getBoundingClientRect();
+                  // Only allow scrolling if input is completely outside container
+                  if (rect.bottom > containerRect.bottom || rect.top < containerRect.top ||
+                      rect.right > containerRect.right || rect.left < containerRect.left) {
+                    // Use container scrolling instead of viewport
+                    return;
+                  }
+                }
+                // Prevent default scrollIntoView
+                return;
+              };
+            }
+          });
+        };
+        
+        // Fix inputs immediately and on next frame
+        fixTextInputs();
+        requestAnimationFrame(fixTextInputs);
+        setTimeout(fixTextInputs, 100);
+      };
+
+      fabricCanvas.on('text:editing:entered', handleTextEditingEntered);
+      
+      // Also listen for when text objects are selected (they might enter editing mode)
+      fabricCanvas.on('selection:created', (e: any) => {
+        const obj = e.selected?.[0] || e.target;
+        if (obj && (obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text')) {
+          // Small delay to catch text editing entry
+          setTimeout(handleTextEditingEntered, 50);
+        }
       });
 
       // Store in context
@@ -707,6 +971,9 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         justifyContent: "center",
         alignItems: "center",
         background: "#f5f5f5",
+        position: "relative",
+        isolation: "isolate", // Create new stacking context
+        contain: "layout style paint", // Prevent layout shifts from affecting parent
       }}
     >
       {/* Canvas preview area - scales with CSS transform */}
@@ -717,7 +984,8 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
           transform: `scale(${zoom})`,
           position: "relative",
           background: "#ffffff",
-          boxShadow: "0 0 0 5000px rgba(0, 0, 0, 0.1), 0 4px 20px rgba(0, 0, 0, 0.15)",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+          // Remove the huge 5000px shadow that causes layout shifts
         }}
       >
         <canvas
@@ -769,6 +1037,29 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
           background-position: var(--offsetX) var(--offsetY),
             calc(var(--size) + var(--offsetX)) calc(var(--size) + var(--offsetY));
           background-size: calc(var(--size) * 2) calc(var(--size) * 2);
+        }
+
+        /* Prevent Fabric.js text editing inputs from causing viewport shifts */
+        .canvas-container textarea,
+        .canvas-container input[type="text"],
+        .fabric-text-editor,
+        .fabric-textarea {
+          position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
+          pointer-events: auto !important;
+          z-index: 1000 !important;
+          /* Prevent these elements from causing scroll */
+          contain: strict !important;
+        }
+
+        /* Prevent body/html scrolling in editor */
+        body.editor-mode,
+        html.editor-mode {
+          overflow: hidden !important;
+          position: fixed !important;
+          width: 100% !important;
+          height: 100% !important;
         }
       `}</style>
     </div>

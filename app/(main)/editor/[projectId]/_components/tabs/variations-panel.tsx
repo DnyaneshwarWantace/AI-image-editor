@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Type, Plus, Sparkles, Grid3x3 } from "lucide-react";
+import { Type, Plus, Sparkles, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { cn } from "@/lib/utils";
@@ -54,22 +54,11 @@ export function VariationsPanel() {
   const extractTextElements = useCallback(() => {
     if (!canvas) return [];
 
-    const objects = canvas.getObjects();
+    // Use LIVE canvas objects (what user sees now)
+    const liveObjects = canvas.getObjects();
     const texts: TextElement[] = [];
 
-    // Load localStorage variations as fallback
-    let localVariations: Record<string, any> = {};
-    try {
-      const storageKey = `variations-${projectIdParam}`;
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        localVariations = JSON.parse(stored);
-      }
-    } catch (error) {
-      console.error("Error loading localStorage variations:", error);
-    }
-
-    objects.forEach((obj: any, index: number) => {
+    liveObjects.forEach((obj: any, index: number) => {
       // Skip workspace and non-text objects
       if (obj.id === "workspace" || obj.constructor.name === "GuideLine") {
         return;
@@ -82,11 +71,25 @@ export function VariationsPanel() {
         obj.type === "text";
 
       if (isTextObject) {
-        const textId = obj.id || `text-${index}`;
-        // Prioritize Convex data, fallback to localStorage
+        // ALWAYS use the object's existing ID - never generate a new one
+        // If object has no ID, it means it's brand new and we should assign a UUID
+        let textId = obj.id;
+
+        if (!textId) {
+          // Import uuid for new objects
+          const { v4: uuid } = require('uuid');
+          textId = uuid();
+          obj.set('id', textId);
+          console.log(`✅ Assigned new UUID to text object: ${textId}`);
+
+          // Trigger canvas save to persist the new ID
+          canvas.requestRenderAll();
+        }
+
+        // Get variation count from Convex backend
         const count = projectId && variationCounts
           ? (variationCounts[textId] || 0)
-          : (localVariations[textId]?.variations?.length || 0);
+          : 0;
 
         texts.push({
           id: textId,
@@ -94,11 +97,15 @@ export function VariationsPanel() {
           object: obj,
           variationCount: count,
         });
+
+        console.log(`📝 Text element: "${obj.text}" with ID: ${textId} (${count} variations)`);
       }
     });
 
+    console.log(`📝 Found ${texts.length} text elements on canvas:`, texts.map(t => ({ id: t.id, text: t.text })));
+
     return texts;
-  }, [canvas, variationCounts, projectId, projectIdParam]);
+  }, [canvas, variationCounts, projectId]);
 
   useEffect(() => {
     if (!canvas) return;
@@ -137,7 +144,7 @@ export function VariationsPanel() {
   }, [canvas, extractTextElements]);
 
   const selectTextElement = (element: TextElement) => {
-    if (!canvas) return;
+    if (!canvas || !element.object) return;
     canvas.discardActiveObject();
     canvas.setActiveObject(element.object);
     canvas.requestRenderAll();
@@ -150,88 +157,48 @@ export function VariationsPanel() {
   };
 
   const handleSaveVariations = async (variations: string[]) => {
-    if (!selectedElement || !canvas) return;
+    if (!selectedElement || !canvas || !projectId) {
+      console.error("❌ Cannot save variations: missing required data");
+      return;
+    }
 
     try {
-      // Ensure the canvas object has an ID - assign one if missing
-      const canvasObject = selectedElement.object;
-      if (!canvasObject.id) {
-        // Import uuid if not already imported
-        const { v4: uuid } = await import('uuid');
-        const newId = uuid();
-        canvasObject.set('id', newId);
-        // Update selectedElement to use the new ID
-        selectedElement.id = newId;
-        canvas.requestRenderAll();
-        console.log(`✅ Assigned ID to text object: ${newId}`);
-      }
+      // ALWAYS use the element's current ID from the canvas object
+      const elementId = selectedElement.id;
 
-      // Use the actual canvas object ID (now guaranteed to exist)
-      const elementId = canvasObject.id || selectedElement.id;
+      console.log(`💾 Saving ${variations.length} variations for element ID: ${elementId} (text: "${selectedElement.text}")`);
 
       // Convert variations to the format expected by Convex
       const variationsData = variations.map((text, index) => ({
         id: `${elementId}-var-${index}-${Date.now()}`,
         text,
-        type: "manual", // We can enhance this to distinguish between manual and AI
+        type: "manual",
         language: undefined,
       }));
 
-      // Always try to save to Convex if we have a valid project ID
-      if (projectId) {
-        try {
-          await saveVariationsMutation({
-            projectId,
-            elementId: elementId, // Use the guaranteed ID
-            originalText: selectedElement.text,
-            variations: variationsData,
-            userId: undefined, // TODO: Get from auth context
-          });
-          console.log("✅ Variations saved to Convex backend");
-          
-          // Also save to localStorage as backup
-          const storageKey = `variations-${projectIdParam}`;
-          const stored = localStorage.getItem(storageKey);
-          const allVariations = stored ? JSON.parse(stored) : {};
-          allVariations[elementId] = { // Use the guaranteed ID
-            originalText: selectedElement.text,
-            variations: variationsData,
-          };
-          localStorage.setItem(storageKey, JSON.stringify(allVariations));
-        } catch (convexError) {
-          console.error("❌ Failed to save to Convex, falling back to localStorage:", convexError);
-          // Fallback to localStorage if Convex save fails
-          const storageKey = `variations-${projectIdParam}`;
-          const stored = localStorage.getItem(storageKey);
-          const allVariations = stored ? JSON.parse(stored) : {};
-          allVariations[elementId] = { // Use the guaranteed ID
-            originalText: selectedElement.text,
-            variations: variationsData,
-          };
-          localStorage.setItem(storageKey, JSON.stringify(allVariations));
-          console.log("✅ Variations saved to localStorage (fallback)");
-        }
-      } else {
-        // Store in localStorage for non-Convex projects
-        const storageKey = `variations-${projectIdParam}`;
-        const stored = localStorage.getItem(storageKey);
-        const allVariations = stored ? JSON.parse(stored) : {};
-        allVariations[elementId] = { // Use the guaranteed ID
+      // Save to Convex backend (only source of truth)
+      try {
+        await saveVariationsMutation({
+          projectId,
+          elementId, // Use stable ID from canvas
           originalText: selectedElement.text,
           variations: variationsData,
-        };
-        localStorage.setItem(storageKey, JSON.stringify(allVariations));
-        console.log("✅ Variations saved to localStorage (non-Convex project)");
-      }
+          userId: undefined, // TODO: Get from auth context
+        });
+        console.log(`✅ Variations saved to Convex backend for ID: ${elementId}`);
 
-      // Update local state to show variation count immediately
-      setTextElements((prev) =>
-        prev.map((el) =>
-          el.id === elementId // Use the guaranteed ID
-            ? { ...el, variationCount: variations.length }
-            : el
-        )
-      );
+        // Update local state to show variation count immediately
+        setTextElements((prev) =>
+          prev.map((el) =>
+            el.id === elementId
+              ? { ...el, variationCount: variations.length }
+              : el
+          )
+        );
+      } catch (convexError) {
+        console.error("❌ Failed to save to Convex:", convexError);
+        throw new Error("Failed to save variations to backend");
+      }
     } catch (error) {
       console.error("❌ Error saving variations:", error);
       alert("Failed to save variations. Please try again.");
@@ -309,7 +276,7 @@ export function VariationsPanel() {
                 className="w-full mt-2 text-xs h-8"
               >
                 <Plus className="h-3 w-3 mr-1" />
-                Add Variations
+                {element.variationCount > 0 ? 'Edit Variations' : 'Add Variations'}
               </Button>
             </div>
           ))
@@ -331,15 +298,15 @@ export function VariationsPanel() {
             </p>
           </div>
 
-          {/* Generate All Ads Button */}
+          {/* View All Variations Button - Only show when variations exist */}
           {textElements.some((el) => el.variationCount > 0) && (
             <Button
               onClick={() => setIsManagerModalOpen(true)}
               className="w-full"
               size="sm"
             >
-              <Grid3x3 className="h-4 w-4 mr-2" />
-              Generate All Ads
+              <Eye className="h-4 w-4 mr-2" />
+              View All Variations ({textElements.reduce((sum, el) => sum + el.variationCount, 0)} total)
             </Button>
           )}
         </div>

@@ -17,7 +17,17 @@ export function EditorLayout({ project }: EditorLayoutProps) {
   const { processingMessage } = useCanvasContext();
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div 
+      className="flex flex-col h-screen bg-white"
+      style={{
+        overflow: 'hidden',
+        position: 'fixed',
+        width: '100%',
+        height: '100%',
+        top: 0,
+        left: 0,
+      }}
+    >
       {/* Processing Overlay */}
       {processingMessage && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -41,7 +51,14 @@ export function EditorLayout({ project }: EditorLayoutProps) {
       />
 
       {/* Main Content - Flex container */}
-      <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 64px)" }}>
+      <div 
+        className="flex flex-1 overflow-hidden" 
+        style={{ 
+          height: "calc(100vh - 64px)",
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      >
         {/* Left Sidebar - 380px when expanded, 65px when collapsed */}
         <LeftSidebar />
 

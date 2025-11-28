@@ -191,7 +191,7 @@ export function ImportMenu() {
 
         // Use loadSVGFromURL with data URL
         const { objects: svgObjects, options } = await loadSVGFromURL(svgUrl);
-        const filteredObjects = svgObjects.filter((obj): any => obj !== null);
+        const filteredObjects = svgObjects.filter((obj) => obj !== null) as NonNullable<typeof svgObjects[number]>[];
         const item = util.groupSVGElements(filteredObjects, options);
         
         if (item) {

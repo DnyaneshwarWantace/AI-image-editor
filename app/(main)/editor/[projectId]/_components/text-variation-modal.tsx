@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Plus, X, Loader2, Languages } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
+import { useParams } from "next/navigation";
 
 interface TextVariationModalProps {
   isOpen: boolean;
@@ -38,11 +42,42 @@ export function TextVariationModal({
   elementId,
   onSave,
 }: TextVariationModalProps) {
+  const params = useParams();
+  const projectId = params.projectId as string;
+
+  // Check if projectId is valid Convex ID
+  const isValidConvexId = (id: string): boolean => {
+    if (!id || typeof id !== 'string') return false;
+    const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
+    return convexIdPattern.test(id) && id.length >= 16;
+  };
+
+  // Fetch existing variations for this element from backend
+  const existingVariations = useQuery(
+    api.textVariations.getTextVariationsByElement,
+    isValidConvexId(projectId) ? {
+      projectId: projectId as Id<"projects">,
+      elementId
+    } : "skip"
+  );
+
   const [variations, setVariations] = useState<string[]>([]);
   const [manualInput, setManualInput] = useState("");
   const [aiCount, setAiCount] = useState("5");
   const [aiLanguage, setAiLanguage] = useState("english");
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Load existing variations when modal opens
+  useEffect(() => {
+    if (isOpen && existingVariations) {
+      const existingTexts = existingVariations.variations.map(v => v.text);
+      setVariations(existingTexts);
+      console.log(`📝 Loaded ${existingTexts.length} existing variations for element ${elementId}`);
+    } else if (isOpen) {
+      // Reset when opening for new element
+      setVariations([]);
+    }
+  }, [isOpen, existingVariations, elementId]);
 
   const handleAddManualVariation = () => {
     if (manualInput.trim()) {
@@ -82,7 +117,18 @@ export function TextVariationModal({
       }
 
       if (data.variations && data.variations.length > 0) {
-        setVariations([...variations, ...data.variations]);
+        // Filter out duplicates - don't add variations that already exist
+        const newVariations = data.variations.filter((newVar: string) =>
+          !variations.some(existing => existing.toLowerCase().trim() === newVar.toLowerCase().trim())
+        );
+
+        if (newVariations.length > 0) {
+          setVariations([...variations, ...newVariations]);
+          console.log(`✅ Added ${newVariations.length} new unique variations (${data.variations.length - newVariations.length} duplicates filtered)`);
+        } else {
+          console.log(`⚠️ All ${data.variations.length} generated variations were duplicates`);
+          alert("All generated variations already exist. Try different parameters.");
+        }
       }
     } catch (error) {
       console.error("Error generating AI variations:", error);
@@ -137,8 +183,35 @@ IMPORTANT: Output ONLY the variations as a numbered list (1-${count}) in ${langu
     }
   };
 
-  const handleSave = () => {
-    onSave(variations);
+  // Auto-save variations when they change
+  useEffect(() => {
+    // Don't auto-save on initial load (when modal opens) or when loading existing variations
+    if (!isOpen) return;
+
+    // Skip if we just loaded existing variations (first render after open)
+    const isInitialLoad = existingVariations &&
+      variations.length === existingVariations.variations.length &&
+      variations.every((v, i) => v === existingVariations.variations[i]?.text);
+
+    if (isInitialLoad) return;
+
+    // Debounce auto-save to avoid too many saves
+    const autoSaveTimeout = setTimeout(() => {
+      if (variations.length > 0) {
+        console.log(`💾 Auto-saving ${variations.length} variations...`);
+        onSave(variations);
+      }
+    }, 1500); // 1.5 second debounce
+
+    return () => clearTimeout(autoSaveTimeout);
+  }, [variations, isOpen, existingVariations, onSave]);
+
+  // Auto-save when dialog closes
+  const handleClose = () => {
+    if (variations.length > 0) {
+      console.log(`💾 Saving ${variations.length} variations on close...`);
+      onSave(variations);
+    }
     onClose();
   };
 
@@ -150,12 +223,12 @@ IMPORTANT: Output ONLY the variations as a numbered list (1-${count}) in ${langu
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-thin">
         <DialogHeader>
           <DialogTitle>Create Text Variations</DialogTitle>
           <DialogDescription>
-            Add multiple variations of your text to generate different ad versions
+            Add variations using AI or manually. Changes are saved automatically.
           </DialogDescription>
         </DialogHeader>
 
@@ -307,12 +380,21 @@ IMPORTANT: Output ONLY the variations as a numbered list (1-${count}) in ${langu
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={variations.length === 0}>
-            Save {variations.length} Variations
-          </Button>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              {variations.length > 0 ? (
+                <>
+                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <span>{variations.length} variation{variations.length !== 1 ? 's' : ''} - Auto-saved</span>
+                </>
+              ) : (
+                <span className="text-gray-400">No variations yet</span>
+              )}
+            </div>
+            <Button variant="default" onClick={handleClose}>
+              Done
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

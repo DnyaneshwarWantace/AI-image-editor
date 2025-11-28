@@ -76,16 +76,39 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
   const { canvas, editor } = useCanvasContext();
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
   
   // Convex mutation for saving projects
   const updateProjectMutation = useMutation(api.projects.updateProject);
+
+  // Listen to history updates
+  React.useEffect(() => {
+    if (!editor) return;
+
+    const handleHistoryUpdate = (undoCount: number, redoCount: number) => {
+      setCanUndo(undoCount > 0);
+      setCanRedo(redoCount > 0);
+    };
+
+    editor.on?.('historyUpdate', handleHistoryUpdate);
+
+    // Initial check
+    if (editor.canUndo && editor.canRedo) {
+      setCanUndo(editor.canUndo());
+      setCanRedo(editor.canRedo());
+    }
+
+    return () => {
+      editor.off?.('historyUpdate', handleHistoryUpdate);
+    };
+  }, [editor]);
 
   // Undo/Redo
   const handleUndo = () => {
     if (!editor) return;
     try {
       editor.undo?.();
-      toast.success("Undone");
     } catch (error) {
       console.error("Error during undo:", error);
       toast.error("Failed to undo");
@@ -96,7 +119,6 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
     if (!editor) return;
     try {
       editor.redo?.();
-      toast.success("Redone");
     } catch (error) {
       console.error("Error during redo:", error);
       toast.error("Failed to redo");
@@ -232,7 +254,52 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
 
     try {
       setIsSaving(true);
-      const canvasJSON = canvas.toJSON();
+      // Use editor's getJson() which properly includes custom properties
+      const canvasJSON = (editor as any)?.getJson?.() || canvas.toJSON();
+
+      // Detailed logging of what's being saved
+      console.log('💾 MANUAL SAVE - Full canvas data:', {
+        totalObjects: canvasJSON.objects?.length || 0,
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+        backgroundColor: canvasJSON.backgroundColor,
+        backgroundImage: canvasJSON.backgroundImage,
+        objects: canvasJSON.objects?.map((obj: any, idx: number) => ({
+          index: idx,
+          type: obj.type,
+          id: obj.id,
+          // Text properties
+          text: obj.text?.substring(0, 30),
+          fontFamily: obj.fontFamily,
+          fontSize: obj.fontSize,
+          fontWeight: obj.fontWeight,
+          fontStyle: obj.fontStyle,
+          textAlign: obj.textAlign,
+          lineHeight: obj.lineHeight,
+          charSpacing: obj.charSpacing,
+          // Image properties
+          src: obj.src?.substring(0, 50),
+          // Style properties
+          fill: obj.fill,
+          stroke: obj.stroke,
+          strokeWidth: obj.strokeWidth,
+          opacity: obj.opacity,
+          // Transform properties
+          left: obj.left,
+          top: obj.top,
+          width: obj.width,
+          height: obj.height,
+          scaleX: obj.scaleX,
+          scaleY: obj.scaleY,
+          angle: obj.angle,
+          // Shadow & effects
+          shadow: obj.shadow,
+          // Total properties
+          totalProperties: Object.keys(obj).length
+        }))
+      });
+
+      console.log('📝 First object full details:', canvasJSON.objects?.[0]);
 
       // Generate thumbnail for preview (smaller size for better performance)
       const thumbnail = canvas.toDataURL({
@@ -431,9 +498,6 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
       setIsExporting(false);
     }
   };
-
-  const canUndo = editor?.canUndo?.() ?? false;
-  const canRedo = editor?.canRedo?.() ?? false;
 
   return (
     <header

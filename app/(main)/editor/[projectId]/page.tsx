@@ -134,7 +134,17 @@ export default function EditorPage() {
 
   return (
     <CanvasProvider>
-      <div className="h-screen">
+      <div 
+        className="h-screen"
+        style={{
+          overflow: 'hidden',
+          position: 'fixed',
+          width: '100%',
+          height: '100%',
+          top: 0,
+          left: 0,
+        }}
+      >
         <EditorLayout project={currentProject} />
       </div>
     </CanvasProvider>
