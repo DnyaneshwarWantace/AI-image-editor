@@ -208,5 +208,25 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
+
+  // Font Variations (for A/B testing with different fonts)
+  fontVariations: defineTable({
+    projectId: v.id("projects"), // Which project these variations belong to
+    elementId: v.string(), // Canvas element ID (text object ID)
+    originalFont: v.string(), // Original font family
+    variations: v.array(
+      v.object({
+        id: v.string(),
+        fontFamily: v.string(), // Font family name
+        fontWeight: v.optional(v.union(v.string(), v.number())), // Font weight
+        fontStyle: v.optional(v.string()), // Font style (italic, normal, etc.)
+      })
+    ),
+    userId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_project_element", ["projectId", "elementId"]),
 });
 

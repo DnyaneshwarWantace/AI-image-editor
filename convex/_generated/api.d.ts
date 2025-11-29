@@ -9,9 +9,11 @@
  */
 
 import type * as ads from "../ads.js";
+import type * as backgroundColorVariations from "../backgroundColorVariations.js";
 import type * as banners from "../banners.js";
 import type * as files from "../files.js";
 import type * as fontBorders from "../fontBorders.js";
+import type * as fontVariations from "../fontVariations.js";
 import type * as fonts from "../fonts.js";
 import type * as imageVariations from "../imageVariations.js";
 import type * as materials from "../materials.js";
@@ -37,9 +39,11 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   ads: typeof ads;
+  backgroundColorVariations: typeof backgroundColorVariations;
   banners: typeof banners;
   files: typeof files;
   fontBorders: typeof fontBorders;
+  fontVariations: typeof fontVariations;
   fonts: typeof fonts;
   imageVariations: typeof imageVariations;
   materials: typeof materials;

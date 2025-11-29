@@ -110,6 +110,10 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
     api.imageVariations.getImageVariationCounts,
     projectId ? { projectId } : "skip"
   );
+  const fontVariationCounts = useQuery(
+    api.fontVariations.getFontVariationCounts,
+    projectId ? { projectId } : "skip"
+  );
 
   // Calculate total variations
   const totalTextVariations = textVariationCounts
@@ -118,7 +122,10 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
   const totalImageVariations = imageVariationCounts
     ? Object.values(imageVariationCounts).reduce((sum, count) => sum + count, 0)
     : 0;
-  const totalVariations = totalTextVariations + totalImageVariations;
+  const totalFontVariations = fontVariationCounts
+    ? Object.values(fontVariationCounts).reduce((sum, count) => sum + count, 0)
+    : 0;
+  const totalVariations = totalTextVariations + totalImageVariations + totalFontVariations;
 
   // Listen to history updates
   React.useEffect(() => {
