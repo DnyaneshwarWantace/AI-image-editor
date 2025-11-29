@@ -228,5 +228,40 @@ export default defineSchema({
   })
     .index("by_project", ["projectId"])
     .index("by_project_element", ["projectId", "elementId"]),
+
+  // Background Color Variations (for A/B testing with different background colors)
+  backgroundColorVariations: defineTable({
+    projectId: v.id("projects"), // Which project these variations belong to
+    variations: v.array(
+      v.object({
+        id: v.string(),
+        color: v.string(), // Hex color code or CSS color
+        name: v.optional(v.string()), // Optional color name
+      })
+    ),
+    userId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project", ["projectId"]),
+
+  // Text Color Variations (for A/B testing with different text colors)
+  textColorVariations: defineTable({
+    projectId: v.id("projects"), // Which project these variations belong to
+    elementId: v.string(), // Canvas element ID (text object ID)
+    originalColor: v.string(), // Original text color
+    variations: v.array(
+      v.object({
+        id: v.string(),
+        color: v.string(), // Hex color code or CSS color
+        name: v.optional(v.string()), // Optional color name
+      })
+    ),
+    userId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_project_element", ["projectId", "elementId"]),
 });
 

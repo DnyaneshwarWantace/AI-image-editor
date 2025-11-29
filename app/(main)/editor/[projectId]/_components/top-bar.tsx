@@ -114,6 +114,14 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
     api.fontVariations.getFontVariationCounts,
     projectId ? { projectId } : "skip"
   );
+  const backgroundColorVariationCount = useQuery(
+    api.backgroundColorVariations.getBackgroundColorVariationCount,
+    projectId ? { projectId } : "skip"
+  );
+  const textColorVariationCounts = useQuery(
+    api.textColorVariations.getTextColorVariationCounts,
+    projectId ? { projectId } : "skip"
+  );
 
   // Calculate total variations
   const totalTextVariations = textVariationCounts
@@ -125,7 +133,11 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
   const totalFontVariations = fontVariationCounts
     ? Object.values(fontVariationCounts).reduce((sum, count) => sum + count, 0)
     : 0;
-  const totalVariations = totalTextVariations + totalImageVariations + totalFontVariations;
+  const totalBackgroundColorVariations = backgroundColorVariationCount || 0;
+  const totalTextColorVariations = textColorVariationCounts
+    ? Object.values(textColorVariationCounts).reduce((sum, count) => sum + count, 0)
+    : 0;
+  const totalVariations = totalTextVariations + totalImageVariations + totalFontVariations + totalBackgroundColorVariations + totalTextColorVariations;
 
   // Listen to history updates
   React.useEffect(() => {

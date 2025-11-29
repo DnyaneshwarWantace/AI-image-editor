@@ -11,6 +11,7 @@
 import type * as ads from "../ads.js";
 import type * as backgroundColorVariations from "../backgroundColorVariations.js";
 import type * as banners from "../banners.js";
+import type * as elementColorVariations from "../elementColorVariations.js";
 import type * as files from "../files.js";
 import type * as fontBorders from "../fontBorders.js";
 import type * as fontVariations from "../fontVariations.js";
@@ -20,6 +21,7 @@ import type * as materials from "../materials.js";
 import type * as projects from "../projects.js";
 import type * as sizes from "../sizes.js";
 import type * as templates from "../templates.js";
+import type * as textColorVariations from "../textColorVariations.js";
 import type * as textVariations from "../textVariations.js";
 import type * as webSite from "../webSite.js";
 
@@ -41,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   ads: typeof ads;
   backgroundColorVariations: typeof backgroundColorVariations;
   banners: typeof banners;
+  elementColorVariations: typeof elementColorVariations;
   files: typeof files;
   fontBorders: typeof fontBorders;
   fontVariations: typeof fontVariations;
@@ -50,6 +53,7 @@ declare const fullApi: ApiFromModules<{
   projects: typeof projects;
   sizes: typeof sizes;
   templates: typeof templates;
+  textColorVariations: typeof textColorVariations;
   textVariations: typeof textVariations;
   webSite: typeof webSite;
 }>;

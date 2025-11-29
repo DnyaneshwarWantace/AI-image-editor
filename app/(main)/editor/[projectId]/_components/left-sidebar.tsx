@@ -28,6 +28,8 @@ import { MyMaterialsPanel } from "./tabs/my-materials-panel";
 import { TextVariationsPanel } from "./tabs/text-variations-panel";
 import { ImageVariationsPanel } from "./tabs/image-variations-panel";
 import { FontVariationsPanel } from "./tabs/font-variations-panel";
+import { BackgroundColorVariationsPanel } from "./tabs/background-color-variations-panel";
+import { TextColorVariationsPanel } from "./tabs/text-color-variations-panel";
 
 const LEFT_TABS = [
   {
@@ -77,6 +79,18 @@ const LEFT_TABS = [
     name: "Font Variations",
     icon: Palette,
     component: FontVariationsPanel,
+  },
+  {
+    key: "backgroundColorVariations",
+    name: "BG Color",
+    icon: Palette,
+    component: BackgroundColorVariationsPanel,
+  },
+  {
+    key: "textColorVariations",
+    name: "Text Color",
+    icon: Type,
+    component: TextColorVariationsPanel,
   },
   {
     key: "myMaterial",
