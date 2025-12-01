@@ -147,11 +147,26 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
     // Add editor-mode class to body and html to prevent scrolling
     document.body.classList.add('editor-mode');
     document.documentElement.classList.add('editor-mode');
-    
+
+    // Prevent default browser context menu on canvas
+    const preventContextMenu = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Only prevent if clicking on canvas or canvas container
+      if (target.tagName === 'CANVAS' || target.closest('.canvas-container')) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+    };
+
+    document.addEventListener('contextmenu', preventContextMenu, { capture: true, passive: false });
+
     return () => {
       // Remove editor-mode class when component unmounts
       document.body.classList.remove('editor-mode');
       document.documentElement.classList.remove('editor-mode');
+      document.removeEventListener('contextmenu', preventContextMenu, { capture: true });
     };
   }, []);
 
@@ -1006,6 +1021,14 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
           ref={canvasRef}
           id="canvas"
           className={rulerEnabled ? "design-stage-grid" : ""}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.nativeEvent) {
+              e.nativeEvent.stopImmediatePropagation();
+            }
+            return false;
+          }}
         />
       </div>
 
@@ -1074,6 +1097,30 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
           position: fixed !important;
           width: 100% !important;
           height: 100% !important;
+        }
+
+        /* Global editor text styles */
+        .editor-title {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #111827;
+        }
+
+        .editor-subtitle {
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: #374151;
+        }
+
+        .editor-label {
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: #4b5563;
+        }
+
+        .editor-text {
+          font-size: 0.75rem;
+          color: #6b7280;
         }
       `}</style>
     </div>

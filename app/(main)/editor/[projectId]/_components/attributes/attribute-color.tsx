@@ -15,7 +15,21 @@ export function AttributeColor() {
 
     const updateColor = () => {
       const activeObject = canvas.getActiveObject();
-      if (activeObject && activeObject.fill) {
+      if (!activeObject) return;
+
+      // For path objects (all drawings including pencil, circle, spray), use stroke color
+      const isPath = activeObject.type === 'path';
+      const isGroup = activeObject.type === 'group';
+
+      // Check if it's a drawing by looking at the stroke
+      const hasStroke = activeObject.stroke && activeObject.stroke !== '' && activeObject.stroke !== 'transparent';
+
+      if ((isPath || isGroup) && hasStroke) {
+        const stroke = activeObject.stroke;
+        if (typeof stroke === "string") {
+          setColor(stroke);
+        }
+      } else if (activeObject.fill) {
         const fill = activeObject.fill;
         if (typeof fill === "string") {
           setColor(fill);
@@ -30,24 +44,49 @@ export function AttributeColor() {
 
     canvas.on("selection:created", updateColor);
     canvas.on("selection:updated", updateColor);
+    canvas.on("object:modified", updateColor);
 
     return () => {
       canvas.off("selection:created", updateColor);
       canvas.off("selection:updated", updateColor);
+      canvas.off("object:modified", updateColor);
     };
   }, [canvas]);
 
   const handleColorChange = (newColor: string) => {
     setColor(newColor);
     const activeObject = canvas?.getActiveObject();
-    if (activeObject) {
+    if (!activeObject) return;
+
+    // For path objects and groups (all drawings), change stroke instead of fill
+    const isPath = activeObject.type === 'path';
+    const isGroup = activeObject.type === 'group';
+    const hasStroke = activeObject.stroke && activeObject.stroke !== '' && activeObject.stroke !== 'transparent';
+
+    if ((isPath || isGroup) && hasStroke) {
+      activeObject.set("stroke", newColor);
+      // If it's a group (circle/spray brush), update all objects in the group
+      if (isGroup && (activeObject as any)._objects) {
+        (activeObject as any)._objects.forEach((obj: any) => {
+          if (obj.stroke) {
+            obj.set("stroke", newColor);
+          }
+        });
+      }
+    } else {
       activeObject.set("fill", newColor);
-      canvas?.requestRenderAll();
     }
+    canvas?.requestRenderAll();
   };
 
   const activeObject = canvas?.getActiveObject();
-  if (!activeObject || activeObject.type === "image" || activeObject.type === "group") {
+  if (!activeObject || activeObject.type === "image") {
+    return null;
+  }
+
+  // Allow color picker for groups if they have stroke (drawings)
+  const hasStroke = activeObject.stroke && activeObject.stroke !== '' && activeObject.stroke !== 'transparent';
+  if (activeObject.type === "group" && !hasStroke) {
     return null;
   }
 

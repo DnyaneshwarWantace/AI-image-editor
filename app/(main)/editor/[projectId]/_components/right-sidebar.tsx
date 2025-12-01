@@ -27,6 +27,7 @@ import { FlipControls } from "./attributes/flip-controls";
 import { FiltersPanel } from "./attributes/filters-panel";
 import { ImageStrokeFull } from "./attributes/image-stroke-full";
 import { QuickActions } from "./attributes/quick-actions";
+import { StrokeWidthControl } from "./attributes/stroke-width-control";
 
 export function RightSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -104,6 +105,7 @@ export function RightSidebar() {
                   <FlipControls />
                   <AttributePosition />
                   <AttributeColor />
+                  <StrokeWidthControl />
                   <AttributeFont />
                   <AttributeTextContent />
                   <AttributeTextFloat />

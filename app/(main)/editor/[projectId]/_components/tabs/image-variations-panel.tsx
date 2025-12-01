@@ -153,7 +153,7 @@ export function ImageVariationsPanel() {
     setIsModalOpen(true);
   };
 
-  const handleSaveVariations = async (variations: Array<{ id: string; imageUrl: string; type: string }>) => {
+  const handleSaveVariations = async (variations: Array<{ id: string; storageId: string; type: string }>) => {
     if (!selectedElement || !canvas || !projectId) {
       console.error("❌ Cannot save variations: missing required data");
       return;
@@ -171,7 +171,7 @@ export function ImageVariationsPanel() {
           projectId,
           elementId, // Use stable ID from canvas
           originalImageUrl: selectedElement.src,
-          variations,
+          variations: variations as any, // Cast to match Convex ID type
           userId: undefined, // TODO: Get from auth context
         });
         console.log(`✅ Image variations saved to Convex backend for ID: ${elementId}`);
@@ -254,7 +254,7 @@ export function ImageVariationsPanel() {
                   <div className="flex items-center gap-2 mt-1">
                     <Badge
                       variant="secondary"
-                      className="text-xs font-normal"
+                      className="text-xs font-normal text-gray-900 bg-gray-100 border-gray-300"
                     >
                       {element.variationCount} variations
                     </Badge>

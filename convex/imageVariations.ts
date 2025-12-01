@@ -10,8 +10,7 @@ export const saveImageVariations = mutation({
     variations: v.array(
       v.object({
         id: v.string(),
-        imageUrl: v.string(),
-        storageId: v.optional(v.id("_storage")),
+        storageId: v.optional(v.id("_storage")), // Optional for migration
         type: v.string(),
       })
     ),
@@ -77,14 +76,49 @@ export const getImageVariationsByProject = query({
 
     const result = Array.from(deduped.values());
 
+    // Convert storage IDs to URLs for all variations
+    const resultWithUrls = await Promise.all(
+      result.map(async (item) => {
+        const variationsWithUrls = await Promise.all(
+          item.variations.map(async (v: any) => {
+            // Handle both old data (with imageUrl) and new data (with storageId)
+            let url = v.imageUrl || ""; // Old data has imageUrl directly
+            if (v.storageId) {
+              // New data has storageId, fetch URL
+              try {
+                const storageUrl = await ctx.storage.getUrl(v.storageId);
+                if (storageUrl) {
+                  url = storageUrl;
+                } else {
+                  console.error(`❌ No storage URL for variation in element ${item.elementId}`);
+                }
+              } catch (error) {
+                console.error(`❌ Error getting storage URL:`, error);
+              }
+            }
+            return {
+              id: v.id,
+              imageUrl: url,
+              storageId: v.storageId,
+              type: v.type,
+            };
+          })
+        );
+        return {
+          ...item,
+          variations: variationsWithUrls,
+        };
+      })
+    );
+
     // Log for debugging
     console.log(`📊 Image variations for project ${args.projectId}:`, {
       total: variations.length,
-      unique: result.length,
-      elementIds: result.map(v => ({ id: v.elementId, url: v.originalImageUrl, count: v.variations.length }))
+      unique: resultWithUrls.length,
+      elementIds: resultWithUrls.map(v => ({ id: v.elementId, url: v.originalImageUrl, count: v.variations.length }))
     });
 
-    return result;
+    return resultWithUrls;
   },
 });
 
@@ -105,7 +139,40 @@ export const getImageVariationsByElement = query({
       )
       .first();
 
-    return variations;
+    if (!variations) return null;
+
+    // Convert storage IDs to URLs
+    const variationsWithUrls = await Promise.all(
+      variations.variations.map(async (v: any) => {
+        // Handle both old data (with imageUrl) and new data (with storageId)
+        let url = v.imageUrl || ""; // Old data has imageUrl directly
+        if (v.storageId) {
+          // New data has storageId, fetch URL
+          try {
+            const storageUrl = await ctx.storage.getUrl(v.storageId);
+            if (storageUrl) {
+              url = storageUrl;
+              console.log(`✅ Got storage URL for ${v.id}: ${storageUrl.substring(0, 50)}...`);
+            } else {
+              console.error(`❌ No storage URL for ${v.id}, storageId: ${v.storageId}`);
+            }
+          } catch (error) {
+            console.error(`❌ Error getting storage URL for ${v.id}:`, error);
+          }
+        }
+        return {
+          id: v.id,
+          imageUrl: url,
+          storageId: v.storageId,
+          type: v.type,
+        };
+      })
+    );
+
+    return {
+      ...variations,
+      variations: variationsWithUrls,
+    };
   },
 });
 
@@ -181,5 +248,18 @@ export const getImageVariationCounts = query({
       counts[variation.elementId] = variation.variations.length;
     }
     return counts;
+  },
+});
+
+// Generate upload URL for image variation
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
+});
+
+// Get storage URL from storage ID
+export const getStorageUrl = query({
+  args: { storageId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.storageId);
   },
 });

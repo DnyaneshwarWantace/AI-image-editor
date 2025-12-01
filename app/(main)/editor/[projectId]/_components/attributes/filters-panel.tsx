@@ -20,6 +20,10 @@ const NO_PARAMS_FILTERS = [
   { key: "Polaroid", label: "Polaroid" },
   { key: "Invert", label: "Invert" },
   { key: "Sepia", label: "Sepia" },
+  { key: "Grayscale", label: "Grayscale" },
+  { key: "Pixelate", label: "Pixelate" },
+  { key: "Noise", label: "Noise" },
+  { key: "RemoveColor", label: "Remove Color" },
 ];
 
 const PARAMS_FILTERS = [
@@ -43,6 +47,16 @@ const PARAMS_FILTERS = [
     label: "Blur",
     params: [{ key: "blur", min: 0, max: 1, step: 0.01, value: 0 }],
   },
+  {
+    type: "HueRotation",
+    label: "Hue Rotation",
+    params: [{ key: "rotation", min: -2, max: 2, step: 0.01, value: 0 }],
+  },
+  {
+    type: "Gamma",
+    label: "Gamma",
+    params: [{ key: "gamma", min: 0.01, max: 2.2, step: 0.01, value: 1 }],
+  },
 ];
 
 export function FiltersPanel() {
@@ -53,10 +67,14 @@ export function FiltersPanel() {
   const [contrast, setContrast] = useState(0);
   const [saturation, setSaturation] = useState(0);
   const [blur, setBlur] = useState(0);
+  const [hueRotation, setHueRotation] = useState(0);
+  const [gamma, setGamma] = useState(1);
   const [brightnessEnabled, setBrightnessEnabled] = useState(false);
   const [contrastEnabled, setContrastEnabled] = useState(false);
   const [saturationEnabled, setSaturationEnabled] = useState(false);
   const [blurEnabled, setBlurEnabled] = useState(false);
+  const [hueRotationEnabled, setHueRotationEnabled] = useState(false);
+  const [gammaEnabled, setGammaEnabled] = useState(false);
 
   useEffect(() => {
     if (!canvas) return;
@@ -119,6 +137,18 @@ export function FiltersPanel() {
         case "Sepia":
           filterInstance = new fabricFilters.Sepia();
           break;
+        case "Grayscale":
+          filterInstance = new fabricFilters.Grayscale();
+          break;
+        case "Pixelate":
+          filterInstance = new fabricFilters.Pixelate({ blocksize: 8 });
+          break;
+        case "Noise":
+          filterInstance = new fabricFilters.Noise({ noise: 100 });
+          break;
+        case "RemoveColor":
+          filterInstance = new fabricFilters.RemoveColor({ distance: 0.5 });
+          break;
       }
 
       if (filterInstance) {
@@ -162,6 +192,12 @@ export function FiltersPanel() {
           break;
         case "Blur":
           filterInstance = new fabricFilters.Blur({ blur: value });
+          break;
+        case "HueRotation":
+          filterInstance = new fabricFilters.HueRotation({ rotation: value });
+          break;
+        case "Gamma":
+          filterInstance = new fabricFilters.Gamma({ gamma: [value, value, value] });
           break;
       }
 
@@ -335,6 +371,72 @@ export function FiltersPanel() {
                   }}
                   min={0}
                   max={1}
+                  step={0.01}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Hue Rotation */}
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={hueRotationEnabled}
+                onCheckedChange={(checked) => {
+                  setHueRotationEnabled(checked);
+                  updateAdvancedFilter("HueRotation", hueRotation, checked);
+                }}
+              />
+              <Label className="text-xs font-medium text-gray-900">Hue Rotation</Label>
+            </div>
+            {hueRotationEnabled && (
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <Label className="text-xs font-medium text-gray-700">rotation</Label>
+                  <span className="text-xs font-semibold text-gray-900">{hueRotation.toFixed(2)}</span>
+                </div>
+                <Slider
+                  value={[hueRotation]}
+                  onValueChange={(value) => {
+                    setHueRotation(value[0]);
+                    updateAdvancedFilter("HueRotation", value[0], hueRotationEnabled);
+                  }}
+                  min={-2}
+                  max={2}
+                  step={0.01}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Gamma */}
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={gammaEnabled}
+                onCheckedChange={(checked) => {
+                  setGammaEnabled(checked);
+                  updateAdvancedFilter("Gamma", gamma, checked);
+                }}
+              />
+              <Label className="text-xs font-medium text-gray-900">Gamma</Label>
+            </div>
+            {gammaEnabled && (
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <Label className="text-xs font-medium text-gray-700">gamma</Label>
+                  <span className="text-xs font-semibold text-gray-900">{gamma.toFixed(2)}</span>
+                </div>
+                <Slider
+                  value={[gamma]}
+                  onValueChange={(value) => {
+                    setGamma(value[0]);
+                    updateAdvancedFilter("Gamma", value[0], gammaEnabled);
+                  }}
+                  min={0.01}
+                  max={2.2}
                   step={0.01}
                   className="w-full"
                 />

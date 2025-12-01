@@ -46,6 +46,7 @@ export interface IEditor {
   setQrCode(options: any): void;
   addBarcode(): void;
   setBarcode(options: any): void;
+  getBarcodeTypes?(): string[];
 
   // Layer Methods
   up(): void;
@@ -77,6 +78,7 @@ export interface IEditor {
   ycenter(): void;
   centerH(): void;
   centerV(): void;
+  position(type: 'center' | 'centerH' | 'centerV'): void;
 
   // Workspace Methods
   setSize(width: number, height: number): void;

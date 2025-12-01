@@ -8,11 +8,12 @@ import {
   Save,
   Download,
   ChevronDown,
-  Grid3x3,
   Loader2,
   Clipboard,
   Trash2,
   Sparkles,
+  Sticker,
+  Layers2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,11 +73,9 @@ const EXPORT_FORMATS: ExportFormat[] = [
 
 interface TopBarProps {
   project: any;
-  rulerEnabled: boolean;
-  onRulerToggle: () => void;
 }
 
-export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
+export function TopBar({ project }: TopBarProps) {
   const router = useRouter();
   const params = useParams();
   const { canvas, editor } = useCanvasContext();
@@ -233,6 +232,80 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
     } catch (error) {
       console.error("Error copying base64:", error);
       toast.error("Failed to copy base64");
+    }
+  };
+
+  // Download All Elements as Transparent Sticker (preserving gaps/spacing)
+  const handleDownloadAsSticker = () => {
+    if (!canvas) {
+      toast.error("Canvas not ready");
+      return;
+    }
+
+    try {
+      // Get ALL objects EXCEPT workspace/background
+      const allObjects = canvas.getObjects().filter((obj: any) => {
+        return obj.id !== 'workspace' && obj.constructor.name !== 'GuideLine';
+      });
+
+      if (allObjects.length === 0) {
+        toast.error("No elements to download");
+        return;
+      }
+
+      // Temporarily hide workspace
+      const workspace = canvas.getObjects().find((obj: any) => obj.id === 'workspace');
+      const wasWorkspaceVisible = workspace?.visible;
+      if (workspace) {
+        workspace.visible = false;
+        canvas.requestRenderAll();
+      }
+
+      // Calculate bounding box of all visible objects
+      let minX = Infinity, minY = Infinity;
+      let maxX = -Infinity, maxY = -Infinity;
+
+      allObjects.forEach((obj: any) => {
+        const bounds = obj.getBoundingRect(true);
+        minX = Math.min(minX, bounds.left);
+        minY = Math.min(minY, bounds.top);
+        maxX = Math.max(maxX, bounds.left + bounds.width);
+        maxY = Math.max(maxY, bounds.top + bounds.height);
+      });
+
+      const width = maxX - minX;
+      const height = maxY - minY;
+      const padding = 20;
+
+      // Export canvas as image (without workspace, with transparency)
+      const dataURL = canvas.toDataURL({
+        format: 'png',
+        quality: 1,
+        multiplier: 1,
+        left: minX - padding,
+        top: minY - padding,
+        width: width + (padding * 2),
+        height: height + (padding * 2),
+      });
+
+      // Restore workspace visibility
+      if (workspace && wasWorkspaceVisible !== undefined) {
+        workspace.visible = wasWorkspaceVisible;
+        canvas.requestRenderAll();
+      }
+
+      // Download
+      const link = document.createElement('a');
+      link.download = `sticker-${Date.now()}.png`;
+      link.href = dataURL;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success(`Downloaded ${allObjects.length} elements as transparent sticker!`);
+    } catch (error) {
+      console.error("Error downloading sticker:", error);
+      toast.error("Failed to download sticker");
     }
   };
 
@@ -551,27 +624,27 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
 
   return (
     <header
-      className="h-16 px-4 flex items-center justify-between border-b"
+      className="h-16 px-1 flex items-center justify-between border-b overflow-x-auto"
       style={{ borderColor: "#eef2f8", backgroundColor: "#fff" }}
     >
           {/* Left Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {/* New Project Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => router.push("/")}
-              className="text-gray-700 hover:bg-gray-100"
+              className="text-gray-700 hover:bg-gray-100 px-2"
             >
               New
             </Button>
 
-            <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px bg-gray-300 mx-0.5" />
 
             {/* Import Menu */}
             <ImportMenu />
 
-            <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px bg-gray-300 mx-0.5" />
 
             {/* Preview */}
             <PreviewButton />
@@ -579,56 +652,40 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
             {/* Watermark */}
             <WatermarkButton />
 
-            <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px bg-gray-300 mx-0.5" />
 
             {/* Drag Mode */}
             <DragModeToggle />
 
-            <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px bg-gray-300 mx-0.5" />
 
             {/* Variations Manager */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsVariationsModalOpen(true)}
-              className="text-gray-700 hover:bg-gray-100 gap-2"
+              className="text-gray-700 hover:bg-gray-100 gap-1 px-2"
               title="Manage Variations"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>Variations</span>
+              <Layers2 className="h-4 w-4" />
+              <span className="hidden lg:inline">Variations</span>
               {totalVariations > 0 && (
-                <span className="ml-1 px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">
+                <span className="px-1.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">
                   {totalVariations}
                 </span>
               )}
             </Button>
 
-            <div className="h-6 w-px bg-gray-300" />
-
-        {/* Ruler Toggle */}
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={rulerEnabled}
-              onChange={onRulerToggle}
-              className="w-4 h-4"
-            />
-            <Grid3x3 className="h-4 w-4 text-gray-600" />
-            <span className="text-sm text-gray-700">Grid</span>
-          </label>
-        </div>
-
-        <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px bg-gray-300 mx-0.5" />
 
         {/* Undo/Redo */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleUndo}
             disabled={!canUndo}
-            className="text-gray-700 hover:bg-gray-100"
+            className="text-gray-700 hover:bg-gray-100 px-2"
             title="Undo (Ctrl+Z)"
           >
             <RotateCcw className="h-4 w-4" />
@@ -638,24 +695,24 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
             size="sm"
             onClick={handleRedo}
             disabled={!canRedo}
-            className="text-gray-700 hover:bg-gray-100"
+            className="text-gray-700 hover:bg-gray-100 px-2"
             title="Redo (Ctrl+Shift+Z)"
           >
             <RotateCw className="h-4 w-4" />
           </Button>
         </div>
 
-        <div className="h-6 w-px bg-gray-300" />
+        <div className="h-6 w-px bg-gray-300 mx-0.5" />
 
         {/* Clipboard & Clear */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
                 disabled={!canvas}
-                className="text-gray-700 hover:bg-gray-100"
+                className="text-gray-700 hover:bg-gray-100 px-2"
                 title="Copy to Clipboard"
               >
                 <Clipboard className="h-4 w-4" />
@@ -680,9 +737,20 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
           <Button
             variant="ghost"
             size="sm"
+            onClick={handleDownloadAsSticker}
+            disabled={!canvas}
+            className="text-gray-700 hover:bg-gray-100 px-2"
+            title="Download Selection as Sticker (Transparent PNG)"
+          >
+            <Sticker className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleClearCanvas}
             disabled={!canvas}
-            className="text-gray-700 hover:bg-gray-100"
+            className="text-gray-700 hover:bg-gray-100 px-2"
             title="Clear Canvas"
           >
             <Trash2 className="h-4 w-4" />
@@ -691,7 +759,7 @@ export function TopBar({ project, rulerEnabled, onRulerToggle }: TopBarProps) {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1 flex-shrink-0">
         {/* Save Button */}
         <Button
           variant="default"

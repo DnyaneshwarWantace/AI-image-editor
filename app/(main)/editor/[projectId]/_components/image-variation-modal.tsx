@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Plus, X, Upload, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useParams } from "next/navigation";
@@ -23,7 +23,7 @@ interface ImageVariationModalProps {
   onClose: () => void;
   originalImageUrl: string;
   elementId: string;
-  onSave: (variations: Array<{ id: string; imageUrl: string; type: string }>) => void;
+  onSave: (variations: Array<{ id: string; storageId: string; type: string }>) => void;
 }
 
 export function ImageVariationModal({
@@ -53,16 +53,32 @@ export function ImageVariationModal({
     } : "skip"
   );
 
-  const [variations, setVariations] = useState<Array<{ id: string; imageUrl: string; type: string }>>([]);
+  // State includes both imageUrl (for display) and storageId (for saving)
+  // storageId is optional to handle loading existing variations
+  const [variations, setVariations] = useState<Array<{ id: string; imageUrl: string; storageId?: string; type: string }>>([]);
   const [isUploading, setIsUploading] = useState(false);
+
+  const generateUploadUrl = useMutation(api.imageVariations.generateUploadUrl);
 
   // Load existing variations when modal opens
   useEffect(() => {
     if (isOpen && existingVariations) {
+      console.log(`🖼️ Loading variations for element ${elementId}:`, existingVariations.variations);
+      existingVariations.variations.forEach((v, idx) => {
+        console.log(`  Variation ${idx + 1}:`, {
+          id: v.id,
+          hasImageUrl: !!v.imageUrl,
+          imageUrl: v.imageUrl?.substring(0, 100),
+          hasStorageId: !!v.storageId,
+          storageId: v.storageId,
+          type: v.type
+        });
+      });
       setVariations(existingVariations.variations);
-      console.log(`🖼️ Loaded ${existingVariations.variations.length} existing image variations for element ${elementId}`);
+      console.log(`✅ Loaded ${existingVariations.variations.length} existing image variations`);
     } else if (isOpen) {
       // Reset when opening for new element
+      console.log(`🆕 No existing variations, starting fresh`);
       setVariations([]);
     }
   }, [isOpen, existingVariations, elementId]);
@@ -73,7 +89,7 @@ export function ImageVariationModal({
 
     setIsUploading(true);
     try {
-      const newVariations: Array<{ id: string; imageUrl: string; type: string }> = [];
+      const newVariations: Array<{ id: string; imageUrl: string; storageId: string; type: string }> = [];
 
       // Process each file
       for (const file of Array.from(files)) {
@@ -83,15 +99,37 @@ export function ImageVariationModal({
           continue;
         }
 
-        // Convert to data URL
-        const dataUrl = await fileToDataUrl(file);
+        try {
+          // Create blob URL for immediate preview
+          const blobUrl = URL.createObjectURL(file);
 
-        // Add to variations
-        newVariations.push({
-          id: `var-${Date.now()}-${Math.random().toString(36).substring(7)}`,
-          imageUrl: dataUrl,
-          type: 'uploaded',
-        });
+          // Upload to Convex storage in background
+          const uploadUrl = await generateUploadUrl();
+          const result = await fetch(uploadUrl, {
+            method: "POST",
+            headers: { "Content-Type": file.type },
+            body: file,
+          });
+
+          if (!result.ok) {
+            throw new Error(`Upload failed: ${result.statusText}`);
+          }
+
+          const { storageId } = await result.json();
+
+          console.log(`✅ Uploaded image to storage: ${storageId}`);
+
+          // Add to variations with blob URL for immediate display
+          newVariations.push({
+            id: `var-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+            imageUrl: blobUrl, // Use blob URL for immediate preview
+            storageId: storageId, // For saving to database
+            type: 'uploaded',
+          });
+        } catch (uploadError) {
+          console.error(`Failed to upload ${file.name}:`, uploadError);
+          alert(`Failed to upload ${file.name}. Please try again.`);
+        }
       }
 
       if (newVariations.length > 0) {
@@ -137,10 +175,17 @@ export function ImageVariationModal({
 
     // Debounce auto-save to avoid too many saves
     const autoSaveTimeout = setTimeout(() => {
-      if (variations.length > 0) {
-        console.log(`💾 Auto-saving ${variations.length} image variations...`);
-        onSave(variations);
-      }
+      console.log(`💾 Auto-saving ${variations.length} image variations...`);
+      // Only save storageId, not imageUrl
+      const variationsToSave = variations
+        .filter(v => v.storageId) // Only save if we have storageId
+        .map(v => ({
+          id: v.id,
+          storageId: v.storageId!,
+          type: v.type,
+        }));
+      // Save even if empty array (to delete all variations)
+      onSave(variationsToSave);
     }, 1500); // 1.5 second debounce
 
     return () => clearTimeout(autoSaveTimeout);
@@ -148,10 +193,17 @@ export function ImageVariationModal({
 
   // Auto-save when dialog closes
   const handleClose = () => {
-    if (variations.length > 0) {
-      console.log(`💾 Saving ${variations.length} image variations on close...`);
-      onSave(variations);
-    }
+    console.log(`💾 Saving ${variations.length} image variations on close...`);
+    // Only save storageId, not imageUrl
+    const variationsToSave = variations
+      .filter(v => v.storageId) // Only save if we have storageId
+      .map(v => ({
+        id: v.id,
+        storageId: v.storageId!,
+        type: v.type,
+      }));
+    // Save even if empty array (to delete all variations)
+    onSave(variationsToSave);
     onClose();
   };
 
@@ -243,11 +295,22 @@ export function ImageVariationModal({
                   >
                     {/* Image Preview */}
                     <div className="aspect-video bg-gray-100 relative flex items-center justify-center p-2">
-                      <img
-                        src={variation.imageUrl}
-                        alt={`Variation ${index + 1}`}
-                        className="max-w-full max-h-full object-contain"
-                      />
+                      {variation.imageUrl ? (
+                        <img
+                          src={variation.imageUrl}
+                          alt={`Variation ${index + 1}`}
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            console.error(`Failed to load image variation ${index + 1}`, variation);
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="text-gray-400 text-xs">
+                          <ImageIcon className="h-8 w-8 mx-auto mb-2" />
+                          Loading...
+                        </div>
+                      )}
                     </div>
 
                     {/* Remove Button */}

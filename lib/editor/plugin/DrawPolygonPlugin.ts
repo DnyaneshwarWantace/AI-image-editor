@@ -105,7 +105,9 @@ class DrawPolygonPlugin implements IPluginTempl {
   }
   _createPolygon(points: Point[]) {
     return new Polygon(points, {
-      fill: '#cccccc',
+      fill: '#808080',
+      stroke: '#000000',
+      strokeWidth: 8,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       id: uuid(),
@@ -116,7 +118,7 @@ class DrawPolygonPlugin implements IPluginTempl {
     return new Line([p1.x, p1.y, p2.x, p2.y], {
       fill: '#000',
       stroke: '#000',
-      strokeWidth: 1,
+      strokeWidth: 4,
       selectable: false,
       evented: false,
     })

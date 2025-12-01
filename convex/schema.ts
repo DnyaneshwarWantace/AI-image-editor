@@ -199,8 +199,8 @@ export default defineSchema({
     variations: v.array(
       v.object({
         id: v.string(),
-        imageUrl: v.string(), // Variation image URL
-        storageId: v.optional(v.id("_storage")), // Convex storage ID if stored
+        imageUrl: v.optional(v.string()), // DEPRECATED - for old data migration
+        storageId: v.optional(v.id("_storage")), // Convex storage ID - preferred to avoid size limit
         type: v.string(), // "uploaded"
       })
     ),

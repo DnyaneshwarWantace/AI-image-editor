@@ -282,7 +282,7 @@ export function VariationsPanel() {
     }
   };
 
-  const handleSaveImageVariations = async (variations: Array<{ id: string; imageUrl: string; type: string }>) => {
+  const handleSaveImageVariations = async (variations: Array<{ id: string; storageId: string; type: string }>) => {
     if (!selectedImageElement || !canvas || !projectId) {
       console.error("❌ Cannot save image variations: missing required data");
       return;
@@ -296,7 +296,7 @@ export function VariationsPanel() {
         projectId,
         elementId,
         originalImageUrl: selectedImageElement.src,
-        variations,
+        variations: variations as any, // Cast to match Convex ID type
         userId: undefined,
       });
 

@@ -252,7 +252,7 @@ export function TextVariationsPanel() {
                   <div className="flex items-center gap-2 mt-1">
                     <Badge
                       variant="secondary"
-                      className="text-xs font-normal"
+                      className="text-xs font-normal text-gray-900 bg-gray-100 border-gray-300"
                     >
                       {element.variationCount} variations
                     </Badge>

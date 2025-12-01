@@ -364,7 +364,7 @@ export function TextColorVariationsPanel() {
                     <div className="w-4 h-4 rounded border" style={{ backgroundColor: element.fill }} />
                     <span className="text-xs text-gray-500 font-mono">{element.fill}</span>
                   </div>
-                  <Badge variant="secondary" className="text-xs font-normal mt-1">
+                  <Badge variant="secondary" className="text-xs font-normal mt-1 text-gray-900 bg-gray-100 border-gray-300">
                     {element.variationCount} color variations
                   </Badge>
                 </div>

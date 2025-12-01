@@ -19,7 +19,7 @@ export function CenterAlignControls() {
     }
 
     try {
-      editor.centerH?.();
+      editor.position?.('centerH');
       toast.success("Centered horizontally");
     } catch (error) {
       console.error("Error centering:", error);
@@ -37,7 +37,7 @@ export function CenterAlignControls() {
     }
 
     try {
-      editor.centerV?.();
+      editor.position?.('centerV');
       toast.success("Centered vertically");
     } catch (error) {
       console.error("Error centering:", error);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { Bold, Italic, Underline, Strikethrough } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const FONT_FAMILIES = [
   "Arial",
@@ -35,11 +37,27 @@ export function AttributeFont() {
   const [lineHeight, setLineHeight] = useState(1.2);
   const [textAlign, setTextAlign] = useState("left");
 
+  // Fetch fonts from database
+  const dbFonts = useQuery(api.fonts.getFonts, {});
+
+  // Combine default fonts with database fonts
+  const allFonts = useMemo(() => {
+    const fonts = [...FONT_FAMILIES];
+    if (dbFonts) {
+      dbFonts.forEach((font: any) => {
+        if (!fonts.includes(font.fontFamily)) {
+          fonts.push(font.fontFamily);
+        }
+      });
+    }
+    return fonts.sort();
+  }, [dbFonts]);
+
   useEffect(() => {
     if (!canvas) return;
 
     const updateFont = () => {
-      const activeObject = canvas.getActiveObject();
+      const activeObject = canvas.getActiveObject() as any;
       if (
         activeObject &&
         (activeObject.type === "textbox" ||
@@ -108,8 +126,8 @@ export function AttributeFont() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {FONT_FAMILIES.map((font) => (
-              <SelectItem key={font} value={font}>
+            {allFonts.map((font) => (
+              <SelectItem key={font} value={font} style={{ fontFamily: font }}>
                 {font}
               </SelectItem>
             ))}

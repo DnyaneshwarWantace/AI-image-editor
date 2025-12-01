@@ -53,6 +53,7 @@ export function BackgroundColorVariationsPanel() {
   const [colorVariations, setColorVariations] = useState<ColorVariation[]>([]);
   const [newColor, setNewColor] = useState("#FFFFFF");
   const [newColorName, setNewColorName] = useState("");
+  const [currentBgColor, setCurrentBgColor] = useState<string | null>(null);
 
   // Convex hooks
   const existingVariations = useQuery(
@@ -65,12 +66,45 @@ export function BackgroundColorVariationsPanel() {
   );
   const saveVariationsMutation = useMutation(api.backgroundColorVariations.saveBackgroundColorVariations);
 
+  // Get current background color
+  useEffect(() => {
+    if (!canvas) return;
+
+    const getCurrentBgColor = () => {
+      const workspace = canvas.getObjects().find((obj: any) => obj.id === "workspace");
+      if (workspace) {
+        const fill = (workspace as any).fill;
+        if (typeof fill === 'string') {
+          setCurrentBgColor(fill);
+          return;
+        }
+      }
+      // Fallback to canvas background
+      if (typeof canvas.backgroundColor === 'string') {
+        setCurrentBgColor(canvas.backgroundColor);
+      }
+    };
+
+    getCurrentBgColor();
+  }, [canvas]);
+
   // Load existing variations
   useEffect(() => {
     if (existingVariations && existingVariations.length > 0) {
       setColorVariations(existingVariations);
     }
   }, [existingVariations]);
+
+  // Auto-save when variations change
+  useEffect(() => {
+    if (!projectId) return;
+
+    const autoSaveTimeout = setTimeout(() => {
+      handleSaveVariations();
+    }, 1500);
+
+    return () => clearTimeout(autoSaveTimeout);
+  }, [colorVariations, projectId]);
 
   const handleAddColor = () => {
     const variation: ColorVariation = {
@@ -103,7 +137,7 @@ export function BackgroundColorVariationsPanel() {
   };
 
   const handleSaveVariations = async () => {
-    if (!projectId || colorVariations.length === 0) {
+    if (!projectId) {
       return;
     }
 
@@ -114,7 +148,7 @@ export function BackgroundColorVariationsPanel() {
         userId: undefined,
       });
 
-      alert(`Saved ${colorVariations.length} background color variations!`);
+      console.log(`✅ Saved ${colorVariations.length} background color variations`);
     } catch (error) {
       console.error("❌ Error saving background color variations:", error);
       alert("Failed to save variations. Please try again.");
@@ -144,6 +178,15 @@ export function BackgroundColorVariationsPanel() {
     );
   }
 
+  // Don't show if no background color is used
+  if (!currentBgColor) {
+    return (
+      <div className="p-4">
+        <p className="text-gray-500 text-sm">No background color is set. Add a background color to your design first.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3 h-full flex flex-col">
       {/* Header */}
@@ -153,10 +196,25 @@ export function BackgroundColorVariationsPanel() {
           Create different background colors for your design
         </p>
         {variationCount !== undefined && variationCount > 0 && (
-          <Badge variant="secondary" className="mt-2">
+          <Badge variant="secondary" className="mt-2 text-gray-900 bg-gray-100 border-gray-300">
             {variationCount} variations saved
           </Badge>
         )}
+      </div>
+
+      {/* Current Background Color */}
+      <div className="space-y-2 border-b pb-3">
+        <Label className="text-xs font-semibold">Current Background</Label>
+        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded border">
+          <div
+            className="w-10 h-10 rounded border-2 border-gray-300"
+            style={{ backgroundColor: currentBgColor }}
+          />
+          <div className="flex-1">
+            <p className="text-xs font-medium text-gray-900">Original</p>
+            <p className="text-xs text-gray-500">{currentBgColor}</p>
+          </div>
+        </div>
       </div>
 
       {/* Color Picker */}

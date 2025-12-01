@@ -56,6 +56,7 @@ export function FontVariationsPanel() {
     api.fontVariations.getFontVariationCounts,
     projectId ? { projectId } : "skip"
   );
+  const availableFonts = useQuery(api.fonts.getFonts, {});
   const saveVariationsMutation = useMutation(api.fontVariations.saveFontVariations);
 
   const extractTextElements = useCallback(() => {
@@ -218,16 +219,41 @@ export function FontVariationsPanel() {
           </p>
         </div>
 
-        {/* Add Font Input */}
+        {/* Available Fonts from Database */}
+        {availableFonts && availableFonts.length > 0 && (
+          <div className="space-y-2">
+            <Label className="text-xs">Quick Add from Library ({availableFonts.length} fonts)</Label>
+            <div className="max-h-48 overflow-y-auto space-y-1 border rounded p-2 bg-gray-50 scrollbar-thin">
+              {availableFonts.map((font: any) => (
+                <button
+                  key={font._id}
+                  onClick={() => {
+                    const variation: FontVariation = {
+                      id: `font-${Date.now()}-${Math.random()}`,
+                      fontFamily: font.fontFamily,
+                    };
+                    setFontVariations([...fontVariations, variation]);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm rounded hover:bg-blue-100 transition-colors border border-transparent hover:border-blue-300 text-black"
+                  style={{ fontFamily: font.fontFamily }}
+                >
+                  {font.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Add Custom Font Input */}
         <div className="space-y-2">
-          <Label htmlFor="font-name" className="text-xs">Add Font</Label>
+          <Label htmlFor="font-name" className="text-xs text-black">Add Custom Font</Label>
           <div className="flex gap-2">
             <Input
               id="font-name"
               value={newFont}
               onChange={(e) => setNewFont(e.target.value)}
               placeholder="e.g., Roboto, Arial, Times New Roman"
-              className="text-sm"
+              className="text-sm text-black"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleAddFont();
@@ -252,7 +278,7 @@ export function FontVariationsPanel() {
                 key={variation.id}
                 className="flex items-center justify-between p-2 border rounded bg-white"
               >
-                <span className="text-sm font-medium" style={{ fontFamily: variation.fontFamily }}>
+                <span className="text-sm font-medium text-black" style={{ fontFamily: variation.fontFamily }}>
                   {variation.fontFamily}
                 </span>
                 <Button
@@ -331,14 +357,14 @@ export function FontVariationsPanel() {
                   <Type className="h-4 w-4 text-purple-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-black truncate">
                     {element.text}
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-black mt-0.5">
                     Font: {element.fontFamily}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className="text-xs font-normal">
+                    <Badge variant="secondary" className="text-xs font-normal text-black bg-gray-100 border-gray-300">
                       {element.variationCount} font variations
                     </Badge>
                   </div>

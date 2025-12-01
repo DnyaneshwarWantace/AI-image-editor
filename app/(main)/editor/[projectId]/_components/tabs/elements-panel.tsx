@@ -8,7 +8,6 @@ import {
   Triangle,
   Minus,
   ArrowRight,
-  PenTool,
   QrCode,
   ScanLine,
   Spline,
@@ -75,7 +74,8 @@ export function ElementsPanel() {
     stopAllDrawingModes(); // Stop any active drawing
     try {
       // Use CustomTextbox which prevents word breaking
-      const textbox = new CustomTextbox("Type your text here", {
+      const textbox = new CustomTextbox({
+        text: "Type your text here",
         width: 400,
         fontSize: 80,
         fill: "#000000",
@@ -225,7 +225,11 @@ export function ElementsPanel() {
           (editor as any).setMode?.(false);
         });
       } else if (type === "freeDraw") {
-        (editor as any).startDraw?.({ width: 20 });
+        (editor as any).startDraw?.({
+          width: 3,
+          color: "#000000",
+          brushType: "pencil"
+        });
       } else if (type === "pathText") {
         (editor as any).startTextPathDraw?.({
           defaultText: "Text on Path",
@@ -362,17 +366,6 @@ export function ElementsPanel() {
           >
             <Square className="h-6 w-6 mb-1 text-gray-700 rotate-45" />
             <span className="text-xs text-gray-600">Draw Polygon</span>
-          </button>
-          <button
-            onClick={() => toggleDrawingMode("freeDraw")}
-            className={`flex flex-col items-center justify-center p-3 rounded transition-colors ${
-              drawingMode === "freeDraw"
-                ? "bg-blue-100 border-2 border-blue-500"
-                : "bg-gray-50 hover:bg-blue-50"
-            }`}
-          >
-            <PenTool className="h-6 w-6 mb-1 text-gray-700" />
-            <span className="text-xs text-gray-600">Free Draw</span>
           </button>
           <button
             onClick={() => toggleDrawingMode("pathText")}

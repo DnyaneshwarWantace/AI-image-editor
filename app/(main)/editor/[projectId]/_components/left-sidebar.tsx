@@ -9,6 +9,20 @@ import {
   Layers,
   User,
   Palette,
+  FrameIcon,
+  Smile,
+  Wand2,
+  Crop,
+  Eraser,
+  ScanFace,
+  ScanSearch,
+  Facebook,
+  Tv,
+  Droplet,
+  Hash,
+  Rainbow,
+  Copy,
+  Paintbrush,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -30,6 +44,17 @@ import { ImageVariationsPanel } from "./tabs/image-variations-panel";
 import { FontVariationsPanel } from "./tabs/font-variations-panel";
 import { BackgroundColorVariationsPanel } from "./tabs/background-color-variations-panel";
 import { TextColorVariationsPanel } from "./tabs/text-color-variations-panel";
+import { AIColorPalettePanel } from "./tabs/ai-color-palette-panel";
+import { AISmartCropPanel } from "./tabs/ai-smart-crop-panel";
+import { AIBackgroundRemovalPanel } from "./tabs/ai-background-removal-panel";
+import { AIFaceDetectionPanel } from "./tabs/ai-face-detection-panel";
+import { AIObjectDetectionPanel } from "./tabs/ai-object-detection-panel";
+import { AITextOverlayChecker } from "./tabs/ai-text-overlay-checker";
+import { AdMockupPreviewPanel } from "./tabs/ad-mockup-preview-panel";
+import { BlendModesPanel } from "./tabs/blend-modes-panel";
+import { BordersFramesPanel } from "./tabs/borders-frames-panel";
+import { StickersLibraryPanel } from "./tabs/stickers-library-panel";
+import { DrawingToolsPanel } from "./tabs/drawing-tools-panel";
 
 const LEFT_TABS = [
   {
@@ -65,32 +90,98 @@ const LEFT_TABS = [
   {
     key: "textVariations",
     name: "Text Variations",
-    icon: Type,
+    icon: Hash,
     component: TextVariationsPanel,
   },
   {
     key: "imageVariations",
     name: "Image Variations",
-    icon: ImageIcon,
+    icon: Wand2,
     component: ImageVariationsPanel,
   },
   {
     key: "fontVariations",
     name: "Font Variations",
-    icon: Palette,
+    icon: Type,
     component: FontVariationsPanel,
   },
   {
     key: "backgroundColorVariations",
     name: "BG Color",
-    icon: Palette,
+    icon: Droplet,
     component: BackgroundColorVariationsPanel,
   },
   {
     key: "textColorVariations",
     name: "Text Color",
-    icon: Type,
+    icon: Palette,
     component: TextColorVariationsPanel,
+  },
+  {
+    key: "aiColorPalette",
+    name: "AI Colors",
+    icon: Rainbow,
+    component: AIColorPalettePanel,
+  },
+  {
+    key: "aiSmartCrop",
+    name: "AI Crop",
+    icon: Crop,
+    component: AISmartCropPanel,
+  },
+  {
+    key: "aiBackgroundRemoval",
+    name: "AI BG Remove",
+    icon: Eraser,
+    component: AIBackgroundRemovalPanel,
+  },
+  {
+    key: "aiFaceDetection",
+    name: "AI Faces",
+    icon: ScanFace,
+    component: AIFaceDetectionPanel,
+  },
+  {
+    key: "aiObjectDetection",
+    name: "AI Objects",
+    icon: ScanSearch,
+    component: AIObjectDetectionPanel,
+  },
+  {
+    key: "aiTextOverlay",
+    name: "FB Ad Checker",
+    icon: Facebook,
+    component: AITextOverlayChecker,
+  },
+  {
+    key: "adMockup",
+    name: "Ad Preview",
+    icon: Tv,
+    component: AdMockupPreviewPanel,
+  },
+  {
+    key: "blendModes",
+    name: "Blend Modes",
+    icon: Copy,
+    component: BlendModesPanel,
+  },
+  {
+    key: "bordersFrames",
+    name: "Borders",
+    icon: FrameIcon,
+    component: BordersFramesPanel,
+  },
+  {
+    key: "stickers",
+    name: "Stickers",
+    icon: Smile,
+    component: StickersLibraryPanel,
+  },
+  {
+    key: "drawing",
+    name: "Drawing",
+    icon: Paintbrush,
+    component: DrawingToolsPanel,
   },
   {
     key: "myMaterial",

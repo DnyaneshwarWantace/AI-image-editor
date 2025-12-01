@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,9 @@ export function ContextMenu() {
 
     const handleRightClick = (opt: any) => {
       if (opt.e && 'button' in opt.e && opt.e.button === 2) {
+        // Prevent default context menu
+        opt.e.preventDefault();
+
         // Right mouse button (button 2 is right-click)
         const menuItems: ContextMenuItem[] = [];
 
@@ -192,10 +196,27 @@ export function ContextMenu() {
         }
 
         setItems(menuItems);
-        const e = opt.e as MouseEvent | TouchEvent;
-        const clientX = 'clientX' in e ? e.clientX : (e as TouchEvent).touches[0]?.clientX || 0;
-        const clientY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0]?.clientY || 0;
-        setPosition({ x: clientX, y: clientY });
+
+        // Get the actual mouse position from the event
+        const e = opt.e as MouseEvent;
+        let x = e.clientX;
+        let y = e.clientY;
+
+        // Estimate menu size
+        const menuWidth = 270;
+        const menuHeight = menuItems.length * 35;
+
+        // Keep menu within viewport
+        if (x + menuWidth > window.innerWidth) {
+          x = window.innerWidth - menuWidth - 5;
+        }
+        if (y + menuHeight > window.innerHeight) {
+          y = window.innerHeight - menuHeight - 5;
+        }
+        if (x < 5) x = 5;
+        if (y < 5) y = 5;
+
+        setPosition({ x, y });
         setVisible(true);
       }
     };
@@ -225,9 +246,8 @@ export function ContextMenu() {
 
   if (!visible || items.length === 0) return null;
 
-  return (
-    <React.Fragment>
-      <div
+  const menuContent = (
+    <div
         ref={menuRef}
         className="fixed z-[9999] min-w-[270px] bg-[#262933] text-white text-[9pt] border border-[#333333] rounded-md shadow-lg py-1"
         style={{
@@ -334,7 +354,8 @@ export function ContextMenu() {
           );
         })}
       </div>
-    </React.Fragment>
   );
+
+  return createPortal(menuContent, document.body);
 }
 

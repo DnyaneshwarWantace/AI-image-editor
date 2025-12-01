@@ -37,10 +37,24 @@ export function AttributeBorder() {
     const activeObject = canvas?.getActiveObject();
     if (!activeObject) return;
 
-    activeObject.set({
-      strokeWidth,
-      stroke: strokeWidth > 0 ? strokeColor : undefined,
-    });
+    // Check if it's a path (drawing) - preserve stroke even if strokeWidth is 0
+    const isPath = activeObject.type === 'path';
+
+    if (isPath) {
+      // For paths, only update strokeWidth, never remove the stroke color
+      if (strokeWidth > 0) {
+        activeObject.set({
+          strokeWidth,
+          stroke: strokeColor,
+        });
+      }
+    } else {
+      // For other objects, normal behavior
+      activeObject.set({
+        strokeWidth,
+        stroke: strokeWidth > 0 ? strokeColor : undefined,
+      });
+    }
     canvas?.requestRenderAll();
   };
 
@@ -50,6 +64,9 @@ export function AttributeBorder() {
 
   const activeObject = canvas?.getActiveObject();
   if (!activeObject) return null;
+
+  // Don't show border controls for path objects (drawings) - they use stroke in color picker
+  if (activeObject.type === 'path') return null;
 
   return (
     <div className="space-y-3">

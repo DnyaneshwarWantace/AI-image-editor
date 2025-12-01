@@ -54,7 +54,7 @@ class DrawLinePlugin implements IPluginTempl {
       this.pointerPoints = [this.pointer.x, this.pointer.y, this.pointer.x, this.pointer.y]
       let modeHandler
       let opts: any = {
-        strokeWidth: 3,
+        strokeWidth: 8,
         stroke: '#000',
         id: uuid(),
       }
@@ -68,7 +68,7 @@ class DrawLinePlugin implements IPluginTempl {
         case 'thinTailArrow':
           modeHandler = ThinTailArrow
           opts = {
-            strokeWidth: 3,
+            strokeWidth: 8,
             stroke: '#000',
             fill: '#000',
             id: uuid(),

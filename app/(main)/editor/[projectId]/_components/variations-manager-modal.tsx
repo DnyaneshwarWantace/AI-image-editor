@@ -78,6 +78,12 @@ export function VariationsManagerModal({
     projectId ? { projectId } : "skip"
   );
 
+  // Fetch all font variations from Convex backend
+  const fontVariationsData = useQuery(
+    api.fontVariations.getFontVariationsByProject,
+    projectId ? { projectId } : "skip"
+  );
+
   // Filter variations to only include text elements that exist on current canvas
   // This recalculates whenever canvas or textVariationsData changes
   const variationsData = useMemo(() => {
@@ -149,6 +155,41 @@ export function VariationsManagerModal({
 
     return filtered;
   }, [imageVariationsData, canvas]);
+
+  // Filter font variations to only include text elements that exist on current canvas
+  const fontVariationsFiltered = useMemo(() => {
+    if (!fontVariationsData || !canvas) {
+      console.log('⚠️ fontVariationsFiltered: Missing fontVariationsData or canvas');
+      return [];
+    }
+
+    // Get all text element IDs from CURRENT canvas state (fresh check)
+    const canvasObjects = canvas.getObjects();
+    const canvasTextIds = new Set<string>();
+
+    canvasObjects.forEach((obj: any) => {
+      const isTextObject = obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text';
+      if (isTextObject && obj.id) {
+        canvasTextIds.add(obj.id);
+      }
+    });
+
+    console.log('🔍 [fontVariationsFiltered] Current canvas text IDs:', Array.from(canvasTextIds));
+    console.log('🔍 [fontVariationsFiltered] Total font variations from backend:', fontVariationsData.length);
+
+    // Filter variations to only include elements that exist on canvas
+    const filtered = fontVariationsData.filter((variation: any) => {
+      const exists = canvasTextIds.has(variation.elementId);
+      if (!exists) {
+        console.log(`⚠️ [fontVariationsFiltered] Variation for ${variation.elementId} - element not on canvas, excluding`);
+      }
+      return exists;
+    });
+
+    console.log(`✅ [fontVariationsFiltered] Filtered: ${filtered.length} of ${fontVariationsData.length} match canvas.`);
+
+    return filtered;
+  }, [fontVariationsData, canvas]);
 
   // Reset state and cleanup when modal opens
   useEffect(() => {
@@ -261,8 +302,15 @@ export function VariationsManagerModal({
       }, total);
     }
 
+    // Multiply by font variations
+    if (fontVariationsFiltered && fontVariationsFiltered.length > 0) {
+      total = fontVariationsFiltered.reduce((acc: number, variation: any) => {
+        return acc * (variation.variations.length + 1); // +1 for original
+      }, total);
+    }
+
     return total;
-  }, [variationsData, imageVariationsFiltered]);
+  }, [variationsData, imageVariationsFiltered, fontVariationsFiltered]);
 
   // Generate all possible combinations
   // This function uses the latest variationsData from closure
@@ -270,15 +318,18 @@ export function VariationsManagerModal({
     // Get fresh variationsData and canvas state
     const currentVariationsData = variationsData;
     const currentImageVariations = imageVariationsFiltered;
+    const currentFontVariations = fontVariationsFiltered;
     const currentCanvas = canvas;
 
     const hasTextVariations = currentVariationsData && currentVariationsData.length > 0;
     const hasImageVariations = currentImageVariations && currentImageVariations.length > 0;
+    const hasFontVariations = currentFontVariations && currentFontVariations.length > 0;
 
-    if ((!hasTextVariations && !hasImageVariations) || !currentCanvas) {
+    if ((!hasTextVariations && !hasImageVariations && !hasFontVariations) || !currentCanvas) {
       console.error("❌ Cannot generate: missing variations or canvas", {
         hasTextVariations,
         hasImageVariations,
+        hasFontVariations,
         hasCanvas: !!currentCanvas
       });
       setIsGenerating(false);
@@ -289,6 +340,7 @@ export function VariationsManagerModal({
     console.log('🚀 Starting generation with:', {
       textVariationsCount: currentVariationsData?.length || 0,
       imageVariationsCount: currentImageVariations?.length || 0,
+      fontVariationsCount: currentFontVariations?.length || 0,
       totalCombinations,
       canvasObjectCount: currentCanvas.getObjects().length
     });
@@ -369,50 +421,77 @@ export function VariationsManagerModal({
     // Filter to only elements that have variations
     const textElementsWithVariations = currentVariationsData?.filter((v: TextVariation) => v.variations.length > 0) || [];
     const imageElementsWithVariations = currentImageVariations?.filter((v: ImageVariation) => v.variations.length > 0) || [];
+    const fontElementsWithVariations = currentFontVariations?.filter((v: any) => v.variations.length > 0) || [];
 
     console.log("📊 Generating combinations:", {
       textElementsWithVariations: textElementsWithVariations.length,
       imageElementsWithVariations: imageElementsWithVariations.length,
+      fontElementsWithVariations: fontElementsWithVariations.length,
       elementsWithoutTextVariations: elementsWithoutTextVariations.size,
       elementsWithoutImageVariations: elementsWithoutImageVariations.size,
       totalTextElements: allTextElements.length,
       totalImageElements: allImageElements.length,
     });
 
+    console.log("🔤 Font variations details:", fontElementsWithVariations.map(f => ({
+      elementId: f.elementId,
+      originalFont: f.originalFont,
+      variationCount: f.variations.length,
+      variations: f.variations.map((v: any) => v.fontFamily)
+    })));
+
     const combinations: Array<Record<string, any>> = [];
 
-    // Build combinations recursively - for both text AND image variations
+    // Build combinations recursively - for text, image, AND font variations
     const buildCombinations = (
       textIndex: number,
       imageIndex: number,
+      fontIndex: number,
       current: Record<string, any>
     ) => {
       // If we've processed all text variations, move to image variations
       if (textIndex === textElementsWithVariations.length) {
-        // If we've processed all image variations too, save this combination
+        // If we've processed all image variations, move to font variations
         if (imageIndex === imageElementsWithVariations.length) {
-          // Add all elements without variations (keep their original values)
-          elementsWithoutTextVariations.forEach((text, elementId) => {
-            current[elementId] = text;
-          });
-          elementsWithoutImageVariations.forEach((src, elementId) => {
-            current[elementId] = src;
-          });
-          combinations.push({ ...current });
+          // If we've processed all font variations too, save this combination
+          if (fontIndex === fontElementsWithVariations.length) {
+            // Add all elements without variations (keep their original values as strings for backward compatibility)
+            elementsWithoutTextVariations.forEach((text, elementId) => {
+              current[elementId] = text; // Keep as plain string
+            });
+            elementsWithoutImageVariations.forEach((src, elementId) => {
+              current[elementId] = src; // Keep as plain string
+            });
+            combinations.push({ ...current });
+            return;
+          }
+
+          // Process font variation
+          const fontVariation = fontElementsWithVariations[fontIndex];
+
+          // Add original font (use special key prefix to avoid conflicts)
+          current[`__font__${fontVariation.elementId}`] = fontVariation.originalFont;
+          buildCombinations(textIndex, imageIndex, fontIndex + 1, current);
+
+          // Add each font variation
+          for (const v of fontVariation.variations) {
+            current[`__font__${fontVariation.elementId}`] = v.fontFamily;
+            buildCombinations(textIndex, imageIndex, fontIndex + 1, current);
+          }
           return;
         }
 
         // Process image variation
         const imageVariation = imageElementsWithVariations[imageIndex];
 
-        // Add original image
-        current[imageVariation.elementId] = imageVariation.originalImageUrl;
-        buildCombinations(textIndex, imageIndex + 1, current);
+        // Add original image (use special key prefix to avoid conflicts)
+        current[`__image__${imageVariation.elementId}`] = imageVariation.originalImageUrl;
+        buildCombinations(textIndex, imageIndex + 1, fontIndex, current);
 
         // Add each image variation
         for (const v of imageVariation.variations) {
-          current[imageVariation.elementId] = v.imageUrl;
-          buildCombinations(textIndex, imageIndex + 1, current);
+          current[`__image__${imageVariation.elementId}`] = v.imageUrl;
+          buildCombinations(textIndex, imageIndex + 1, fontIndex, current);
         }
         return;
       }
@@ -422,18 +501,23 @@ export function VariationsManagerModal({
 
       // Add original text
       current[textVariation.elementId] = textVariation.originalText;
-      buildCombinations(textIndex + 1, imageIndex, current);
+      buildCombinations(textIndex + 1, imageIndex, fontIndex, current);
 
       // Add each text variation
       for (const v of textVariation.variations) {
         current[textVariation.elementId] = v.text;
-        buildCombinations(textIndex + 1, imageIndex, current);
+        buildCombinations(textIndex + 1, imageIndex, fontIndex, current);
       }
     };
 
-    buildCombinations(0, 0, {});
+    buildCombinations(0, 0, 0, {});
 
     console.log(`✅ Generated ${combinations.length} combinations`);
+    console.log(`🔍 Sample combinations (first 3):`, combinations.slice(0, 3).map((combo, idx) => ({
+      index: idx,
+      keys: Object.keys(combo),
+      values: combo
+    })));
 
     // Create ad objects for each combination
     const ads: GeneratedAd[] = combinations.map((combo, index) => ({
@@ -449,7 +533,7 @@ export function VariationsManagerModal({
     // Pass current variations data to ensure we use the latest data
     ads.forEach((ad, index) => {
       setTimeout(() => {
-        generateAdImage(ad, index, currentVariationsData, currentImageVariations);
+        generateAdImage(ad, index, currentVariationsData, currentImageVariations, currentFontVariations);
       }, index * 500); // Stagger generation
     });
   };
@@ -458,7 +542,8 @@ export function VariationsManagerModal({
     ad: GeneratedAd,
     index: number,
     currentVariationsDataForAd: typeof variationsData,
-    currentImageVariationsForAd: typeof imageVariationsFiltered
+    currentImageVariationsForAd: typeof imageVariationsFiltered,
+    currentFontVariationsForAd: typeof fontVariationsFiltered
   ) => {
     if (!canvas) {
       console.error("❌ Cannot generate image: missing canvas");
@@ -540,16 +625,17 @@ export function VariationsManagerModal({
           const elementId = obj.id;
           let updated = false;
           let newText = obj.text;
+          let newFont = obj.fontFamily;
 
-          // Try exact ID match first
-          if (elementId && ad.combination[elementId]) {
+          // Check for text variation
+          if (elementId && ad.combination[elementId] !== undefined) {
             newText = ad.combination[elementId];
             console.log(`✅ [JSON] Updating text for element ${elementId}: "${obj.text}" -> "${newText}"`);
             updated = true;
           } else if (elementIdToOriginalTextMap.size > 0) {
             // Try to match by original text content
             for (const [varElementId, originalText] of elementIdToOriginalTextMap.entries()) {
-              if (obj.text === originalText && ad.combination[varElementId]) {
+              if (obj.text === originalText && ad.combination[varElementId] !== undefined) {
                 newText = ad.combination[varElementId];
                 console.log(`✅ [JSON Content Match] Updating text (matched ${varElementId}): "${obj.text}" -> "${newText}"`);
                 updated = true;
@@ -558,10 +644,19 @@ export function VariationsManagerModal({
             }
           }
 
+          // Check for font variation (using special prefix)
+          const fontKey = `__font__${elementId}`;
+          if (elementId && ad.combination[fontKey] !== undefined) {
+            newFont = ad.combination[fontKey];
+            console.log(`✅ [JSON] Updating font for element ${elementId}: "${obj.fontFamily}" -> "${newFont}"`);
+            updated = true;
+          }
+
           if (updated) {
             return {
               ...obj,
               text: newText,
+              fontFamily: newFont,
             };
           } else if (elementId) {
             console.log(`⚠️ [JSON] No variation found for element ${elementId}, keeping original: "${obj.text}"`);
@@ -571,16 +666,18 @@ export function VariationsManagerModal({
           let updated = false;
           let newImageUrl = obj.src;
 
-          // Try exact ID match first
-          if (elementId && ad.combination[elementId]) {
-            newImageUrl = ad.combination[elementId];
+          // Try exact ID match first (using special prefix)
+          const imageKey = `__image__${elementId}`;
+          if (elementId && ad.combination[imageKey] !== undefined) {
+            newImageUrl = ad.combination[imageKey];
             console.log(`✅ [JSON] Updating image for element ${elementId}: "${obj.src?.substring(0, 50)}..." -> "${newImageUrl?.substring(0, 50)}..."`);
             updated = true;
           } else if (elementIdToOriginalImageMap.size > 0) {
             // Try to match by original image URL
             for (const [varElementId, originalImageUrl] of elementIdToOriginalImageMap.entries()) {
-              if (obj.src === originalImageUrl && ad.combination[varElementId]) {
-                newImageUrl = ad.combination[varElementId];
+              const imageKey = `__image__${varElementId}`;
+              if (obj.src === originalImageUrl && ad.combination[imageKey] !== undefined) {
+                newImageUrl = ad.combination[imageKey];
                 console.log(`✅ [JSON Content Match] Updating image (matched ${varElementId})`);
                 updated = true;
                 break;
@@ -865,11 +962,11 @@ export function VariationsManagerModal({
             const newImageUrl = ad.combination[elementId];
             if (obj.getSrc && obj.getSrc() !== newImageUrl) {
               console.log(`🔄 [Exact ID] Updating image for ${elementId}`);
-              // Load new image
+              // Load new image with crossOrigin to prevent canvas tainting
               obj.setSrc(newImageUrl, () => {
                 obj.setCoords();
                 fabricCanvas.renderAll();
-              });
+              }, { crossOrigin: 'anonymous' });
             }
           } else if (elementId) {
             // Try to find by matching original image URL
@@ -883,7 +980,7 @@ export function VariationsManagerModal({
                   obj.setSrc(newImageUrl, () => {
                     obj.setCoords();
                     fabricCanvas.renderAll();
-                  });
+                  }, { crossOrigin: 'anonymous' });
                   matched = true;
                   break;
                 }
@@ -1145,7 +1242,7 @@ export function VariationsManagerModal({
                           {variation.originalText}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-xs text-gray-900 bg-gray-100 border-gray-300">
                             {variation.variations.length} variations
                           </Badge>
                           <span className="text-xs text-gray-500">
@@ -1185,7 +1282,7 @@ export function VariationsManagerModal({
                           Image Element
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-xs text-gray-900 bg-gray-100 border-gray-300">
                             {variation.variations.length} variations
                           </Badge>
                           <span className="text-xs text-gray-500">
@@ -1256,7 +1353,7 @@ export function VariationsManagerModal({
                     {/* Info */}
                     <div className="p-3">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-medium text-gray-600">
+                        <p className="text-xs font-medium text-gray-900">
                           Variation {index + 1}
                         </p>
                         <Button
@@ -1279,7 +1376,7 @@ export function VariationsManagerModal({
                             return (
                               <p
                                 key={elementId}
-                                className="text-xs text-gray-500 truncate"
+                                className="text-xs text-gray-900 truncate"
                                 title={displayValue}
                               >
                                 {isShortText ? displayValue : `${displayValue.substring(0, 30)}...`}
