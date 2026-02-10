@@ -1,28 +1,47 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search, Loader2, Type } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { Textbox, IText, Text, Group } from "fabric";
 
 export function FontStylePanel() {
   const { canvas, editor } = useCanvasContext();
   const [selectedType, setSelectedType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [fontStyleTypes, setFontStyleTypes] = useState<any[] | null>(null);
+  const [allFontStyles, setAllFontStyles] = useState<any[] | null>(null);
 
-  // Fetch font style types from Convex
-  const fontStyleTypes = useQuery(api.fonts.getFontStyleTypes);
+  // Fetch font style types and styles from REST API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [typesRes, stylesRes] = await Promise.all([
+          fetch('/api/font-styles/types'),
+          fetch('/api/font-styles?limit=10000')
+        ]);
 
-  // Fetch font styles from Convex
-  const allFontStyles = useQuery(api.fonts.getFontStyles, {
-    limit: 10000,
-  });
+        if (typesRes.ok) {
+          const typesData = await typesRes.json();
+          setFontStyleTypes(typesData || []);
+        }
+
+        if (stylesRes.ok) {
+          const stylesData = await stylesRes.json();
+          setAllFontStyles(stylesData || []);
+        }
+      } catch (error) {
+        console.error('Error fetching font styles:', error);
+        setFontStyleTypes([]);
+        setAllFontStyles([]);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Filter font styles based on search and type
   const fontStyles = useMemo(() => {
@@ -32,7 +51,7 @@ export function FontStylePanel() {
 
     // Filter by type
     if (selectedType !== "all") {
-      filtered = filtered.filter((f) => f.fontStyleTypeId === selectedType);
+      filtered = filtered.filter((f) => f.font_style_type_id === selectedType);
     }
 
     // Filter by search query
@@ -44,22 +63,22 @@ export function FontStylePanel() {
 
     // Format for display
     return filtered.map((item) => ({
-      id: item._id,
+      id: item.id,
       name: item.name,
       json: item.json,
-      preview: item.imageUrl,
+      preview: item.image_url,
     }));
   }, [allFontStyles, selectedType, searchQuery]);
 
   const types = useMemo(() => {
     if (!fontStyleTypes) return [];
     return fontStyleTypes.map((type) => ({
-      id: type._id,
+      id: type.id,
       name: type.name,
     }));
   }, [fontStyleTypes]);
 
-  const isLoading = fontStyleTypes === undefined || allFontStyles === undefined;
+  const isLoading = fontStyleTypes === null || allFontStyles === null;
 
   const loadFontStyle = async (fontStyle: any) => {
     if (!canvas || !editor) {

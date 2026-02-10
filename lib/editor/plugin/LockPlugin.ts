@@ -3,7 +3,6 @@
  * @date 2022-05-24 15:14:34
  * @lastEditors Image Editor
  * @lastEditTime 2022-09-05 18:23:13
- * @Description 锁定文件
  */
 import { Control, ActiveSelection, FabricObject, Canvas as FabricCanvas, util } from 'fabric'
 import { SelectEvent, SelectMode } from '../eventType'
@@ -98,7 +97,6 @@ export default class LockPlugin implements IPluginTempl {
     this.canvas.on('selection:created', () => this.renderForEveryActiveObj())
     this.canvas.on('selection:updated', () => this.renderForEveryActiveObj())
 
-    // 鼠标框选不能多选锁定元素
     // Override _groupSelectedObjects to filter out locked objects
     const originalGroupSelectedObjects = (FabricCanvas.prototype as any)._groupSelectedObjects;
     (FabricCanvas.prototype as any)._groupSelectedObjects = function (this: FabricCanvas) {
@@ -136,7 +134,6 @@ export default class LockPlugin implements IPluginTempl {
       }
     }
 
-    // shift+左键点选不能多选锁定元素
     // Override _handleGrouping to filter out locked objects
     const originalHandleGrouping = (FabricCanvas.prototype as any)._handleGrouping;
     (FabricCanvas.prototype as any)._handleGrouping = function (this: FabricCanvas, e: any, target: FabricObject | undefined) {
@@ -220,7 +217,6 @@ export default class LockPlugin implements IPluginTempl {
   lock() {
     const activeObject = this.canvas.getActiveObject() as FabricObject
     if (activeObject) {
-      // 修改默认属性
       Object.values(TypeKey).forEach((key: TypeKey) => {
         activeObject[key] = true
       })
@@ -236,7 +232,6 @@ export default class LockPlugin implements IPluginTempl {
       activeObject.hasControls = true
       activeObject.selectable = true
       activeObject.evented = true
-      // 修改默认属性
       Object.values(TypeKey).forEach((key: TypeKey) => {
         activeObject[key] = false
       })

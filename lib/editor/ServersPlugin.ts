@@ -127,31 +127,24 @@ class ServersPlugin implements IPluginTempl {
   }
 
   async loadJSON(jsonFile: string | object, callback?: () => void) {
-    // 确保元素存在id
     const temp = typeof jsonFile === 'string' ? JSON.parse(jsonFile) : jsonFile;
     const textPaths: Record<'id' | 'path', any>[] = [];
     temp.objects.forEach((item: any) => {
       !(item as any).id && ((item as any).id = uuid());
-      // 收集所有路径文本元素i-text，并设置path为null
       if (item.type === 'i-text' && item.path) {
         textPaths.push({ id: item.id, path: item.path });
         item.path = null;
       }
     });
 
-    // hookTransform遍历
     const tempTransform = await this._transform(temp);
 
     jsonFile = JSON.stringify(tempTransform);
-    // 加载前钩子
     this.editor.hooksEntity.hookImportBefore.callAsync(jsonFile, () => {
       this.canvas.loadFromJSON(jsonFile, () => {
-        // 把i-text对应的path加上
         this.renderITextPath(textPaths);
         this.canvas.renderAll();
-        // 加载后钩子
         this.editor.hooksEntity.hookImportAfter.callAsync(jsonFile, () => {
-          // 修复导入带水印的json无法清除问题 #359
           this.editor?.updateDrawStatus &&
             typeof this.editor.updateDrawStatus === 'function' &&
             this.editor.updateDrawStatus(!!temp['overlayImage']);
@@ -204,7 +197,6 @@ class ServersPlugin implements IPluginTempl {
   }
 
   /**
-   * @description: 拖拽添加到画布
    * @param {Event} event
    * @param {Object} item
    */
@@ -254,7 +246,6 @@ class ServersPlugin implements IPluginTempl {
 
   async saveJson() {
     const dataUrl = this.getJson();
-    // 把文本text转为textgroup，让导入可以编辑
     await transformText(dataUrl.objects);
     const fileStr = `data:text/json;charset=utf-8,${encodeURIComponent(
       JSON.stringify(dataUrl, null, '\t')

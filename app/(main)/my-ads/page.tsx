@@ -1,32 +1,52 @@
 "use client";
 
-import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { api } from "@/convex/_generated/api";
 import { ArrowLeft, Edit, Trash2, Sparkles } from "lucide-react";
-import { Id } from "@/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+import { useState, useEffect } from "react";
 
 export default function MyGeneratedAdsPage() {
   const router = useRouter();
-  const generatedAds = useQuery(api.ads.getGeneratedAds, {
-    userId: undefined, // TODO: Add user authentication
-    limit: 100,
-  });
-  const deleteAd = useMutation(api.ads.deleteGeneratedAd);
+  const [generatedAds, setGeneratedAds] = useState<any[] | null>(null);
 
-  const handleEdit = (adId: Id<"generatedAds">, json: any) => {
+  useEffect(() => {
+    const fetchGeneratedAds = async () => {
+      try {
+        const response = await fetch('/api/ads?limit=100');
+        if (response.ok) {
+          const data = await response.json();
+          setGeneratedAds(data);
+        } else {
+          setGeneratedAds([]);
+        }
+      } catch (error) {
+        console.error('Error fetching ads:', error);
+        setGeneratedAds([]);
+      }
+    };
+
+    fetchGeneratedAds();
+  }, []);
+
+  const handleEdit = (adId: string, json: any) => {
     // Create a new project with this template
     const projectId = `generated-ad-${Date.now()}`;
     localStorage.setItem(`project-${projectId}`, JSON.stringify(json));
     router.push(`/editor/${projectId}`);
   };
 
-  const handleDelete = async (adId: Id<"generatedAds">) => {
+  const handleDelete = async (adId: string) => {
     if (!confirm("Are you sure you want to delete this ad?")) return;
 
     try {
-      await deleteAd({ id: adId });
+      const response = await fetch(`/api/ads/${adId}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        // Refresh the list
+        setGeneratedAds(generatedAds?.filter(ad => ad.id !== adId) || []);
+      } else {
+        alert("Failed to delete ad");
+      }
     } catch (error) {
       alert("Failed to delete ad");
     }
@@ -82,7 +102,7 @@ export default function MyGeneratedAdsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {generatedAds.map((ad) => (
               <div
-                key={ad._id}
+                key={ad.id}
                 className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden group hover:border-blue-500 transition-all"
               >
                 {/* Ad Preview */}
@@ -103,14 +123,14 @@ export default function MyGeneratedAdsPage() {
                   {/* Overlay Actions */}
                   <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button
-                      onClick={() => handleEdit(ad._id, ad.json)}
+                      onClick={() => handleEdit(ad.id, ad.json)}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium"
                     >
                       <Edit className="h-4 w-4" />
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(ad._id)}
+                      onClick={() => handleDelete(ad.id)}
                       className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium"
                     >
                       <Trash2 className="h-4 w-4" />

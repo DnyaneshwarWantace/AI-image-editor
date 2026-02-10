@@ -11,9 +11,6 @@ import { TextVariationModal } from "../text-variation-modal";
 import { ImageVariationModal } from "../image-variation-modal";
 import { VariationsManagerModal } from "../variations-manager-modal";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 
 interface TextElement {
   id: string;
@@ -45,7 +42,7 @@ export function VariationsPanel() {
 
   // Check if projectId is a valid Convex ID
   const isValidId = isValidConvexId(projectIdParam);
-  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+  const projectId = isValidId ? projectIdParam : null;
 
   const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [imageElements, setImageElements] = useState<ImageElement[]>([]);
@@ -57,19 +54,36 @@ export function VariationsPanel() {
   const [isManagerModalOpen, setIsManagerModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"text" | "image">("text");
 
-  // Convex hooks for text variations
-  const textVariationCounts = useQuery(
-    api.textVariations.getVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const saveTextVariationsMutation = useMutation(api.textVariations.saveTextVariations);
+  // State for variation counts
+  const [textVariationCounts, setTextVariationCounts] = useState<Record<string, number>>({});
+  const [imageVariationCounts, setImageVariationCounts] = useState<Record<string, number>>({});
 
-  // Convex hooks for image variations
-  const imageVariationCounts = useQuery(
-    api.imageVariations.getImageVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const saveImageVariationsMutation = useMutation(api.imageVariations.saveImageVariations);
+  // Fetch variation counts from backend
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchVariationCounts = async () => {
+      try {
+        // Fetch text variation counts
+        const textResponse = await fetch(`/api/variations/counts?projectId=${projectId}&type=text`);
+        if (textResponse.ok) {
+          const textData = await textResponse.json();
+          setTextVariationCounts(textData);
+        }
+
+        // Fetch image variation counts
+        const imageResponse = await fetch(`/api/variations/counts?projectId=${projectId}&type=image`);
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          setImageVariationCounts(imageData);
+        }
+      } catch (error) {
+        console.error('Error fetching variation counts:', error);
+      }
+    };
+
+    fetchVariationCounts();
+  }, [projectId]);
 
   const extractTextElements = useCallback(() => {
     if (!canvas) return [];
@@ -253,16 +267,23 @@ export function VariationsPanel() {
         language: undefined,
       }));
 
-      // Save to Convex backend (only source of truth)
+      // Save to Supabase backend (only source of truth)
       try {
-        await saveTextVariationsMutation({
-          projectId,
-          elementId, // Use stable ID from canvas
-          originalText: selectedTextElement.text,
-          variations: variationsData,
-          userId: undefined, // TODO: Get from auth context
+        const response = await fetch('/api/text-variations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectId,
+            elementId, // Use stable ID from canvas
+            originalText: selectedTextElement.text,
+            variations: variationsData,
+            userId: undefined, // TODO: Get from auth context
+          }),
         });
-        console.log(`✅ Variations saved to Convex backend for ID: ${elementId}`);
+
+        if (!response.ok) throw new Error('Failed to save variations');
+
+        console.log(`✅ Variations saved to Supabase backend for ID: ${elementId}`);
 
         // Update local state to show variation count immediately
         setTextElements((prev) =>
@@ -272,8 +293,8 @@ export function VariationsPanel() {
               : el
           )
         );
-      } catch (convexError) {
-        console.error("❌ Failed to save to Convex:", convexError);
+      } catch (apiError) {
+        console.error("❌ Failed to save to Supabase:", apiError);
         throw new Error("Failed to save variations to backend");
       }
     } catch (error) {
@@ -292,13 +313,19 @@ export function VariationsPanel() {
       const elementId = selectedImageElement.id;
       console.log(`💾 Saving ${variations.length} image variations for element ID: ${elementId}`);
 
-      await saveImageVariationsMutation({
-        projectId,
-        elementId,
-        originalImageUrl: selectedImageElement.src,
-        variations: variations as any, // Cast to match Convex ID type
-        userId: undefined,
+      const response = await fetch('/api/image-variations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId,
+          elementId,
+          originalImageUrl: selectedImageElement.src,
+          variations,
+          userId: undefined,
+        }),
       });
+
+      if (!response.ok) throw new Error('Failed to save image variations');
 
       setImageElements((prev) =>
         prev.map((el) =>

@@ -37,7 +37,6 @@ class MaskPlugin implements IPluginTempl {
   }
 
   /**
-   * @desc 蒙版开关
    * @param val boolean false
    */
   workspaceMaskToggle() {
@@ -45,7 +44,6 @@ class MaskPlugin implements IPluginTempl {
     if (!workspaceMask) {
       this.initMask()
     } else {
-      // 如果有 则删除
       workspaceMask && this.canvas.remove(workspaceMask)
       this.workspace!.clone().then((cloned: Rect) => {
         this.canvas.clipPath = cloned
@@ -56,21 +54,18 @@ class MaskPlugin implements IPluginTempl {
     }
   }
   /**
-   * @desc 获取蒙版开关
    */
   getWorkspaceMaskState() {
     return this.coverMask !== null
   }
 
   /**
-   * @desc 获取蒙版
    * @returns object
    */
   getWorkspaceMask() {
     return this.canvas.getObjects().find((item) => (item as any).id === 'coverMask') as Rect
   }
 
-  // 返回workspace对象
   getWorkspace() {
     return this.canvas.getObjects().find((item) => (item as any).id === 'workspace') as Rect
   }
@@ -83,7 +78,6 @@ class MaskPlugin implements IPluginTempl {
     const zoom = this.canvas.getZoom()
     let zoomPoint: number = zoom
     if (hack) {
-      // 比较hack的方法，判断为fabric内部的数据更新问题
       zoomPoint += 0.0001 * (this.hackFlag ? 1 : -1)
       this.hackFlag = !this.hackFlag
     }
@@ -131,7 +125,6 @@ class MaskPlugin implements IPluginTempl {
     this.canvas.add(coverMask)
     this.coverMask = coverMask
     this.setOverMask()
-    // 适配模板和psd的loadjson，在加载完成后再入mask
     undefinedLoad && this.editor.on('loadJson', () => this.initMask(false))
   }
 

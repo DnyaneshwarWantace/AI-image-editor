@@ -8,9 +8,6 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { TextVariationModal } from "../text-variation-modal";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 
 interface TextElement {
   id: string;
@@ -19,33 +16,35 @@ interface TextElement {
   variationCount: number;
 }
 
-// Helper function to check if a string looks like a valid Convex ID
-function isValidConvexId(id: string): boolean {
-  if (!id || typeof id !== 'string') return false;
-  const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-  return convexIdPattern.test(id) && id.length >= 16;
-}
-
 export function TextVariationsPanel() {
   const { canvas } = useCanvasContext();
   const params = useParams();
-  const projectIdParam = params.projectId as string;
-
-  // Check if projectId is a valid Convex ID
-  const isValidId = isValidConvexId(projectIdParam);
-  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+  const projectId = params.projectId as string;
 
   const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState<TextElement | null>(null);
+  const [variationCounts, setVariationCounts] = useState<Record<string, number>>({});
 
-  // Convex hooks
-  const variationCounts = useQuery(
-    api.textVariations.getVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const saveVariationsMutation = useMutation(api.textVariations.saveTextVariations);
+  // Fetch variation counts from REST API
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchVariationCounts = async () => {
+      try {
+        const response = await fetch(`/api/variations/counts?projectId=${projectId}&type=text`);
+        if (response.ok) {
+          const data = await response.json();
+          setVariationCounts(data || {});
+        }
+      } catch (error) {
+        console.error('Error fetching variation counts:', error);
+      }
+    };
+
+    fetchVariationCounts();
+  }, [projectId]);
 
   const extractTextElements = useCallback(() => {
     if (!canvas) return [];
@@ -81,10 +80,8 @@ export function TextVariationsPanel() {
           canvas.requestRenderAll();
         }
 
-        // Get variation count from Convex backend
-        const count = projectId && variationCounts
-          ? (variationCounts[textId] || 0)
-          : 0;
+        // Get variation count from backend
+        const count = variationCounts[textId] || 0;
 
         texts.push({
           id: textId,
@@ -100,7 +97,7 @@ export function TextVariationsPanel() {
     console.log(`📝 Found ${texts.length} text elements on canvas:`, texts.map(t => ({ id: t.id, text: t.text })));
 
     return texts;
-  }, [canvas, variationCounts, projectId]);
+  }, [canvas, variationCounts]);
 
   useEffect(() => {
     if (!canvas) return;
@@ -163,7 +160,7 @@ export function TextVariationsPanel() {
 
       console.log(`💾 Saving ${variations.length} variations for element ID: ${elementId} (text: "${selectedElement.text}")`);
 
-      // Convert variations to the format expected by Convex
+      // Convert variations to the format expected by API
       const variationsData = variations.map((text, index) => ({
         id: `${elementId}-var-${index}-${Date.now()}`,
         text,
@@ -171,16 +168,25 @@ export function TextVariationsPanel() {
         language: undefined,
       }));
 
-      // Save to Convex backend (only source of truth)
+      // Save to backend via REST API
       try {
-        await saveVariationsMutation({
-          projectId,
-          elementId, // Use stable ID from canvas
-          originalText: selectedElement.text,
-          variations: variationsData,
-          userId: undefined, // TODO: Get from auth context
+        const response = await fetch('/api/text-variations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectId,
+            elementId, // Use stable ID from canvas
+            originalText: selectedElement.text,
+            variations: variationsData,
+            userId: undefined, // TODO: Get from auth context
+          }),
         });
-        console.log(`✅ Variations saved to Convex backend for ID: ${elementId}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to save variations');
+        }
+
+        console.log(`✅ Variations saved to backend for ID: ${elementId}`);
 
         // Update local state to show variation count immediately
         setTextElements((prev) =>
@@ -190,8 +196,15 @@ export function TextVariationsPanel() {
               : el
           )
         );
-      } catch (convexError) {
-        console.error("❌ Failed to save to Convex:", convexError);
+
+        // Refresh variation counts
+        const countsResponse = await fetch(`/api/variations/counts?projectId=${projectId}&type=text`);
+        if (countsResponse.ok) {
+          const data = await countsResponse.json();
+          setVariationCounts(data || {});
+        }
+      } catch (apiError) {
+        console.error("❌ Failed to save to backend:", apiError);
         throw new Error("Failed to save variations to backend");
       }
     } catch (error) {

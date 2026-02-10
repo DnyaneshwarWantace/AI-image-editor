@@ -19,13 +19,11 @@ class ResizePlugin implements IPluginTempl {
   static events = []
   static apis = []
   workspaceEl!: HTMLElement
-  // 最小画布尺寸
   minSize = { width: 30, height: 30 }
-  // 控制条
   barOpts = {
-    barWidth: 8, // 宽
-    barHeight: 8, // 高
-    barPadding: 10, // 离画布边缘的距离
+    barWidth: 8,
+    barHeight: 8,
+    barPadding: 10,
   }
   hasCreatedBar = false
   isDragging = false
@@ -52,7 +50,6 @@ class ResizePlugin implements IPluginTempl {
     this.workspaceEl = workspaceEl
   }
 
-  // 初始化监听器
   _initResizeObserve() {
     const resizeObserver = new ResizeObserver(
       throttle(() => {
@@ -62,7 +59,6 @@ class ResizePlugin implements IPluginTempl {
     resizeObserver.observe(this.workspaceEl)
   }
 
-  // 渲染控制条具体位置
   renderBars() {
     const viewportTransform = this.canvas.viewportTransform
     if (!viewportTransform) return
@@ -74,30 +70,24 @@ class ResizePlugin implements IPluginTempl {
     const wsLeft = (workspace.left || 0) * scaleX
     const wsTop = (workspace.top || 0) * scaleY
     const { barWidth, barHeight, barPadding } = this.barOpts
-    // 左控制条
     const leftBar = this._getBarFromType('left')
     leftBar.style.left = `${offsetX + wsLeft - barHeight - barPadding}px`
     leftBar.style.top = `${offsetY + wsTop + wsHeight / 2 - barWidth / 2}px`
-    // 右控制条
     const rightBar = this._getBarFromType('right')
     rightBar.style.left = `${offsetX + wsLeft + wsWidth + barPadding}px`
     rightBar.style.top = `${offsetY + wsTop + wsHeight / 2 - barWidth / 2}px`
-    // 上控制条
     const topBar = this._getBarFromType('top')
     topBar.style.left = `${offsetX + wsLeft + wsWidth / 2 - barWidth / 2}px`
     topBar.style.top = `${offsetY + wsTop - barHeight - barPadding}px`
-    // 下控制条
     const bottomBar = this._getBarFromType('bottom')
     bottomBar.style.left = `${offsetX + wsLeft + wsWidth / 2 - barWidth / 2}px`
     bottomBar.style.top = `${offsetY + wsTop + wsHeight + barPadding}px`
-    // 监听
     if (!this.hasCreatedBar) {
       this.hasCreatedBar = true
       this._watchDrag()
     }
   }
 
-  // get或创建控制条
   _getBarFromType(type: Position) {
     let bar = document.querySelector(`#resize-${type}-bar`) as HTMLElement
     if (bar) return bar
@@ -113,7 +103,6 @@ class ResizePlugin implements IPluginTempl {
     return bar
   }
 
-  // 监听拖拽相关事件
   _watchDrag() {
     const barList = Array.from(document.getElementsByClassName('resize-bar')) as HTMLElement[]
     barList.forEach((bar) => {
@@ -146,7 +135,6 @@ class ResizePlugin implements IPluginTempl {
     })
   }
 
-  // 拖拽更新控制条及画布
   onDragging(e: MouseEvent) {
     if (this.isDragging && this.dragEl) {
       const workspace = this.getWorkspace()
@@ -220,18 +208,15 @@ class ResizePlugin implements IPluginTempl {
     }
   }
 
-  // 事件句柄缓存
   private eventHandler: Record<string, (...args: any) => void> = {
     render: throttle(this.renderBars.bind(this), 50),
     onDragging: throttle(this.onDragging.bind(this), 50),
   }
 
-  // 监听画布渲染
   _addListeners() {
     this.canvas.on('after:render', this.eventHandler.render)
   }
 
-  // 返回workspace对象
   getWorkspace() {
     return this.canvas.getObjects().find((item) => (item as any).id === 'workspace') as Rect | undefined
   }

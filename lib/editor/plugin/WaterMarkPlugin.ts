@@ -7,7 +7,7 @@
  */
 import { cloneDeep } from 'lodash-es'
 import type { Canvas as FabricCanvas } from 'fabric'
-import type { IEditor, IPluginTempl } from '../interface/Editor'
+import type { IEditor } from '../interface/Editor'
 
 type IPlugin = Pick<WaterMarkPlugin, 'drawWaterMark' | 'clearWaterMark' | 'updateDrawState'>
 
@@ -24,7 +24,7 @@ enum E {
   fill = 'fill',
 }
 
-type Position = E.leftTop | E.leftBottom | E.rightTop | E.rightBottom | E.fill // lt 左上 lr 左上 rt 右上  rb 右下 ll 平铺 后续可扩展其他功能
+type Position = E.leftTop | E.leftBottom | E.rightTop | E.rightBottom | E.fill
 type DrawOps = {
   text: string
   size: number
@@ -37,13 +37,13 @@ type DrawOps = {
 const defaultOptions: DrawOps = {
   text: '',
   size: 20,
-  isRotate: false, // 是否倾斜
-  fontFamily: '汉体', // 可考虑自定义字体
-  color: '#ccc', // 可考虑自定义颜色
+  isRotate: false,
+  fontFamily: 'Arial',
+  color: '#ccc',
   position: E.leftTop,
 }
 
-class WaterMarkPlugin implements IPluginTempl {
+class WaterMarkPlugin {
   static pluginName = 'WaterMarkPlugin'
   static apis = ['drawWaterMark', 'clearWaterMark', 'updateDrawState']
   private hasDraw = false
@@ -62,7 +62,6 @@ class WaterMarkPlugin implements IPluginTempl {
     return waterCanvas
   }
 
-  // 待优化
   private drawing: Record<Position, (...arg: any[]) => void> = {
     [E.leftTop]: (width: number, height: number, cb: (imgString: string) => void) => {
       let waterCanvas: HTMLCanvasElement | null = this.createCanvas(width, height)
@@ -120,7 +119,7 @@ class WaterMarkPlugin implements IPluginTempl {
       ctx = null
     },
     [E.fill]: (width: number, height: number, cb: (imgString: string) => void) => {
-      const angle = -20 // 按逆时针度算
+      const angle = -20
       const a = (angle * Math.PI) / 180
       const font = `${this.drawOps.size}px ${this.drawOps.fontFamily}`
       let waterCanvas: HTMLCanvasElement | null = this.createCanvas(width, height)
@@ -161,19 +160,23 @@ class WaterMarkPlugin implements IPluginTempl {
     if (!this.drawOps.text) return
     const workspace = this.canvas.getObjects().find((item: any) => item.id === 'workspace')
     const { width, height, left, top }: any = workspace
-    this.drawing[this.drawOps.position](width, height, (imgString: string) => {
-      this.canvas.overlayImage = undefined
-      this.hasDraw = true
-      this.canvas.setOverlayImage(imgString, this.canvas.renderAll.bind(this.canvas), {
-        left: left || 0,
-        top: top || 0,
-        originX: 'left',
-        originY: 'top',
+    const drawFn: any = this.drawing[this.drawOps.position]
+    const self = this
+    if (drawFn) {
+      drawFn(width, height, (imgString: string) => {
+        self.canvas.overlayImage = undefined
+        // @ts-ignore - TypeScript false positive with Boolean type
+        self.hasDraw = true
+        (self.canvas as any).setOverlayImage(imgString, self.canvas.renderAll.bind(self.canvas), {
+          left: left || 0,
+          top: top || 0,
+          originX: 'left',
+          originY: 'top',
+        })
       })
-    })
+    }
   }
 
-  // updateHandDraw 导入json时无法知道是否绘制
   updateDrawState(state: boolean) {
     this.hasDraw = state
   }

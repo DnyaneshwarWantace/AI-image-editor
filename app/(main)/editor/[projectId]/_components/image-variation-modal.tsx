@@ -13,9 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Plus, X, Upload, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { useParams } from "next/navigation";
 
 interface ImageVariationModalProps {
@@ -45,20 +42,40 @@ export function ImageVariationModal({
   };
 
   // Fetch existing variations for this element from backend
-  const existingVariations = useQuery(
-    api.imageVariations.getImageVariationsByElement,
-    isValidConvexId(projectId) ? {
-      projectId: projectId as Id<"projects">,
-      elementId
-    } : "skip"
-  );
+  const [existingVariations, setExistingVariations] = useState<{ variations: Array<{ id: string; imageUrl: string; storageId?: string; type: string }> } | null>(null);
+
+  useEffect(() => {
+    if (!isValidConvexId(projectId) || !elementId) return;
+
+    const fetchExistingVariations = async () => {
+      try {
+        const response = await fetch(`/api/image-variations?projectId=${projectId}&elementId=${elementId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setExistingVariations(data);
+        }
+      } catch (error) {
+        console.error('Error fetching existing variations:', error);
+      }
+    };
+
+    fetchExistingVariations();
+  }, [projectId, elementId]);
 
   // State includes both imageUrl (for display) and storageId (for saving)
   // storageId is optional to handle loading existing variations
   const [variations, setVariations] = useState<Array<{ id: string; imageUrl: string; storageId?: string; type: string }>>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  const generateUploadUrl = useMutation(api.imageVariations.generateUploadUrl);
+  // Generate upload URL for image storage
+  const generateUploadUrl = async () => {
+    const response = await fetch('/api/image-variations/upload-url', {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to generate upload URL');
+    const data = await response.json();
+    return data.uploadUrl;
+  };
 
   // Load existing variations when modal opens
   useEffect(() => {
@@ -148,14 +165,6 @@ export function ImageVariationModal({
     }
   };
 
-  const fileToDataUrl = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
 
   const handleRemoveVariation = (index: number) => {
     setVariations(variations.filter((_, i) => i !== index));

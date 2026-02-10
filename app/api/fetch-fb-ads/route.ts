@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
+import { supabase } from "@/lib/supabase/client";
 
 const SCRAPOR_API_KEY = process.env.SCRAPOR_API_KEY || "";
-const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL || "";
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,38 +41,44 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
 
-    // Save scraped ads to Convex database first to get Convex IDs
-    let savedAdIds: string[] = [];
-    if (CONVEX_URL && data.results && data.results.length > 0) {
+    // Save scraped ads to Supabase database
+    const savedAds: any[] = [];
+    if (data.results && data.results.length > 0) {
       try {
-        const convex = new ConvexHttpClient(CONVEX_URL);
         const adsToSave = data.results.map((ad: any) => ({
-          facebookAdId: ad.ad_archive_id || ad.collation_id,
-          pageId: pageId,
-          pageName: ad.page_name,
+          facebook_ad_id: ad.ad_archive_id || ad.collation_id,
+          page_id: pageId,
+          page_name: ad.page_name,
           title: ad.snapshot?.body?.text || ad.snapshot?.title || "Untitled Ad",
           description: ad.snapshot?.link_description || "",
-          imageUrl: ad.snapshot?.videos?.[0]?.video_preview_image_url ||
+          image_url: ad.snapshot?.videos?.[0]?.video_preview_image_url ||
                    ad.snapshot?.images?.[0] ||
                    ad.snapshot?.videos?.[0]?.video_sd_url || "",
           cta: ad.snapshot?.cta_text || "",
           link: ad.snapshot?.link_url || "",
-          rawData: ad,
+          raw_data: ad,
+          user_id: userId,
         }));
 
-        savedAdIds = await convex.mutation(api.ads.saveScrapedAds, {
-          ads: adsToSave,
-          userId: userId,
-        });
+        const { data: insertedData, error } = await supabase
+          .from('ads')
+          .insert(adsToSave)
+          .select();
+
+        if (error) {
+          console.error("Error saving ads to database:", error);
+        } else {
+          savedAds.push(...(insertedData || []));
+        }
       } catch (saveError) {
         console.error("Error saving ads to database:", saveError);
       }
     }
 
-    // Transform API response to match our expected format with Convex IDs
+    // Transform API response to match our expected format with Supabase IDs
     const transformedData = {
       ads: data.results?.map((ad: any, index: number) => ({
-        id: savedAdIds[index] || ad.ad_archive_id || ad.collation_id, // Use Convex ID if available
+        id: savedAds[index]?.id || ad.ad_archive_id || ad.collation_id, // Use Supabase ID if available
         facebookAdId: ad.ad_archive_id || ad.collation_id,
         title: ad.snapshot?.body?.text || ad.snapshot?.title || "Untitled Ad",
         description: ad.snapshot?.link_description || "",

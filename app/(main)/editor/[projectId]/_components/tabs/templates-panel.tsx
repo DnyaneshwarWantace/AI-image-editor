@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 
 export function TemplatesPanel() {
@@ -16,28 +14,47 @@ export function TemplatesPanel() {
   const projectId = params.projectId as string;
   const [selectedType, setSelectedType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [templateTypes, setTemplateTypes] = useState<any[]>([]);
+  const [allTemplates, setAllTemplates] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch template types from Convex
-  const templateTypes = useQuery(api.templates.getTemplateTypes);
+  // Fetch template types and templates from REST API
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [typesRes, templatesRes] = await Promise.all([
+          fetch('/api/templates/types'),
+          fetch('/api/templates?is_public=true&limit=10000')
+        ]);
 
-  // Fetch templates from Convex
-  const allTemplates = useQuery(api.templates.getTemplates, {
-    isPublic: true,
-    limit: 10000,
-  });
+        if (typesRes.ok) {
+          const typesData = await typesRes.json();
+          setTemplateTypes(typesData || []);
+        }
 
-  // Mutation for saving project after loading template
-  const updateProjectMutation = useMutation(api.projects.updateProject);
+        if (templatesRes.ok) {
+          const templatesData = await templatesRes.json();
+          setAllTemplates(templatesData || []);
+        }
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Filter templates based on search and type
   const templates = useMemo(() => {
-    if (!allTemplates) return [];
+    if (!allTemplates || allTemplates.length === 0) return [];
 
     let filtered = allTemplates;
 
     // Filter by type
     if (selectedType !== "all") {
-      filtered = filtered.filter((t) => t.templateTypeId === selectedType);
+      filtered = filtered.filter((t) => t.template_type_id === selectedType);
     }
 
     // Filter by search query
@@ -49,22 +66,20 @@ export function TemplatesPanel() {
 
     // Format for display
     return filtered.map((item) => ({
-      id: item._id,
+      id: item.id,
       name: item.name,
-      preview: item.imageUrl,
+      preview: item.image_url,
       json: item.json,
     }));
   }, [allTemplates, selectedType, searchQuery]);
 
   const types = useMemo(() => {
-    if (!templateTypes) return [];
+    if (!templateTypes || templateTypes.length === 0) return [];
     return templateTypes.map((type) => ({
-      id: type._id,
+      id: type.id,
       name: type.name,
     }));
   }, [templateTypes]);
-
-  const isLoading = templateTypes === undefined || allTemplates === undefined;
 
   const loadTemplate = async (template: any) => {
     if (!canvas || !editor) {
@@ -182,25 +197,26 @@ export function TemplatesPanel() {
           };
           localStorage.setItem(`project-meta-${projectId}`, JSON.stringify(meta));
 
-          // Save to Convex backend if valid Convex ID
-          const isValidConvexId = (id: string): boolean => {
-            if (!id || typeof id !== 'string') return false;
-            const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-            return convexIdPattern.test(id) && id.length >= 16;
-          };
-
-          if (isValidConvexId(projectId)) {
+          // Save to backend via REST API
+          if (projectId) {
             try {
-              await updateProjectMutation({
-                projectId: projectId as any,
-                canvasState: canvasJSON,
-                width: templateWidth,
-                height: templateHeight,
-                imageUrl: thumbnail,
+              const response = await fetch(`/api/projects/${projectId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  canvas_state: canvasJSON,
+                  width: templateWidth,
+                  height: templateHeight,
+                  image_url: thumbnail,
+                }),
               });
-              console.log('✅ Template saved to Convex backend');
-            } catch (convexError) {
-              console.warn('Could not save to Convex, saved to localStorage:', convexError);
+              if (response.ok) {
+                console.log('✅ Template saved to backend');
+              } else {
+                console.warn('Could not save to backend, saved to localStorage');
+              }
+            } catch (saveError) {
+              console.warn('Could not save to backend, saved to localStorage:', saveError);
             }
           }
         } catch (saveError) {

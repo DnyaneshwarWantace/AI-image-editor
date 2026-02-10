@@ -11,16 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Download, Loader2, Sparkles, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { Canvas } from "fabric";
 
 interface VariationsManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  projectId: Id<"projects"> | null;
+  projectId: string | null;
   projectIdParam: string;
 }
 
@@ -63,26 +60,46 @@ export function VariationsManagerModal({
   const [isGenerating, setIsGenerating] = useState(false);
   const hasGeneratedRef = useRef(false); // Track if we've already generated for this modal open
 
-  // Mutation to clean up orphaned variations
-  const cleanupOrphanedVariationsMutation = useMutation(api.textVariations.cleanupOrphanedVariations);
+  // State for variations data
+  const [textVariationsData, setTextVariationsData] = useState<any[]>([]);
+  const [imageVariationsData, setImageVariationsData] = useState<any[]>([]);
+  const [fontVariationsData, setFontVariationsData] = useState<any[]>([]);
 
-  // Fetch all text variations from Convex backend (single source of truth)
-  const textVariationsData = useQuery(
-    api.textVariations.getTextVariationsByProject,
-    projectId ? { projectId } : "skip"
-  );
+  // Fetch all variations from backend
+  useEffect(() => {
+    if (!projectId && !projectIdParam) return;
 
-  // Fetch all image variations from Convex backend
-  const imageVariationsData = useQuery(
-    api.imageVariations.getImageVariationsByProject,
-    projectId ? { projectId } : "skip"
-  );
+    const fetchVariations = async () => {
+      const id = projectIdParam;
 
-  // Fetch all font variations from Convex backend
-  const fontVariationsData = useQuery(
-    api.fontVariations.getFontVariationsByProject,
-    projectId ? { projectId } : "skip"
-  );
+      try {
+        // Fetch text variations
+        const textResponse = await fetch(`/api/text-variations?projectId=${id}`);
+        if (textResponse.ok) {
+          const textData = await textResponse.json();
+          setTextVariationsData(textData);
+        }
+
+        // Fetch image variations
+        const imageResponse = await fetch(`/api/image-variations?projectId=${id}`);
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          setImageVariationsData(imageData);
+        }
+
+        // Fetch font variations
+        const fontResponse = await fetch(`/api/font-variations?projectId=${id}`);
+        if (fontResponse.ok) {
+          const fontData = await fontResponse.json();
+          setFontVariationsData(fontData);
+        }
+      } catch (error) {
+        console.error('Error fetching variations:', error);
+      }
+    };
+
+    fetchVariations();
+  }, [projectId, projectIdParam]);
 
   // Filter variations to only include text elements that exist on current canvas
   // This recalculates whenever canvas or textVariationsData changes
@@ -209,7 +226,7 @@ export function VariationsManagerModal({
 
   // Clean up orphaned variations when modal opens
   useEffect(() => {
-    if (isOpen && canvas && projectId) {
+    if (isOpen && canvas && projectIdParam) {
       const cleanupOrphaned = async () => {
         // Get all text element IDs from current canvas
         const canvasObjects = canvas.getObjects();
@@ -225,13 +242,20 @@ export function VariationsManagerModal({
         console.log('🧹 Cleaning up orphaned variations for canvas text IDs:', canvasTextIds);
 
         try {
-          const result = await cleanupOrphanedVariationsMutation({
-            projectId,
-            canvasTextIds,
+          const response = await fetch('/api/text-variations/cleanup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              projectId: projectIdParam,
+              canvasTextIds,
+            }),
           });
 
-          if (result.deletedCount > 0) {
-            console.log(`🗑️ Cleaned up ${result.deletedCount} orphaned variations:`, result.deletedElements);
+          if (response.ok) {
+            const result = await response.json();
+            if (result.deletedCount > 0) {
+              console.log(`🗑️ Cleaned up ${result.deletedCount} orphaned variations:`, result.deletedElements);
+            }
           }
         } catch (error) {
           console.error('Failed to cleanup orphaned variations:', error);
@@ -240,7 +264,7 @@ export function VariationsManagerModal({
 
       cleanupOrphaned();
     }
-  }, [isOpen, canvas, projectId, cleanupOrphanedVariationsMutation]);
+  }, [isOpen, canvas, projectIdParam]);
 
   // Auto-generate ads when modal opens with fresh data
   // This runs AFTER cleanup and state reset
@@ -634,7 +658,7 @@ export function VariationsManagerModal({
             updated = true;
           } else if (elementIdToOriginalTextMap.size > 0) {
             // Try to match by original text content
-            for (const [varElementId, originalText] of elementIdToOriginalTextMap.entries()) {
+            for (const [varElementId, originalText] of Array.from(elementIdToOriginalTextMap.entries())) {
               if (obj.text === originalText && ad.combination[varElementId] !== undefined) {
                 newText = ad.combination[varElementId];
                 console.log(`✅ [JSON Content Match] Updating text (matched ${varElementId}): "${obj.text}" -> "${newText}"`);
@@ -674,7 +698,7 @@ export function VariationsManagerModal({
             updated = true;
           } else if (elementIdToOriginalImageMap.size > 0) {
             // Try to match by original image URL
-            for (const [varElementId, originalImageUrl] of elementIdToOriginalImageMap.entries()) {
+            for (const [varElementId, originalImageUrl] of Array.from(elementIdToOriginalImageMap.entries())) {
               const imageKey = `__image__${varElementId}`;
               if (obj.src === originalImageUrl && ad.combination[imageKey] !== undefined) {
                 newImageUrl = ad.combination[imageKey];
@@ -934,7 +958,7 @@ export function VariationsManagerModal({
             // Try to find by matching original text content (for elements without IDs)
             let matched = false;
             if (elementIdToOriginalText.size > 0) {
-              for (const [varElementId, originalText] of elementIdToOriginalText.entries()) {
+              for (const [varElementId, originalText] of Array.from(elementIdToOriginalText.entries())) {
                 // Check if this object's current text matches the original text for this variation
                 if (obj.text === originalText && ad.combination[varElementId] !== undefined) {
                   const newText = ad.combination[varElementId];
@@ -972,7 +996,7 @@ export function VariationsManagerModal({
             // Try to find by matching original image URL
             let matched = false;
             if (elementIdToOriginalImageMap.size > 0) {
-              for (const [varElementId, originalImageUrl] of elementIdToOriginalImageMap.entries()) {
+              for (const [varElementId, originalImageUrl] of Array.from(elementIdToOriginalImageMap.entries())) {
                 const currentSrc = obj.getSrc ? obj.getSrc() : obj.src;
                 if (currentSrc === originalImageUrl && ad.combination[varElementId] !== undefined) {
                   const newImageUrl = ad.combination[varElementId];

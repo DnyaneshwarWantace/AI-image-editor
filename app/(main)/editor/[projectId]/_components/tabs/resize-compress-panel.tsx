@@ -49,7 +49,7 @@ export function ResizeCompressPanel() {
     }
 
     const dataUrl = canvas.toDataURL({
-      format,
+      format: format as any,
       quality,
       multiplier: 1,
     });

@@ -93,7 +93,6 @@ class WorkspacePlugin implements IPluginTempl {
     })
   }
 
-  // 初始化背景
   _initBackground() {
     // In Fabric.js v6, set backgroundImage to undefined to clear it
     this.canvas.backgroundImage = undefined
@@ -107,7 +106,6 @@ class WorkspacePlugin implements IPluginTempl {
     }
   }
 
-  // 初始化画布
   _initWorkspace() {
     const { width, height } = this.option
     const workspace = new Rect({
@@ -131,14 +129,11 @@ class WorkspacePlugin implements IPluginTempl {
     this.auto()
   }
 
-  // 返回workspace对象
   getWorkspace() {
     return this.canvas.getObjects().find((item) => (item as any).id === 'workspace') as Rect | undefined
   }
 
   /**
-   * 设置画布中心到指定对象中心点上
-   * @param {Object} obj 指定的对象
    */
   setCenterFromObject(obj: Rect) {
     const { canvas } = this
@@ -151,7 +146,6 @@ class WorkspacePlugin implements IPluginTempl {
     canvas.renderAll()
   }
 
-  // 初始化监听器
   _initResizeObserve() {
     const resizeObserver = new ResizeObserver(
       throttle(() => {
@@ -166,7 +160,6 @@ class WorkspacePlugin implements IPluginTempl {
     this._initBackground()
     this.option.width = width
     this.option.height = height
-    // 重新设置workspace
     this.workspace = this.canvas
       .getObjects()
       .find((item) => (item as any).id === 'workspace') as Rect | undefined
@@ -193,7 +186,6 @@ class WorkspacePlugin implements IPluginTempl {
     if (!this.workspace) return
     this.setCenterFromObject(this.workspace)
 
-    // 超出画布不展示
     // In Fabric.js v6, clone() returns a Promise
     this.workspace.clone().then((cloned: Rect) => {
       this.canvas.clipPath = cloned
@@ -212,7 +204,6 @@ class WorkspacePlugin implements IPluginTempl {
     })
   }
 
-  // 放大
   big() {
     let zoomRatio = this.canvas.getZoom()
     zoomRatio += 0.05
@@ -220,7 +211,6 @@ class WorkspacePlugin implements IPluginTempl {
     this.canvas.zoomToPoint(new Point(center.left, center.top), zoomRatio)
   }
 
-  // 缩小
   small() {
     let zoomRatio = this.canvas.getZoom()
     zoomRatio -= 0.05
@@ -231,13 +221,11 @@ class WorkspacePlugin implements IPluginTempl {
     )
   }
 
-  // 自动缩放
   auto() {
     const scale = this._getScale()
     this.setZoomAuto(scale * this.zoomRatio)
   }
 
-  // 1:1 放大
   one() {
     this.setZoomAuto(1 * this.zoomRatio)
     this.canvas.requestRenderAll()

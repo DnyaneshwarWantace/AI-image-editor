@@ -29,7 +29,6 @@ export function removeLocal(key: string) {
 }
 
 /**
- * clear localStorage 清除本地存储
  */
 export function clearLocal() {
   return localStorage.clear();

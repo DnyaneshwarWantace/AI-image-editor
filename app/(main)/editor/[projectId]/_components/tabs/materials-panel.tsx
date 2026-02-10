@@ -1,27 +1,45 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 export function MaterialsPanel() {
   const { canvas, editor } = useCanvasContext();
   const [selectedType, setSelectedType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [materialTypes, setMaterialTypes] = useState<any[] | null>(null);
+  const [allMaterials, setAllMaterials] = useState<any[] | null>(null);
 
-  // Fetch material types from Convex
-  const materialTypes = useQuery(api.materials.getMaterialTypes);
+  // Fetch material types and materials from REST API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [typesRes, materialsRes] = await Promise.all([
+          fetch('/api/materials/types'),
+          fetch('/api/materials?is_public=true&limit=10000')
+        ]);
 
-  // Fetch materials from Convex
-  const allMaterials = useQuery(api.materials.getMaterials, {
-    isPublic: true,
-    limit: 10000,
-  });
+        if (typesRes.ok) {
+          const typesData = await typesRes.json();
+          setMaterialTypes(typesData || []);
+        }
+
+        if (materialsRes.ok) {
+          const materialsData = await materialsRes.json();
+          setAllMaterials(materialsData || []);
+        }
+      } catch (error) {
+        console.error('Error fetching materials:', error);
+        setMaterialTypes([]);
+        setAllMaterials([]);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Filter materials based on search and type
   const materials = useMemo(() => {
@@ -31,7 +49,7 @@ export function MaterialsPanel() {
 
     // Filter by type
     if (selectedType !== "all") {
-      filtered = filtered.filter((m) => m.materialTypeId === selectedType);
+      filtered = filtered.filter((m) => m.material_type_id === selectedType);
     }
 
     // Filter by search query
@@ -43,22 +61,22 @@ export function MaterialsPanel() {
 
     // Format for display
     return filtered.map((item) => ({
-      id: item._id,
+      id: item.id,
       name: item.name,
-      src: item.imageUrl,
-      preview: item.thumbnailUrl || item.smallUrl || item.imageUrl,
+      src: item.image_url,
+      preview: item.thumbnail_url || item.small_url || item.image_url,
     }));
   }, [allMaterials, selectedType, searchQuery]);
 
   const types = useMemo(() => {
     if (!materialTypes) return [];
     return materialTypes.map((type) => ({
-      id: type._id,
+      id: type.id,
       name: type.name,
     }));
   }, [materialTypes]);
 
-  const isLoading = materialTypes === undefined || allMaterials === undefined;
+  const isLoading = materialTypes === null || allMaterials === null;
 
   const addMaterial = async (material: any) => {
     if (!canvas || !editor || !material.src) {

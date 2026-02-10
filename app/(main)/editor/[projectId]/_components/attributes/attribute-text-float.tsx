@@ -19,9 +19,9 @@ export function AttributeTextFloat() {
         (activeObject.type === "textbox" ||
           activeObject.type === "i-text" ||
           activeObject.type === "text") &&
-        activeObject.text?.includes(".")
+        (activeObject as any).text?.includes(".")
       ) {
-        setVerticalAlign(activeObject.verticalAlign || null);
+        setVerticalAlign((activeObject as any).verticalAlign || null);
       }
     };
 
@@ -41,20 +41,20 @@ export function AttributeTextFloat() {
     const activeObject = canvas?.getActiveObject();
     if (
       activeObject &&
-      activeObject.text?.includes(".")
+      (activeObject as any).text?.includes(".")
     ) {
-      const [init] = activeObject.text.split(".");
+      const [init] = (activeObject as any).text.split(".");
       const startIndex = init.length + 1;
-      const endIndex = activeObject.text.length;
+      const endIndex = (activeObject as any).text.length;
 
       if (value === "top") {
         // Superscript
         (activeObject as any).setSuperscript?.(startIndex, endIndex);
       } else if (value === "bottom") {
         // Subscript
-        activeObject.setSelectionStyles(
+        (activeObject as any).setSelectionStyles(
           {
-            fontSize: ((activeObject as any).superscript?.size || 0.6) * activeObject.fontSize,
+            fontSize: ((activeObject as any).superscript?.size || 0.6) * (activeObject as any).fontSize,
           },
           startIndex,
           endIndex
@@ -71,7 +71,7 @@ export function AttributeTextFloat() {
     (activeObject.type !== "textbox" &&
       activeObject.type !== "i-text" &&
       activeObject.type !== "text") ||
-    !activeObject.text?.includes(".")
+    !(activeObject as any).text?.includes(".")
   ) {
     return null;
   }

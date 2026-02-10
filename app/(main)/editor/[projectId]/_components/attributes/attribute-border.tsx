@@ -18,7 +18,13 @@ export function AttributeBorder() {
       const activeObject = canvas.getActiveObject();
       if (activeObject) {
         setStrokeWidth(activeObject.strokeWidth || 0);
-        setStrokeColor(activeObject.stroke || "#000000");
+        // Handle stroke which can be string or TFiller (gradient)
+        const stroke = activeObject.stroke;
+        if (typeof stroke === 'string') {
+          setStrokeColor(stroke);
+        } else {
+          setStrokeColor("#000000"); // Default for gradients
+        }
       }
     };
 

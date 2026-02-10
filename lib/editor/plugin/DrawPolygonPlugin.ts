@@ -23,7 +23,6 @@ class DrawPolygonPlugin implements IPluginTempl {
   tmpLine: Line | undefined
   lastPoint: Point | undefined
   onEnd!: OnEnd
-  // 最后一点和第一点的距离为delta即闭合
   delta = 10
   static pluginName = 'DrawPolygonPlugin'
   static apis = ['beginDrawPolygon', 'endDrawPolygon', 'discardPolygon']

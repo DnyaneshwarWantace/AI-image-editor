@@ -18,7 +18,7 @@ export function AttributeId() {
     const updateId = () => {
       const activeObject = canvas.getActiveObject();
       if (activeObject) {
-        setId(activeObject.id || "");
+        setId((activeObject as any).id || "");
         const linkData = (activeObject as any).linkData || ["", ""];
         setLinkType(linkData[0] || "");
         setLinkValue(linkData[1] || "");

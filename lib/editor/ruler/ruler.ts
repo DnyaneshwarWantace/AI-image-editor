@@ -6,7 +6,6 @@ import { throttle } from 'lodash-es';
 import GuideLine, { setupGuideLine, type IGuideLineOptions } from './guideline';
 
 /**
- * 配置
  */
 export interface RulerOptions {
   /**
@@ -15,40 +14,33 @@ export interface RulerOptions {
   canvas: Canvas;
 
   /**
-   * 标尺宽高
    * @default 20
    */
   ruleSize?: number;
 
   /**
-   * 字体大小
    * @default 10
    */
   fontSize?: number;
 
   /**
-   * 是否开启标尺
    * @default false
    */
   enabled?: boolean;
 
   /**
-   * 背景颜色
    */
   backgroundColor?: string;
 
   /**
-   * 文字颜色
    */
   textColor?: string;
 
   /**
-   * 边框颜色
    */
   borderColor?: string;
 
   /**
-   * 高亮颜色
    */
   highlightColor?: string;
 }
@@ -63,19 +55,16 @@ class CanvasRuler {
   protected ctx: CanvasRenderingContext2D;
 
   /**
-   * 配置
    */
   public options: Required<RulerOptions>;
 
   /**
-   * 标尺起始点
    */
   public startCalibration: undefined | Point;
 
   private activeOn: 'down' | 'up' = 'up';
 
   /**
-   * 选取对象矩形坐标
    */
   private objectRect:
     | undefined
@@ -85,7 +74,6 @@ class CanvasRuler {
       };
 
   /**
-   * 事件句柄缓存
    */
   private eventHandler: Record<string, (...args: any) => void> = {
     // calcCalibration: this.calcCalibration.bind(this),
@@ -95,7 +83,6 @@ class CanvasRuler {
     canvasMouseMove: throttle(this.canvasMouseMove.bind(this), 15),
     canvasMouseUp: this.canvasMouseUp.bind(this),
     render: (e: any) => {
-      // 避免多次渲染
       if (!e.ctx) return;
       this.render();
     },
@@ -114,7 +101,6 @@ class CanvasRuler {
   private tempGuidelLine: GuideLine | undefined;
 
   constructor(_options: RulerOptions) {
-    // 合并默认配置
     this.options = Object.assign(
       {
         ruleSize: 20,
@@ -140,13 +126,11 @@ class CanvasRuler {
     }
   }
 
-  // 销毁
   public destroy() {
     this.disable();
   }
 
   /**
-   * 移除全部辅助线
    */
   public clearGuideline() {
     const objects = this.options.canvas.getObjects();
@@ -159,7 +143,6 @@ class CanvasRuler {
   }
 
   /**
-   * 显示全部辅助线
    */
   public showGuideline() {
     this?.options?.canvas?.getObjects().filter((obj: any) => obj.type === 'GuideLine').forEach((guideLine) => {
@@ -169,7 +152,6 @@ class CanvasRuler {
   }
 
   /**
-   * 隐藏全部辅助线
    */
   public hideGuideline() {
     this.options.canvas.getObjects().filter((obj: any) => obj.type === 'GuideLine').forEach((guideLine) => {
@@ -179,12 +161,10 @@ class CanvasRuler {
   }
 
   /**
-   * 启用
    */
   public enable() {
     this.options.enabled = true;
 
-    // 绑定事件
     this.options.canvas.on('after:render', this.eventHandler.calcObjectRect);
     this.options.canvas.on('after:render', this.eventHandler.render);
     this.options.canvas.on('mouse:down', this.eventHandler.canvasMouseDown);
@@ -192,18 +172,14 @@ class CanvasRuler {
     this.options.canvas.on('mouse:up', this.eventHandler.canvasMouseUp);
     this.options.canvas.on('selection:cleared', this.eventHandler.clearStatus);
 
-    // 显示辅助线
     this.showGuideline();
 
-    // 绘制一次
     this.render();
   }
 
   /**
-   * 禁用
    */
   public disable() {
-    // 解除事件
     this.options.canvas.off('after:render', this.eventHandler.calcObjectRect);
     this.options.canvas.off('after:render', this.eventHandler.render);
     this.options.canvas.off('mouse:down', this.eventHandler.canvasMouseDown);
@@ -211,20 +187,17 @@ class CanvasRuler {
     this.options.canvas.off('mouse:up', this.eventHandler.canvasMouseUp);
     this.options.canvas.off('selection:cleared', this.eventHandler.clearStatus);
 
-    // 隐藏辅助线
     this.hideGuideline();
 
     this.options.enabled = false;
   }
 
   /**
-   * 绘制
    */
   public render() {
     // if (!this.options.enabled) return;
     const vpt = this.options.canvas.viewportTransform;
     if (!vpt) return;
-    // 绘制尺子
     this.draw({
       isHorizontal: true,
       rulerLength: this.getSize().width,
@@ -237,7 +210,6 @@ class CanvasRuler {
       // startCalibration: -(vpt[5] / vpt[3]),
       startCalibration: this.startCalibration?.y ? this.startCalibration.y : -(vpt[5] / vpt[3]),
     });
-    // 绘制左上角的遮罩
     drawMask(this.ctx, {
       isHorizontal: true,
       left: -10,
@@ -257,7 +229,6 @@ class CanvasRuler {
   }
 
   /**
-   * 获取画板尺寸
    */
   private getSize() {
     return {
@@ -279,7 +250,6 @@ class CanvasRuler {
     const startValue = Math[startCalibration > 0 ? 'floor' : 'ceil'](startCalibration / gap) * gap;
     const startOffset = startValue - startCalibration;
 
-    // 标尺背景
     const canvasSize = this.getSize();
     darwRect(this.ctx, {
       left: 0,
@@ -290,9 +260,7 @@ class CanvasRuler {
       stroke: this.options.borderColor,
     });
 
-    // 颜色
     const textColor = new Color(this.options.textColor);
-    // 标尺文字显示
     for (let i = 0; i + startOffset <= Math.ceil(unitLength); i += gap) {
       const position = (startOffset + i) * zoom;
       const textValue = startValue + i + '';
@@ -312,7 +280,6 @@ class CanvasRuler {
       });
     }
 
-    // 标尺刻度线显示
     for (let j = 0; j + startOffset <= Math.ceil(unitLength); j += gap) {
       const position = Math.round((startOffset + j) * zoom);
       const left = isHorizontal ? position : this.options.ruleSize - 8;
@@ -328,16 +295,13 @@ class CanvasRuler {
       });
     }
 
-    // 标尺蓝色遮罩
     if (this.objectRect) {
       const axis = isHorizontal ? 'x' : 'y';
       this.objectRect[axis].forEach((rect) => {
-        // 跳过指定矩形
         if (rect.skip === axis) {
           return;
         }
 
-        // Get数字的值
         const roundFactor = (x: number) => Math.round(x / zoom + startCalibration) + '';
         const leftTextVal = roundFactor(isHorizontal ? rect.left : rect.top);
         const rightTextVal = roundFactor(
@@ -346,7 +310,6 @@ class CanvasRuler {
 
         const isSameText = leftTextVal === rightTextVal;
 
-        // 背景遮罩
         const maskOpt = {
           isHorizontal,
           width: isHorizontal ? 160 : this.options.ruleSize - 8,
@@ -366,10 +329,8 @@ class CanvasRuler {
           });
         }
 
-        // 颜色
         const highlightColor = new Color(this.options.highlightColor);
 
-        // 高亮遮罩
         highlightColor.setAlpha(0.5);
         darwRect(this.ctx, {
           left: isHorizontal ? rect.left : this.options.ruleSize - 8,
@@ -379,7 +340,6 @@ class CanvasRuler {
           fill: highlightColor.toRgba(),
         });
 
-        // 两边的数字
         const pad = this.options.ruleSize / 2 - this.options.fontSize / 2 - 4;
 
         const textOpt = {
@@ -405,7 +365,6 @@ class CanvasRuler {
           });
         }
 
-        // 两边的线
         const lineSize = isSameText ? 8 : 14;
 
         highlightColor.setAlpha(1);
@@ -435,7 +394,6 @@ class CanvasRuler {
   }
 
   /**
-   * 计算起始点
    */
   // private calcCalibration() {
   //   if (this.startCalibration) return;
@@ -454,7 +412,6 @@ class CanvasRuler {
     const allRect = activeObjects.reduce((rects, obj) => {
       // In Fabric.js v6, getBoundingRect() doesn't accept arguments
       const rect: HighlightRect = obj.getBoundingRect();
-      // 如果是分组单独计算坐标
       if (obj.group) {
         // Use obj.group properties with defaults for missing values
         const groupObj = obj.group as any;
@@ -466,7 +423,6 @@ class CanvasRuler {
           scaleX: groupObj.scaleX ?? 1,
           scaleY: groupObj.scaleY ?? 1,
         };
-        // 计算矩形坐标
         rect.width *= group.scaleX;
         rect.height *= group.scaleY;
         const groupCenterX = group.width / 2 + group.left;
@@ -493,7 +449,6 @@ class CanvasRuler {
   }
 
   /**
-   * 清除起始点和矩形坐标
    */
   private clearStatus() {
     // this.startCalibration = undefined;
@@ -532,7 +487,6 @@ class CanvasRuler {
     if (!e.pointer || !e.absolutePointer) return;
     const hoveredRuler = this.isPointOnRuler(e.pointer);
     if (hoveredRuler && this.activeOn === 'up') {
-      // 备份属性
       this.lastAttr.selection = this.options.canvas.selection;
       this.options.canvas.selection = false;
       this.activeOn = 'down';
@@ -593,9 +547,7 @@ class CanvasRuler {
 
     const hoveredRuler = this.isPointOnRuler(e.pointer);
     if (!hoveredRuler) {
-      // 鼠标从里面出去
       if (this.lastAttr.status !== 'out') {
-        // 更改鼠标指针
         this.options.canvas.defaultCursor = this.lastAttr.cursor ?? 'default';
         this.lastAttr.status = 'out';
       }
@@ -605,9 +557,7 @@ class CanvasRuler {
     // if (activeObjects.length === 1 && activeObjects[0] instanceof fabric.GuideLine) {
     //   return;
     // }
-    // 鼠标从外边进入 或 在另一侧标尺
     if (this.lastAttr.status === 'out' || hoveredRuler !== this.lastAttr.status) {
-      // 更改鼠标指针
       this.lastAttr.cursor = this.options.canvas.defaultCursor;
       this.options.canvas.defaultCursor = hoveredRuler === 'horizontal' ? 'ns-resize' : 'ew-resize';
       this.lastAttr.status = hoveredRuler;
@@ -617,7 +567,6 @@ class CanvasRuler {
   private canvasMouseUp(e: any) {
     if (this.activeOn !== 'down') return;
 
-    // 还原属性
     this.options.canvas.selection = this.lastAttr.selection ?? true;
     this.activeOn = 'up';
 

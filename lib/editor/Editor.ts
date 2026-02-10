@@ -57,7 +57,6 @@ class Editor extends EventEmitter {
     if (this._checkPlugin(plugin) && this.canvas) {
       this._saveCustomAttr(plugin);
       const pluginRunTime = new (plugin as IPluginClass)(this.canvas, this, options || {});
-      // Add插件名称
       pluginRunTime.pluginName = plugin.pluginName;
       this.pluginMap[plugin.pluginName] = pluginRunTime;
       this._bindingHooks(pluginRunTime);
@@ -114,7 +113,6 @@ class Editor extends EventEmitter {
           // Convert arguments to array to ensure it's iterable
           const argsArray = Array.from(arguments);
           const result = hook.apply(plugin, argsArray);
-          // hook 兼容非 Promise 返回值
           // Convert to Promise<void> as required by tapPromise
           const promise = (result as any) instanceof Promise ? result : Promise.resolve(result);
           return promise.then(() => undefined);

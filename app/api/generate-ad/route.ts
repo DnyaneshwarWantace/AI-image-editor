@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleGenAI } from "@google/genai";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
+import { supabase } from "@/lib/supabase/client";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL || "";
+
+// Helper function to fetch image as base64
+async function fetchImageAsBase64(imageUrl: string): Promise<string> {
+  const response = await fetch(imageUrl);
+  const arrayBuffer = await response.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString('base64');
+  return base64;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -168,29 +174,39 @@ export async function POST(request: NextRequest) {
       ],
     };
 
-    // Save generated ad to Convex database
+    // Save generated ad to Supabase database
     let generatedAdId = null;
-    if (CONVEX_URL && referenceAdIds && referenceAdIds.length > 0) {
+    if (referenceAdIds && referenceAdIds.length > 0) {
       try {
         console.log("💾 Saving generated ad to database...");
         console.log("🖼️ imageUrl being saved:", imageUrl ? `${imageUrl.substring(0, 50)}...` : "undefined");
-        const convex = new ConvexHttpClient(CONVEX_URL);
-        generatedAdId = await convex.mutation(api.ads.saveGeneratedAd, {
-          name: `${brandInfo.brandName} - ${brandInfo.productName}`,
-          json: template,
-          imageUrl: imageUrl || undefined, // Save the generated image URL
-          brandInfo: brandInfo,
-          referenceAdIds: referenceAdIds,
-          analysis: analysis,
-          userId: userId,
-        });
-        console.log("✅ Ad saved successfully with ID:", generatedAdId);
+
+        const { data, error } = await supabase
+          .from('generated_ads')
+          .insert({
+            name: `${brandInfo.brandName} - ${brandInfo.productName}`,
+            template_json: template,
+            image_url: imageUrl || null,
+            brand_info: brandInfo,
+            reference_ad_ids: referenceAdIds,
+            analysis: analysis,
+            user_id: userId,
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error("❌ Error saving generated ad to database:", error);
+        } else {
+          generatedAdId = data.id;
+          console.log("✅ Ad saved successfully with ID:", generatedAdId);
+        }
       } catch (saveError) {
         console.error("❌ Error saving generated ad to database:", saveError);
         // Continue even if save fails
       }
     } else {
-      console.log("⚠️ Skipping database save - missing CONVEX_URL or referenceAdIds");
+      console.log("⚠️ Skipping database save - missing referenceAdIds");
     }
 
     return NextResponse.json({

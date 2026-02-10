@@ -1,10 +1,10 @@
-import type { Rect } from './ruler';
+import type { RectBounds as Rect } from './ruler';
 import { Color } from 'fabric';
 
 /**
- * 计算尺子间距
- * @param zoom 缩放比例
- * @returns 返回计算出的尺子间距
+ * Calculate ruler gap
+ * @param zoom Zoom ratio
+ * @returns Calculated ruler gap
  */
 const getGap = (zoom: number) => {
   const zooms = [0.02, 0.03, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 18];
@@ -19,32 +19,29 @@ const getGap = (zoom: number) => {
 };
 
 /**
- * 线段合并
- * @param rect Rect数组
+ * Merge line segments
+ * @param rect Rect array
  * @param isHorizontal
- * @returns 合并后的Rect数组
+ * @returns Merged Rect array
  */
 const mergeLines = (rect: Rect[], isHorizontal: boolean) => {
   const axis = isHorizontal ? 'left' : 'top';
   const length = isHorizontal ? 'width' : 'height';
-  // 先按照 axis 的大小排序
+  // Sort by axis size
   rect.sort((a, b) => a[axis] - b[axis]);
   const mergedLines = [];
   let currentLine = Object.assign({}, rect[0]);
   for (const item of rect) {
     const line = Object.assign({}, item);
     if (currentLine[axis] + currentLine[length] >= line[axis]) {
-      // 当前线段和下一个线段相交，合并宽度
       currentLine[length] =
         Math.max(currentLine[axis] + currentLine[length], line[axis] + line[length]) -
         currentLine[axis];
     } else {
-      // 当前线段和下一个线段不相交，将当前线段加入结果数组中，并更新当前线段为下一个线段
       mergedLines.push(currentLine);
       currentLine = Object.assign({}, line);
     }
   }
-  // 加入数组
   mergedLines.push(currentLine);
   return mergedLines;
 };
@@ -137,7 +134,6 @@ const drawMask = (
 ) => {
   ctx.save();
   const { isHorizontal, left, top, width, height, backgroundColor } = options;
-  // Create一个线性渐变对象
   const gradient = isHorizontal
     ? ctx.createLinearGradient(left, height / 2, left + width, height / 2)
     : ctx.createLinearGradient(width / 2, top, width / 2, height + top);

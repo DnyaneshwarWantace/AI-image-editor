@@ -29,7 +29,7 @@ export function ClipImage() {
   const handleAddClip = (clipType: string) => {
     if (!editor) return;
     try {
-      editor.addClipPathToImage?.(clipType);
+      (editor as any).addClipPathToImage?.(clipType);
       toast.success("Clip path added");
     } catch (error) {
       console.error("Error adding clip:", error);
@@ -40,7 +40,7 @@ export function ClipImage() {
   const handleRemoveClip = () => {
     if (!editor) return;
     try {
-      editor.removeClip?.();
+      (editor as any).removeClip?.();
       toast.success("Clip path removed");
     } catch (error) {
       console.error("Error removing clip:", error);

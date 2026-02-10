@@ -63,7 +63,7 @@ export function BordersFramesPanel() {
 
       if (border) {
         canvas.add(border);
-        border.sendToBack();
+        (border as any).sendToBack();
         canvas.requestRenderAll();
         toast.success("Border added!");
       }

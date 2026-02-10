@@ -9,7 +9,7 @@ import Editor from '../Editor';
 type IEditor = Editor;
 type callback = () => void;
 
-class HistoryPlugin implements IPluginTempl {
+class HistoryPlugin {
   static pluginName = 'HistoryPlugin';
   static apis = ['undo', 'redo', 'canUndo', 'canRedo', 'historyUpdate', 'clearAndSaveState', 'saveState'];
   static events = [];
@@ -37,14 +37,14 @@ class HistoryPlugin implements IPluginTempl {
 
     // Bind events
     Object.entries(events).forEach(([event, handler]) => {
-      this.canvas.on(event, handler);
+      this.canvas.on(event as any, handler);
     });
 
     // Initialize state
     this.saveState();
 
     // Update history state
-    this.canvas.on('history:append', () => {
+    this.canvas.on('history:append' as any, () => {
       this.historyUpdate();
     });
 

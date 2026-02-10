@@ -122,7 +122,6 @@ class GroupTextEditorPlugin implements IPluginTempl {
       const finalFill = tmpText.fill === '#000000' ? originalFill : (tmpText.fill || originalFill)
       const finalBgColor = tmpText.backgroundColor || originalBgColor
 
-      // 进入编辑模式时触发
       textObject.set({
         ...pick(attrs, [
           'fontSize',
@@ -142,7 +141,6 @@ class GroupTextEditorPlugin implements IPluginTempl {
     })
   }
 
-  // 绑定编辑取消事件
   _bindingEditingEvent(textObject: FabricText, opt: TPointerEventInfo<TPointerEvent>) {
     if (!opt.target) return
     const left = (opt.target as any).left
@@ -151,7 +149,6 @@ class GroupTextEditorPlugin implements IPluginTempl {
 
     const restoreGroup = () => {
       const groupArr = this.canvas.getObjects().filter((item: any) => item.id && ids.includes(item.id))
-      // left元素
       groupArr.forEach((item: any) => this.canvas.remove(item))
 
       // ensure groupArr is an array before spreading

@@ -412,67 +412,67 @@ export function StickersLibraryPanel() {
 
         {/* Emojis Tab */}
         <TabsContent value="emojis" className="flex-1 flex flex-col mt-3 space-y-3">
-          {/* Search */}
-          <div>
-            <Input
-              placeholder="Search emojis..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="text-xs"
-            />
-          </div>
+      {/* Search */}
+      <div>
+        <Input
+          placeholder="Search emojis..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="text-xs"
+        />
+      </div>
 
-          {/* Categories */}
-          {!searchTerm && (
-            <div className="space-y-1">
-              <Label className="text-xs font-medium">Categories</Label>
-              <div className="flex gap-1 overflow-x-auto pb-2">
-                {EMOJI_CATEGORIES.map((category, index) => (
-                  <Button
-                    key={category.name}
-                    onClick={() => setActiveCategory(index)}
-                    variant={activeCategory === index ? "default" : "outline"}
-                    size="sm"
-                    className="text-xs whitespace-nowrap"
-                  >
-                    {category.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Emoji Grid */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="grid grid-cols-6 gap-2">
-              {filteredEmojis.map((emoji, index) => (
-                <button
-                  key={`${emoji}-${index}`}
-                  onClick={() => addEmojiToCanvas(emoji)}
-                  className="aspect-square flex items-center justify-center text-2xl hover:bg-gray-100 rounded transition-colors border border-gray-200"
-                  title="Click to add"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
+      {/* Categories */}
+      {!searchTerm && (
+        <div className="space-y-1">
+          <Label className="text-xs font-medium">Categories</Label>
+          <div className="flex gap-1 overflow-x-auto pb-2">
+            {EMOJI_CATEGORIES.map((category, index) => (
+              <Button
+                key={category.name}
+                onClick={() => setActiveCategory(index)}
+                variant={activeCategory === index ? "default" : "outline"}
+                size="sm"
+                className="text-xs whitespace-nowrap"
+              >
+                {category.name}
+              </Button>
+            ))}
           </div>
+        </div>
+      )}
 
-          {/* Size Control */}
-          <div className="border-t pt-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium">Emoji Size</Label>
-              <span className="text-xs text-gray-600">{emojiSize}px</span>
-            </div>
-            <input
-              type="range"
-              min="30"
-              max="150"
-              value={emojiSize}
-              onChange={(e) => setEmojiSize(Number(e.target.value))}
-              className="w-full"
-            />
-          </div>
+      {/* Emoji Grid */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="grid grid-cols-6 gap-2">
+          {filteredEmojis.map((emoji, index) => (
+            <button
+              key={`${emoji}-${index}`}
+              onClick={() => addEmojiToCanvas(emoji)}
+              className="aspect-square flex items-center justify-center text-2xl hover:bg-gray-100 rounded transition-colors border border-gray-200"
+              title="Click to add"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Size Control */}
+      <div className="border-t pt-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs font-medium">Emoji Size</Label>
+          <span className="text-xs text-gray-600">{emojiSize}px</span>
+        </div>
+        <input
+          type="range"
+          min="30"
+          max="150"
+          value={emojiSize}
+          onChange={(e) => setEmojiSize(Number(e.target.value))}
+          className="w-full"
+        />
+      </div>
         </TabsContent>
 
         {/* Icons Tab */}
@@ -568,18 +568,18 @@ export function StickersLibraryPanel() {
             </p>
           </div>
 
-          {/* Info */}
-          <div className="border-t pt-3">
-            <div className="flex items-start gap-2 text-xs text-gray-600">
+      {/* Info */}
+      <div className="border-t pt-3">
+        <div className="flex items-start gap-2 text-xs text-gray-600">
               <Sparkles className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-              <div>
+          <div>
                 <p className="font-medium">Free Icons</p>
-                <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 mt-1">
                   {ICON_LIBRARIES[selectedIconLib].icons.length}+ {ICON_LIBRARIES[selectedIconLib].name} icons available
-                </p>
-              </div>
-            </div>
+            </p>
           </div>
+        </div>
+      </div>
         </TabsContent>
 
         {/* Noun Project Tab */}

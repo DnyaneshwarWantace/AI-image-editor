@@ -16,8 +16,8 @@ export function AttributeRounded() {
     const updateRounded = () => {
       const activeObject = canvas.getActiveObject();
       if (activeObject && activeObject.type === "rect") {
-        setRx(activeObject.rx || 0);
-        setRy(activeObject.ry || 0);
+        setRx((activeObject as any).rx || 0);
+        setRy((activeObject as any).ry || 0);
       }
     };
 

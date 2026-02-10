@@ -44,7 +44,7 @@ export function ImageStrokeFull() {
   const applyStroke = () => {
     if (!editor || !canvas) return;
     const strokeType = isOnlyStroke ? "destination-out" : "source-over";
-    editor.imageStrokeDraw?.(strokeColor, strokeWidth, strokeType);
+    (editor as any).imageStrokeDraw?.(strokeColor, strokeWidth, strokeType);
   };
 
   const handleToggle = (value: boolean) => {
@@ -74,7 +74,9 @@ export function ImageStrokeFull() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h4 className="text-xs font-semibold text-gray-900">Image Stroke</h4>
-          <AlertCircle className="h-4 w-4 text-orange-500" title="Only supports PNG transparent images" />
+          <div title="Only supports PNG transparent images">
+            <AlertCircle className="h-4 w-4 text-orange-500" />
+          </div>
         </div>
         <Switch checked={enabled} onCheckedChange={handleToggle} />
       </div>

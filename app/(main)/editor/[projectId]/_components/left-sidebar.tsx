@@ -50,6 +50,7 @@ import { AIBackgroundRemovalPanel } from "./tabs/ai-background-removal-panel";
 import { AIFaceDetectionPanel } from "./tabs/ai-face-detection-panel";
 import { AIObjectDetectionPanel } from "./tabs/ai-object-detection-panel";
 import { AITextOverlayChecker } from "./tabs/ai-text-overlay-checker";
+import { AIExtractLayersPanel } from "./tabs/ai-extract-layers-panel";
 import { AdMockupPreviewPanel } from "./tabs/ad-mockup-preview-panel";
 import { BlendModesPanel } from "./tabs/blend-modes-panel";
 import { BordersFramesPanel } from "./tabs/borders-frames-panel";
@@ -146,6 +147,12 @@ const LEFT_TABS = [
     name: "AI Objects",
     icon: ScanSearch,
     component: AIObjectDetectionPanel,
+  },
+  {
+    key: "aiExtractLayers",
+    name: "AI Extract",
+    icon: Wand2,
+    component: AIExtractLayersPanel,
   },
   {
     key: "aiTextOverlay",

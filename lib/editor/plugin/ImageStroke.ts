@@ -4,7 +4,6 @@
  * @lastEditors fan qq.com
  * @lastEditTime 2022-09-05 18:23:13
  * @FilePath /v-fabric-editor/packages/core/plugin/ImageStroke.ts
- * @Description 图像描边
  */
 import { FabricImage } from 'fabric'
 import type { Canvas as FabricCanvas } from 'fabric'
@@ -76,7 +75,6 @@ class ImageStrokePlugin implements IPluginTempl {
     let canvas: HTMLCanvasElement | null = document.createElement('canvas')
     const ctx = canvas!.getContext('2d')
     if (!ctx) return
-    // 描边等于0 说明关闭了开关或者不需要描边  直接从原图绘制
     if (strokeWidth === 0) {
       await activeObject.setSrc(src)
       activeObject.canvas!.renderAll()

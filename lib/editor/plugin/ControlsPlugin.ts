@@ -41,7 +41,6 @@ function drawImg(
   ctx.restore()
 }
 
-// 中间横杠
 function intervalControl() {
   // Ensure controls object exists on prototype
   if (!FabricObject.prototype.controls) {
@@ -73,7 +72,6 @@ function intervalControl() {
   ) {
     drawImg(ctx, left, top, horizontalImgIcon, 25, 20, fabricObject.angle)
   }
-  // 中间横杠
   FabricObject.prototype.controls.ml = new Control({
     x: -0.5,
     y: 0,
@@ -115,7 +113,6 @@ function intervalControl() {
   })
 }
 
-// 顶点
 function peakControl() {
   // Ensure controls object exists on prototype
   if (!FabricObject.prototype.controls) {
@@ -134,7 +131,6 @@ function peakControl() {
   ) {
     drawImg(ctx, left, top, img, 25, 25, fabricObject.angle)
   }
-  // 四角图标
   FabricObject.prototype.controls.tl = new Control({
     x: -0.5,
     y: -0.5,
@@ -182,7 +178,6 @@ function peakControl() {
     drawImg(ctx, left, top, delImg, 24, 24, fabricObject.angle)
   }
 
-  // delete选中元素
   function deleteObject(mouseEvent: MouseEvent, target: FabricTransform) {
     if (target.action === 'rotate') return true
     const activeObject = canvas.getActiveObjects()
@@ -194,7 +189,6 @@ function peakControl() {
     return true
   }
 
-  // delete图标
   FabricObject.prototype.controls.deleteControl = new Control({
     x: 0.5,
     y: -0.5,
@@ -207,7 +201,6 @@ function peakControl() {
   })
 }*/
 
-// 旋转
 function rotationControl() {
   // Ensure controls object exists on prototype
   if (!FabricObject.prototype.controls) {
@@ -225,7 +218,6 @@ function rotationControl() {
   ) {
     drawImg(ctx, left, top, img, 40, 40, fabricObject.angle)
   }
-  // 旋转图标
   FabricObject.prototype.controls.mtr = new Control({
     x: 0,
     y: 0.5,
@@ -249,16 +241,11 @@ class ControlsPlugin implements IPluginTempl {
       (FabricObject.prototype as any).controls = {};
     }
     
-    // delete图标
     // deleteControl(this.canvas)
-    // 顶点图标
     peakControl()
-    // 中间横杠图标
     intervalControl()
-    // 旋转图标
     rotationControl()
 
-    // 选中样式
     FabricObject.prototype.set({
       transparentCorners: false,
       borderColor: '#51B9F9',
@@ -268,7 +255,6 @@ class ControlsPlugin implements IPluginTempl {
       cornerStrokeColor: '#0E98FC',
       borderOpacityWhenMoving: 1,
     })
-    // textbox保持一致
     // Textbox.prototype.controls = FabricObject.prototype.controls
   }
 

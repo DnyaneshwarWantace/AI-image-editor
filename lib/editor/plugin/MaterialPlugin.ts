@@ -39,7 +39,6 @@ class MaterialPlugin implements IPluginTempl {
       svg: config.repoSrc + '/svg/type.json',
     }
   }
-  // Get模板分类
   getTmplTypeList() {
     return axios.get(`${this.repoSrc}/api/tmpl-types?pagination[pageSize]=100`).then((res) => {
       const list = res.data.data.map((item: any) => {
@@ -51,7 +50,6 @@ class MaterialPlugin implements IPluginTempl {
       return list
     })
   }
-  // 分页获取模板列表
   getTmplList(tmplType = '', index = 1, searchKeyword = '') {
     const query = {
       fields: '*',
@@ -92,7 +90,6 @@ class MaterialPlugin implements IPluginTempl {
   }
 
   /**
-   * @description 获取素材分类
    * @return {Promise<any>}
    */
   getMaterialTypeList() {
@@ -108,7 +105,6 @@ class MaterialPlugin implements IPluginTempl {
   }
 
   /**
-   * @description 获取素材列表
    * @returns Promise<Array>
    */
   getMaterialList(materialType = '', index = 1, searchKeyword = '') {
@@ -186,7 +182,6 @@ class MaterialPlugin implements IPluginTempl {
     return this.repoSrc + imgUrl
   }
 
-  // 拼接查询条件参数
   _getQueryParams(option: any, filters: any) {
     filters.forEach((item: any) => {
       const { key, value, type } = item

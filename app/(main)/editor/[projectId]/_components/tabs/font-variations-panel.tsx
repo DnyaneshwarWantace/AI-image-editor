@@ -7,9 +7,6 @@ import { useCanvasContext } from "@/providers/canvas-provider";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -28,21 +25,10 @@ interface FontVariation {
   fontStyle?: string;
 }
 
-// Helper function to check if a string looks like a valid Convex ID
-function isValidConvexId(id: string): boolean {
-  if (!id || typeof id !== 'string') return false;
-  const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-  return convexIdPattern.test(id) && id.length >= 16;
-}
-
 export function FontVariationsPanel() {
   const { canvas } = useCanvasContext();
   const params = useParams();
-  const projectIdParam = params.projectId as string;
-
-  // Check if projectId is a valid Convex ID
-  const isValidId = isValidConvexId(projectIdParam);
-  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+  const projectId = params.projectId as string;
 
   const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -50,14 +36,36 @@ export function FontVariationsPanel() {
   const [isEditing, setIsEditing] = useState(false);
   const [fontVariations, setFontVariations] = useState<FontVariation[]>([]);
   const [newFont, setNewFont] = useState("");
+  const [variationCounts, setVariationCounts] = useState<Record<string, number>>({});
+  const [availableFonts, setAvailableFonts] = useState<any[]>([]);
 
-  // Convex hooks
-  const variationCounts = useQuery(
-    api.fontVariations.getFontVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const availableFonts = useQuery(api.fonts.getFonts, {});
-  const saveVariationsMutation = useMutation(api.fontVariations.saveFontVariations);
+  // Fetch variation counts and fonts from REST API
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchData = async () => {
+      try {
+        const [countsRes, fontsRes] = await Promise.all([
+          fetch(`/api/variations/counts?projectId=${projectId}&type=font`),
+          fetch('/api/fonts')
+        ]);
+
+        if (countsRes.ok) {
+          const countsData = await countsRes.json();
+          setVariationCounts(countsData || {});
+        }
+
+        if (fontsRes.ok) {
+          const fontsData = await fontsRes.json();
+          setAvailableFonts(fontsData || []);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [projectId]);
 
   const extractTextElements = useCallback(() => {
     if (!canvas) return [];
@@ -85,9 +93,7 @@ export function FontVariationsPanel() {
           canvas.requestRenderAll();
         }
 
-        const count = projectId && variationCounts
-          ? (variationCounts[textId] || 0)
-          : 0;
+        const count = variationCounts[textId] || 0;
 
         texts.push({
           id: textId,
@@ -100,7 +106,7 @@ export function FontVariationsPanel() {
     });
 
     return texts;
-  }, [canvas, variationCounts, projectId]);
+  }, [canvas, variationCounts]);
 
   useEffect(() => {
     if (!canvas) return;
@@ -172,13 +178,21 @@ export function FontVariationsPanel() {
     }
 
     try {
-      await saveVariationsMutation({
-        projectId,
-        elementId: selectedElement.id,
-        originalFont: selectedElement.fontFamily,
-        variations: fontVariations,
-        userId: undefined,
+      const response = await fetch('/api/font-variations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId,
+          elementId: selectedElement.id,
+          originalFont: selectedElement.fontFamily,
+          variations: fontVariations,
+          userId: undefined,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to save variations');
+      }
 
       // Update local state
       setTextElements((prev) =>
@@ -188,6 +202,13 @@ export function FontVariationsPanel() {
             : el
         )
       );
+
+      // Refresh variation counts
+      const countsResponse = await fetch(`/api/variations/counts?projectId=${projectId}&type=font`);
+      if (countsResponse.ok) {
+        const data = await countsResponse.json();
+        setVariationCounts(data || {});
+      }
 
       setIsEditing(false);
       setSelectedElement(null);

@@ -22,9 +22,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Plus, X, Loader2, Languages } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { useParams } from "next/navigation";
 
 interface TextVariationModalProps {
@@ -53,13 +50,25 @@ export function TextVariationModal({
   };
 
   // Fetch existing variations for this element from backend
-  const existingVariations = useQuery(
-    api.textVariations.getTextVariationsByElement,
-    isValidConvexId(projectId) ? {
-      projectId: projectId as Id<"projects">,
-      elementId
-    } : "skip"
-  );
+  const [existingVariations, setExistingVariations] = useState<{ variations: Array<{ text: string }> } | null>(null);
+
+  useEffect(() => {
+    if (!isValidConvexId(projectId) || !elementId) return;
+
+    const fetchExistingVariations = async () => {
+      try {
+        const response = await fetch(`/api/text-variations?projectId=${projectId}&elementId=${elementId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setExistingVariations(data);
+        }
+      } catch (error) {
+        console.error('Error fetching existing variations:', error);
+      }
+    };
+
+    fetchExistingVariations();
+  }, [projectId, elementId]);
 
   const [variations, setVariations] = useState<string[]>([]);
   const [manualInput, setManualInput] = useState("");

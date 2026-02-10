@@ -26,16 +26,16 @@ export function useSelect(options?: UseSelectOptions) {
     const [item] = arr;
     if (item) {
       setSelectActive([item]);
-      setSelectId(item.id as string);
+      setSelectId((item as any).id as string);
       setSelectOneType(item.type || '');
-      setSelectIds([item.id as string]);
+      setSelectIds([(item as any).id as string]);
     }
   }, []);
 
   const selectMulti = useCallback((arr: FabricObject[]) => {
     setSelectMode(SelectMode.MULTI);
     setSelectId(null);
-    setSelectIds(arr.map((item) => item.id as string));
+    setSelectIds(arr.map((item) => (item as any).id as string));
   }, []);
 
   const selectCancel = useCallback(() => {

@@ -7,9 +7,6 @@ import { useCanvasContext } from "@/providers/canvas-provider";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -25,12 +22,6 @@ interface ColorVariation {
   id: string;
   color: string;
   name?: string;
-}
-
-function isValidConvexId(id: string): boolean {
-  if (!id || typeof id !== 'string') return false;
-  const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-  return convexIdPattern.test(id) && id.length >= 16;
 }
 
 const COLOR_PRESETS = [
@@ -49,10 +40,7 @@ const COLOR_PRESETS = [
 export function TextColorVariationsPanel() {
   const { canvas } = useCanvasContext();
   const params = useParams();
-  const projectIdParam = params.projectId as string;
-
-  const isValidId = isValidConvexId(projectIdParam);
-  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+  const projectId = params.projectId as string;
 
   const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -61,12 +49,26 @@ export function TextColorVariationsPanel() {
   const [colorVariations, setColorVariations] = useState<ColorVariation[]>([]);
   const [newColor, setNewColor] = useState("#000000");
   const [newColorName, setNewColorName] = useState("");
+  const [variationCounts, setVariationCounts] = useState<Record<string, number>>({});
 
-  const variationCounts = useQuery(
-    api.textColorVariations.getTextColorVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const saveVariationsMutation = useMutation(api.textColorVariations.saveTextColorVariations);
+  // Fetch variation counts from REST API
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchVariationCounts = async () => {
+      try {
+        const response = await fetch(`/api/variations/counts?projectId=${projectId}&type=textColor`);
+        if (response.ok) {
+          const data = await response.json();
+          setVariationCounts(data || {});
+        }
+      } catch (error) {
+        console.error('Error fetching text color variation counts:', error);
+      }
+    };
+
+    fetchVariationCounts();
+  }, [projectId]);
 
   const extractTextElements = useCallback(() => {
     if (!canvas) return [];
@@ -88,7 +90,7 @@ export function TextColorVariationsPanel() {
           canvas.requestRenderAll();
         }
 
-        const count = projectId && variationCounts ? (variationCounts[textId] || 0) : 0;
+        const count = variationCounts[textId] || 0;
 
         texts.push({
           id: textId,
@@ -183,19 +185,34 @@ export function TextColorVariationsPanel() {
     if (!selectedElement || !canvas || !projectId || colorVariations.length === 0) return;
 
     try {
-      await saveVariationsMutation({
-        projectId,
-        elementId: selectedElement.id,
-        originalColor: selectedElement.fill,
-        variations: colorVariations,
-        userId: undefined,
+      const response = await fetch('/api/text-color-variations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId,
+          elementId: selectedElement.id,
+          originalColor: selectedElement.fill,
+          variations: colorVariations,
+          userId: undefined,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to save variations');
+      }
 
       setTextElements((prev) =>
         prev.map((el) =>
           el.id === selectedElement.id ? { ...el, variationCount: colorVariations.length } : el
         )
       );
+
+      // Refresh variation counts
+      const countsResponse = await fetch(`/api/variations/counts?projectId=${projectId}&type=textColor`);
+      if (countsResponse.ok) {
+        const data = await countsResponse.json();
+        setVariationCounts(data || {});
+      }
 
       setIsEditing(false);
       setSelectedElement(null);

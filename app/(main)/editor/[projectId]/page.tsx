@@ -5,18 +5,7 @@ import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { EditorLayout } from "./_components/editor-layout";
 import { CanvasProvider } from "@/providers/canvas-provider";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-
-// Helper function to check if a string looks like a valid Convex ID
-// Convex IDs are base32 encoded and typically start with a letter
-function isValidConvexId(id: string): boolean {
-  if (!id || typeof id !== 'string') return false;
-  // Convex IDs are base32 encoded: start with letter, followed by alphanumeric
-  // Typical format: j1234567890abcdefghijklmnopqrstuv
-  const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-  return convexIdPattern.test(id) && id.length >= 16;
-}
+import { CarouselSlidesProvider } from "@/providers/carousel-slides-provider";
 
 export default function EditorPage() {
   const params = useParams();
@@ -25,83 +14,81 @@ export default function EditorPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Only try to load from Convex if projectId looks like a valid Convex ID
-  const shouldQueryConvex = isValidConvexId(projectId);
-  const convexProject = useQuery(
-    api.projects.getProject,
-    shouldQueryConvex ? { projectId: projectId } : "skip"
-  );
-
   useEffect(() => {
-    // If we have a project from Convex, use it
-    if (convexProject && convexProject !== null) {
-      setCurrentProject({
-        _id: convexProject._id,
-        title: convexProject.title,
-        width: convexProject.width,
-        height: convexProject.height,
-        canvasState: convexProject.canvasState,
-        imageUrl: convexProject.imageUrl || null,
-        userId: convexProject.userId || null,
-        createdAt: convexProject.createdAt,
-        updatedAt: convexProject.updatedAt,
-      });
-      setIsLoading(false);
-      return;
-    }
+    const fetchProject = async () => {
+      try {
+        const response = await fetch(`/api/projects/${projectId}`);
 
-    // If Convex query is still loading and we should query, wait
-    if (shouldQueryConvex && convexProject === undefined) {
-      return;
-    }
-
-    // If Convex project not found, fallback to localStorage
-    try {
-      const storedProject = localStorage.getItem(`project-${projectId}`);
-      const storedMeta = localStorage.getItem(`project-meta-${projectId}`);
-
-      let project = {
-        _id: projectId,
-        title: 'Untitled Project',
-        width: 800,
-        height: 600,
-        canvasState: null,
-        imageUrl: null,
-        userId: null,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
-
-      // Load canvas state from localStorage
-      if (storedProject) {
-        try {
-          const canvasState = JSON.parse(storedProject);
-          project.canvasState = canvasState;
-        } catch (e) {
-          console.error('Error parsing stored project:', e);
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentProject({
+            _id: data.id,
+            id: data.id,
+            title: data.title,
+            // FORCE LinkedIn carousel size (ignore database dimensions)
+            width: 1080,
+            height: 1350,
+            canvasState: data.canvas_state,
+            imageUrl: data.image_url || null,
+            userId: data.user_id || null,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at,
+          });
+          setIsLoading(false);
+          return;
         }
-      }
 
-      // Load project metadata (dimensions) from localStorage
-      if (storedMeta) {
-        try {
-          const meta = JSON.parse(storedMeta);
-          if (meta.width) project.width = meta.width;
-          if (meta.height) project.height = meta.height;
-          if (meta.title) project.title = meta.title;
-        } catch (e) {
-          console.error('Error parsing project metadata:', e);
+        // If project not found in Supabase, fallback to localStorage
+        const storedProject = localStorage.getItem(`project-${projectId}`);
+        const storedMeta = localStorage.getItem(`project-meta-${projectId}`);
+
+        let project = {
+          _id: projectId,
+          id: projectId,
+          title: 'Untitled Carousel',
+          width: 1080,
+          height: 1350,
+          canvasState: null,
+          imageUrl: null,
+          userId: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        // Load canvas state from localStorage
+        if (storedProject) {
+          try {
+            const canvasState = JSON.parse(storedProject);
+            project.canvasState = canvasState;
+          } catch (e) {
+            console.error('Error parsing stored project:', e);
+          }
         }
-      }
 
-      setCurrentProject(project);
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error loading project:', error);
-      setError('Failed to load project');
-      setIsLoading(false);
-    }
-  }, [projectId, convexProject]);
+        // Load project metadata from localStorage
+        if (storedMeta) {
+          try {
+            const meta = JSON.parse(storedMeta);
+            // FORCE LinkedIn carousel size (ignore saved dimensions)
+            project.width = 1080;
+            project.height = 1350;
+            if (meta.title) project.title = meta.title;
+          } catch (e) {
+            console.error('Error parsing project metadata:', e);
+          }
+        }
+
+        setCurrentProject(project);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error loading project:', error);
+        setError('Failed to load project');
+        setIsLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [projectId]);
 
   // Loading state
   if (isLoading || !currentProject) {
@@ -115,7 +102,7 @@ export default function EditorPage() {
     );
   }
 
-  // Error state (only show if there's an actual error)
+  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -133,20 +120,22 @@ export default function EditorPage() {
   }
 
   return (
-    <CanvasProvider>
-      <div 
-        className="h-screen"
-        style={{
-          overflow: 'hidden',
-          position: 'fixed',
-          width: '100%',
-          height: '100%',
-          top: 0,
-          left: 0,
-        }}
-      >
-        <EditorLayout project={currentProject} />
-      </div>
-    </CanvasProvider>
+    <CarouselSlidesProvider>
+      <CanvasProvider>
+        <div
+          className="h-screen"
+          style={{
+            overflow: 'hidden',
+            position: 'fixed',
+            width: '100%',
+            height: '100%',
+            top: 0,
+            left: 0,
+          }}
+        >
+          <EditorLayout project={currentProject} />
+        </div>
+      </CanvasProvider>
+    </CarouselSlidesProvider>
   );
 }

@@ -3,7 +3,7 @@
  * @date 2022-05-24
  * @lastEditors Image Editor
  * @lastEditTime 2023-08-01
- * @Description 二维码生成工具
+ * @Description QR Code Generator Plugin
  */
 
 import { FabricImage } from 'fabric'
@@ -19,7 +19,6 @@ declare module '../interface/Editor' {
   interface IEditor extends IPlugin {}
 }
 
-// 二维码生成参数
 
 enum DotsType {
   rounded = 'rounded',
@@ -65,7 +64,7 @@ class QrCodePlugin implements IPluginTempl {
     const qrCode = new QRCodeStyling(options)
     const blob = await qrCode.getRawData('png')
     if (!blob) return ''
-    const base64Str = (await blobToBase64(blob)) as string
+    const base64Str = (await blobToBase64(blob as any)) as string
     return base64Str || ''
   }
 
@@ -95,22 +94,18 @@ class QrCodePlugin implements IPluginTempl {
       qrOptions: {
         errorCorrectionLevel: option.errorCorrectionLevel,
       },
-      // 点
       dotsOptions: {
         color: option.dotsColor,
         type: option.dotsType,
       },
-      // 三个角
       cornersSquareOptions: {
         color: option.cornersSquareColor,
         type: option.cornersSquareType,
       },
-      // 圆点选项
       cornersDotOptions: {
         color: option.cornersDotColor,
         type: option.cornersDotType,
       },
-      // 背景
       backgroundOptions: {
         color: option.background,
       },

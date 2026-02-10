@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { TopBar } from "./top-bar";
 import { LeftSidebar } from "./left-sidebar";
 import { RightSidebar } from "./right-sidebar";
+import { HorizontalCarouselCanvas } from "./canvas/horizontal-carousel-canvas";
 import { CanvasArea } from "./canvas-area";
 import { RingLoader } from "react-spinners";
 import { useCanvasContext } from "@/providers/canvas-provider";
@@ -14,6 +15,7 @@ interface EditorLayoutProps {
 
 export function EditorLayout({ project }: EditorLayoutProps) {
   const [rulerEnabled, setRulerEnabled] = useState(true);
+  const [isCarouselMode, setIsCarouselMode] = useState(false);
   const { processingMessage } = useCanvasContext();
 
   return (
@@ -48,12 +50,14 @@ export function EditorLayout({ project }: EditorLayoutProps) {
         project={project}
         rulerEnabled={rulerEnabled}
         onRulerToggle={() => setRulerEnabled(!rulerEnabled)}
+        isCarouselMode={isCarouselMode}
+        onCarouselToggle={() => setIsCarouselMode(!isCarouselMode)}
       />
 
       {/* Main Content - Flex container */}
-      <div 
-        className="flex flex-1 overflow-hidden" 
-        style={{ 
+      <div
+        className="flex flex-1 overflow-hidden"
+        style={{
           height: "calc(100vh - 64px)",
           overflow: 'hidden',
           position: 'relative',
@@ -62,11 +66,18 @@ export function EditorLayout({ project }: EditorLayoutProps) {
         {/* Left Sidebar - 380px when expanded, 65px when collapsed */}
         <LeftSidebar />
 
-        {/* Canvas Area - Flexible center */}
-        <CanvasArea
-          project={project}
-          rulerEnabled={rulerEnabled}
-        />
+        {/* Canvas Area - Toggle between single editor and carousel */}
+        {isCarouselMode ? (
+          <HorizontalCarouselCanvas
+            project={project}
+            rulerEnabled={rulerEnabled}
+          />
+        ) : (
+          <CanvasArea
+            project={project}
+            rulerEnabled={rulerEnabled}
+          />
+        )}
 
         {/* Right Sidebar - 380px when expanded */}
         <RightSidebar />

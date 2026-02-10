@@ -283,7 +283,7 @@ class GroupAlignPlugin implements IPluginTempl {
     // Get all element heights
     function getAllItemHeight() {
       let count = 0;
-      activeObject.forEachObject((item: FabricObject) => {
+      (activeObject as any).forEachObject((item: FabricObject) => {
         count += getItemHeight(item);
       });
       return count;
@@ -305,7 +305,7 @@ class GroupAlignPlugin implements IPluginTempl {
       return height;
     }
 
-    if (activeObject && activeObject.type === 'activeSelection') {
+    if (activeObject && (activeObject as any).type === 'activeSelection') {
       const activeSelection = activeObject;
       // Sort
       (activeSelection as any)._objects.sort((a: FabricObject, b: FabricObject) => (a.top || 0) - (b.top || 0));
@@ -315,7 +315,7 @@ class GroupAlignPlugin implements IPluginTempl {
       // Group origin height
       const yHeight = Number(activeObject.height) / 2;
 
-      activeObject.forEachObject((item: FabricObject, i: number) => {
+      (activeObject as any).forEachObject((item: FabricObject, i: number) => {
         // Get height of all elements before current element
         const preHeight = getItemTop(i);
         // Top distance: spacing * index + previous element height - origin height

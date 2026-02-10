@@ -6,9 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { Badge } from "@/components/ui/badge";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -16,13 +13,6 @@ interface ColorVariation {
   id: string;
   color: string;
   name?: string;
-}
-
-// Helper function to check if a string looks like a valid Convex ID
-function isValidConvexId(id: string): boolean {
-  if (!id || typeof id !== 'string') return false;
-  const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-  return convexIdPattern.test(id) && id.length >= 16;
 }
 
 // Popular color presets
@@ -44,27 +34,42 @@ const COLOR_PRESETS = [
 export function BackgroundColorVariationsPanel() {
   const { canvas } = useCanvasContext();
   const params = useParams();
-  const projectIdParam = params.projectId as string;
-
-  // Check if projectId is a valid Convex ID
-  const isValidId = isValidConvexId(projectIdParam);
-  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+  const projectId = params.projectId as string;
 
   const [colorVariations, setColorVariations] = useState<ColorVariation[]>([]);
   const [newColor, setNewColor] = useState("#FFFFFF");
   const [newColorName, setNewColorName] = useState("");
   const [currentBgColor, setCurrentBgColor] = useState<string | null>(null);
+  const [existingVariations, setExistingVariations] = useState<any[]>([]);
+  const [variationCount, setVariationCount] = useState(0);
 
-  // Convex hooks
-  const existingVariations = useQuery(
-    api.backgroundColorVariations.getBackgroundColorVariations,
-    projectId ? { projectId } : "skip"
-  );
-  const variationCount = useQuery(
-    api.backgroundColorVariations.getBackgroundColorVariationCount,
-    projectId ? { projectId } : "skip"
-  );
-  const saveVariationsMutation = useMutation(api.backgroundColorVariations.saveBackgroundColorVariations);
+  // Fetch existing variations from REST API
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchVariations = async () => {
+      try {
+        const [variationsRes, countRes] = await Promise.all([
+          fetch(`/api/background-color-variations?projectId=${projectId}`),
+          fetch(`/api/variations/counts?projectId=${projectId}&type=backgroundColor`)
+        ]);
+
+        if (variationsRes.ok) {
+          const data = await variationsRes.json();
+          setExistingVariations(data || []);
+        }
+
+        if (countRes.ok) {
+          const countData = await countRes.json();
+          setVariationCount(countData.count || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching background color variations:', error);
+      }
+    };
+
+    fetchVariations();
+  }, [projectId]);
 
   // Get current background color
   useEffect(() => {
@@ -142,11 +147,26 @@ export function BackgroundColorVariationsPanel() {
     }
 
     try {
-      await saveVariationsMutation({
-        projectId,
-        variations: colorVariations,
-        userId: undefined,
+      const response = await fetch('/api/background-color-variations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId,
+          variations: colorVariations,
+          userId: undefined,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to save variations');
+      }
+
+      // Refresh variation count
+      const countRes = await fetch(`/api/variations/counts?projectId=${projectId}&type=backgroundColor`);
+      if (countRes.ok) {
+        const countData = await countRes.json();
+        setVariationCount(countData.count || 0);
+      }
 
       console.log(`✅ Saved ${colorVariations.length} background color variations`);
     } catch (error) {

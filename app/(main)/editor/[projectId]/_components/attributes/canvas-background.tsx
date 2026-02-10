@@ -42,7 +42,12 @@ export function CanvasBackground() {
     const updateColor = () => {
       const workspace = canvas.getObjects().find((obj: any) => obj.id === "workspace");
       if (workspace) {
-        setColor(workspace.fill || "#ffffff");
+        const fill = workspace.fill;
+        if (typeof fill === 'string') {
+          setColor(fill);
+        } else {
+          setColor("#ffffff"); // Default for gradients
+        }
       }
     };
 
@@ -52,6 +57,10 @@ export function CanvasBackground() {
 
   const setBackgroundColor = (newColor: string) => {
     if (!canvas) return;
+
+    // Clear any background image/effect
+    canvas.backgroundImage = null;
+
     const workspace = canvas.getObjects().find((obj: any) => obj.id === "workspace");
     if (workspace) {
       workspace.set("fill", newColor);

@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
     const data = await new Promise((resolve, reject) => {
       oauth.get(
         apiUrl,
-        null, // token
-        null, // token secret
+        null as any, // token
+        null as any, // token secret
         (error: any, data: any, response: any) => {
           if (error) {
             console.error('Noun Project OAuth error:', error);

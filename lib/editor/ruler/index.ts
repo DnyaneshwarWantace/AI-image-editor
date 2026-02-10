@@ -14,14 +14,14 @@ function initRuler(canvas: Canvas, options?: RulerOptions) {
   let workspace: FabricObject | undefined = undefined;
 
   /**
-   * 获取workspace
+   * Get workspace
    */
   const getWorkspace = () => {
-    workspace = canvas.getObjects().find((item) => item.id === 'workspace');
+    workspace = canvas.getObjects().find((item) => (item as any).id === 'workspace');
   };
 
   /**
-   * 判断target是否在object矩形外
+   * Check if target is outside object rectangle
    * @param object
    * @param target
    * @returns
@@ -57,7 +57,7 @@ function initRuler(canvas: Canvas, options?: RulerOptions) {
     return false;
   };
 
-  canvas.on('guideline:moving', (e) => {
+  canvas.on('guideline:moving' as any, (e: any) => {
     if (!workspace) {
       getWorkspace();
       return;
@@ -68,7 +68,7 @@ function initRuler(canvas: Canvas, options?: RulerOptions) {
     }
   });
 
-  canvas.on('guideline:mouseup', (e) => {
+  canvas.on('guideline:mouseup' as any, (e: any) => {
     if (!workspace) {
       getWorkspace();
       return;

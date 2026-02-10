@@ -38,7 +38,7 @@ class CustomTextbox extends Textbox {
    * This ensures words stay together when text wraps
    * Note: This method may not exist in all Fabric.js versions, so we use a try-catch
    */
-  _wrapText(text: string, maxWidth: number): string[] {
+  _wrapText(text: any, maxWidth: any): any {
     try {
       if (!text || !maxWidth) {
         // Try parent implementation if it exists

@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Canvas, FabricObject } from "fabric";
+import { Canvas, FabricObject, Rect } from "fabric";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { ZoomControls } from "./canvas/zoom-controls";
 import Editor from "@/lib/editor/Editor";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { useState as useApiState, useEffect as useApiEffect } from "react";
 
 // Import all plugins (removed WorkspacePlugin, ResizePlugin, MaskPlugin)
 import DringPlugin from "@/lib/editor/plugin/DringPlugin";
@@ -50,18 +49,29 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { setCanvas, setEditor, canvas } = useCanvasContext();
   const [zoom, setZoom] = useState(1);
+  // ALWAYS use LinkedIn carousel size (1080x1350) - ignore project dimensions
   const [canvasSize, setCanvasSize] = useState({
-    width: project.width || 800,
-    height: project.height || 600,
+    width: 1080,
+    height: 1350,
   });
 
-  // Fetch fonts from Convex
-  const convexFonts = useQuery(api.fonts.getFonts, {
-    limit: 10000,
-  });
+  // Fetch fonts from Supabase API
+  const [fonts, setFonts] = useState<any[]>([]);
 
-  // Mutation for auto-saving to Convex
-  const updateProjectMutation = useMutation(api.projects.updateProject);
+  useEffect(() => {
+    const fetchFonts = async () => {
+      try {
+        const response = await fetch('/api/fonts');
+        if (response.ok) {
+          const data = await response.json();
+          setFonts(data);
+        }
+      } catch (error) {
+        console.error('Error fetching fonts:', error);
+      }
+    };
+    fetchFonts();
+  }, []);
 
 
   // Calculate zoom to fit canvas in container
@@ -103,13 +113,13 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
     setZoom(newZoom);
   }, [canvasSize.width, canvasSize.height]);
 
-  // Update canvas size when project changes
-  useEffect(() => {
-    setCanvasSize({
-      width: project.width || 800,
-      height: project.height || 600,
-    });
-  }, [project.width, project.height]);
+  // DISABLED: Always use LinkedIn carousel size, don't update from project
+  // useEffect(() => {
+  //   setCanvasSize({
+  //     width: project.width || 1080,
+  //     height: project.height || 1350,
+  //   });
+  // }, [project.width, project.height]);
 
   // Listen for custom canvas size change events (from templates)
   useEffect(() => {
@@ -127,12 +137,12 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
   // Update canvas dimensions when canvasSize changes (without recreating canvas)
   useEffect(() => {
     const fabricCanvas = (canvasRef.current as any)?.__fabricCanvas;
-    if (!fabricCanvas || !fabricCanvas.getContext()) return;
+    if (!fabricCanvas || !fabricCanvas.getElement()) return;
 
     // Only update dimensions if they actually changed
     const currentWidth = fabricCanvas.getWidth();
     const currentHeight = fabricCanvas.getHeight();
-    
+
     if (currentWidth !== canvasSize.width || currentHeight !== canvasSize.height) {
       fabricCanvas.setDimensions({
         width: canvasSize.width,
@@ -182,14 +192,15 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
 
     let fabricCanvas: Canvas | null = null;
     try {
-      // Initialize Fabric Canvas with exact project dimensions
+      // Initialize Fabric Canvas with LinkedIn carousel dimensions (1080x1350)
       fabricCanvas = new Canvas(canvasRef.current, {
         fireRightClick: true,
         stopContextMenu: true,
         controlsAboveOverlay: true,
         preserveObjectStacking: true,
-        width: canvasSize.width,
-        height: canvasSize.height,
+        width: 1080,  // LinkedIn carousel width
+        height: 1350, // LinkedIn carousel height (4:5 ratio)
+
         // Enable multi-select with Shift+Click
         selection: true,
         // Allow selection of multiple objects
@@ -252,8 +263,8 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
       (canvasEditor as any).getCanvasSize = () => canvasSize;
 
       // Transform Convex fonts to FontPlugin format (if loaded)
-      const fontList = convexFonts
-        ? convexFonts
+      const fontList = fonts
+        ? fonts
             .filter((f) => f.url && f.imageUrl) // Only include fonts with both font file and preview
             .map((font) => ({
               name: font.name,
@@ -304,40 +315,35 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         }
       }
 
+      // Create workspace background if it doesn't exist
+      const ensureWorkspace = () => {
+        const objects = fabricCanvas.getObjects();
+        const existingWorkspace = objects.find((obj: any) => (obj as any).id === 'workspace');
+        if (!existingWorkspace) {
+          const workspace = new Rect({
+            fill: 'rgba(255,255,255,1)',
+            width: 1080,
+            height: 1350,
+            id: 'workspace',
+            strokeWidth: 0,
+          } as any);
+          workspace.set('selectable', false);
+          workspace.set('hasControls', false);
+          workspace.hoverCursor = 'default';
+          fabricCanvas.add(workspace);
+          fabricCanvas.sendObjectToBack(workspace);
+          fabricCanvas.requestRenderAll();
+        }
+      };
+
       // Load canvas state if exists
       if (project.canvasState && fabricCanvas) {
-        // Extract workspace dimensions from canvas state before loading
-        let loadedWidth = canvasSize.width;
-        let loadedHeight = canvasSize.height;
-        
-        try {
-          const canvasState = typeof project.canvasState === 'string' 
-            ? JSON.parse(project.canvasState) 
-            : project.canvasState;
-          
-          // Check if canvas state has width/height
-          if (canvasState.width && canvasState.height) {
-            loadedWidth = canvasState.width;
-            loadedHeight = canvasState.height;
-          }
-          
-          // Check for workspace object in canvas state
-          if (canvasState.objects) {
-            const workspace = canvasState.objects.find((obj: any) => obj.id === 'workspace');
-            if (workspace && workspace.width && workspace.height) {
-              loadedWidth = workspace.width;
-              loadedHeight = workspace.height;
-            }
-          }
-        } catch (e) {
-          console.warn('Could not parse canvas state for dimensions:', e);
-        }
-        
-        // Update canvas size state with loaded dimensions
-        setCanvasSize({ width: loadedWidth, height: loadedHeight });
-        
-        // Update canvas dimensions to match loaded state
-        fabricCanvas.setDimensions({ width: loadedWidth, height: loadedHeight });
+        // FORCE LinkedIn carousel dimensions (1080x1350) - ignore saved dimensions
+        // ALWAYS use LinkedIn carousel size
+        setCanvasSize({ width: 1080, height: 1350 });
+
+        // ALWAYS set canvas dimensions to LinkedIn carousel size
+        fabricCanvas.setDimensions({ width: 1080, height: 1350 });
         
         // Load fonts BEFORE loading canvas state to prevent FOUT (Flash of Unstyled Text)
         const canvasStateString = typeof project.canvasState === 'string' 
@@ -357,29 +363,17 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         // Also ensure canvas is fully initialized before loading
         Promise.all([
           loadFontsPromise,
-          // Wait for canvas to be fully ready with retry logic
+          // Wait for canvas to be fully ready
           new Promise<void>((resolve) => {
             const checkCanvasReady = (attempts = 0) => {
-              if (fabricCanvas) {
-                try {
-                  const context = fabricCanvas.getContext();
-                  // Check if context exists and has canvas property
-                  if (context && (context as any).canvas && fabricCanvas.width && fabricCanvas.height) {
-                    // Additional check: ensure Fabric.js internal elements are ready
-                    const fabricCanvasAny = fabricCanvas as any;
-                    if (fabricCanvasAny.elements && fabricCanvasAny.elements.lower && fabricCanvasAny.elements.lower.ctx) {
-                      // Wait one more frame to ensure everything is fully initialized
-                      requestAnimationFrame(() => {
-                        setTimeout(() => resolve(), 50);
-                      });
-                      return;
-                    }
-                  }
-                } catch (e) {
-                  // Context not ready yet
-                }
+              if (fabricCanvas && fabricCanvas.getElement() && fabricCanvas.width && fabricCanvas.height) {
+                // Canvas is ready
+                requestAnimationFrame(() => {
+                  setTimeout(() => resolve(), 50);
+                });
+                return;
               }
-              
+
               if (attempts < 20) {
                 // Retry up to 20 times (1 second total)
                 setTimeout(() => checkCanvasReady(attempts + 1), 50);
@@ -394,58 +388,8 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         ])
           .then(async () => {
             // Fonts are loaded and canvas is ready, safe to load canvas state
-            if (!fabricCanvas) {
+            if (!fabricCanvas || !fabricCanvas.getElement()) {
               console.warn('Canvas not available for loading state');
-              return;
-            }
-            
-            // Double-check context before loading - ensure Fabric.js internal elements are ready
-            try {
-              const context = fabricCanvas.getContext();
-              const fabricCanvasAny = fabricCanvas as any;
-              
-              if (!context || !(context as any).canvas) {
-                console.warn('Canvas context not ready, waiting...');
-                await new Promise<void>((resolve) => {
-                  setTimeout(() => {
-                    try {
-                      const ctx = fabricCanvas?.getContext();
-                      const fcAny = fabricCanvas as any;
-                      if (ctx && (ctx as any).canvas && fabricCanvas && 
-                          fcAny.elements && fcAny.elements.lower && fcAny.elements.lower.ctx) {
-                        fabricCanvas.loadFromJSON(project.canvasState).then(() => resolve()).catch(() => resolve());
-                      } else {
-                        resolve();
-                      }
-                    } catch (e) {
-                      console.error('Failed to load canvas state after retry:', e);
-                      resolve();
-                    }
-                  }, 100);
-                });
-                return;
-              }
-              
-              // Ensure Fabric.js internal elements are ready
-              if (!fabricCanvasAny.elements || !fabricCanvasAny.elements.lower || !fabricCanvasAny.elements.lower.ctx) {
-                console.warn('Fabric.js internal elements not ready, waiting...');
-                await new Promise<void>((resolve) => {
-                  const checkElements = (attempts = 0) => {
-                    const fcAny = fabricCanvas as any;
-                    if (fcAny.elements && fcAny.elements.lower && fcAny.elements.lower.ctx) {
-                      resolve();
-                    } else if (attempts < 10) {
-                      setTimeout(() => checkElements(attempts + 1), 50);
-                    } else {
-                      console.warn('Fabric.js elements not ready after retries');
-                      resolve();
-                    }
-                  };
-                  checkElements();
-                });
-              }
-            } catch (e) {
-              console.error('Error checking canvas context:', e);
               return;
             }
             
@@ -471,8 +415,11 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
             }
           })
           .then(() => {
-            if (fabricCanvas && fabricCanvas.getContext()) {
-              // Ensure canvas dimensions match workspace after load
+            if (fabricCanvas && fabricCanvas.getElement()) {
+              // Ensure workspace exists
+              ensureWorkspace();
+
+              // FORCE LinkedIn carousel dimensions - ignore workspace
               const objects = fabricCanvas.getObjects();
               const workspace = objects.find((obj: any) => (obj as any).id === 'workspace');
               if (workspace) {
@@ -483,17 +430,17 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
                   evented: false,
                   excludeFromExport: false,
                 });
-                
-                if (workspace.width && workspace.height) {
-                  const wsWidth = workspace.width;
-                  const wsHeight = workspace.height;
-                  
-                  // Update canvas size if workspace dimensions differ
-                  if (wsWidth !== loadedWidth || wsHeight !== loadedHeight) {
-                    setCanvasSize({ width: wsWidth, height: wsHeight });
-                    fabricCanvas.setDimensions({ width: wsWidth, height: wsHeight });
-                  }
-                }
+
+                // FORCE workspace to be LinkedIn carousel size (1080x1350)
+                workspace.set({
+                  width: 1080,
+                  height: 1350,
+                  scaleX: 1,
+                  scaleY: 1,
+                });
+
+                // ALWAYS keep canvas at 1080x1350
+                fabricCanvas.setDimensions({ width: 1080, height: 1350 });
               }
               
               // Ensure all objects are selectable (except workspace)
@@ -523,11 +470,10 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
                 }
               });
               
-              // Use requestAnimationFrame to ensure canvas context is ready
+              // Use requestAnimationFrame to ensure canvas is ready for render
               requestAnimationFrame(() => {
                 try {
-                  const ctx = fabricCanvas?.getContext();
-                  if (fabricCanvas && ctx && (ctx as any).canvas) {
+                  if (fabricCanvas && fabricCanvas.getElement()) {
                     fabricCanvas.requestRenderAll();
                   }
                 } catch (e) {
@@ -542,18 +488,15 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
             if (fabricCanvas && project.canvasState) {
               setTimeout(() => {
                 try {
-                  const ctx = fabricCanvas?.getContext();
-                  const fabricCanvasAny = fabricCanvas as any;
-                  // Ensure both context and internal elements are ready
-                  if (fabricCanvas && ctx && (ctx as any).canvas && 
-                      fabricCanvasAny.elements && fabricCanvasAny.elements.lower && 
-                      fabricCanvasAny.elements.lower.ctx && project.canvasState) {
+                  const canvasElement = fabricCanvas?.getElement?.();
+                  if (fabricCanvas && canvasElement && project.canvasState) {
                     requestAnimationFrame(() => {
                       setTimeout(() => {
                         if (fabricCanvas && project.canvasState) {
                           fabricCanvas.loadFromJSON(project.canvasState).then(() => {
                             requestAnimationFrame(() => {
-                              if (fabricCanvas && fabricCanvas.getContext()) {
+                              const el = fabricCanvas?.getElement?.();
+                              if (fabricCanvas && el) {
                                 fabricCanvas.requestRenderAll();
                               }
                             });
@@ -573,10 +516,11 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
             }
           });
       } else if (fabricCanvas) {
+        // No canvas state - create workspace for new canvas
+        ensureWorkspace();
         requestAnimationFrame(() => {
           try {
-            const ctx = fabricCanvas?.getContext();
-            if (fabricCanvas && ctx && (ctx as any).canvas) {
+            if (fabricCanvas && fabricCanvas.getElement()) {
               fabricCanvas.requestRenderAll();
             }
           } catch (e) {
@@ -722,11 +666,10 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
           // Skip auto-save if we're loading from JSON
           if ((fabricCanvas as any)._isLoadingFromJSON) return;
 
-          // Ensure canvas context is ready before accessing canvas methods
+          // Ensure canvas is ready before accessing canvas methods
           try {
-            const context = fabricCanvas.getContext();
-            if (!context) {
-              console.warn('Canvas context not ready for auto-save');
+            if (!fabricCanvas.getElement()) {
+              console.warn('Canvas element not ready for auto-save');
               return;
             }
 
@@ -779,14 +722,8 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
             };
             localStorage.setItem(`project-meta-${project._id}`, JSON.stringify(meta));
 
-            // Save to Convex backend if valid Convex ID
-            const isValidConvexId = (id: string): boolean => {
-              if (!id || typeof id !== 'string') return false;
-              const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-              return convexIdPattern.test(id) && id.length >= 16;
-            };
-
-            if (isValidConvexId(project._id)) {
+            // Save to Supabase backend if project ID exists
+            if (project._id || project.id) {
               try {
                 // Generate thumbnail (smaller for auto-save performance)
                 const thumbnail = fabricCanvas.toDataURL({
@@ -795,17 +732,25 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
                   multiplier: 0.25, // 25% size for auto-save
                 });
 
-                // Save to Convex backend
-                await updateProjectMutation({
-                  projectId: project._id as any,
-                  canvasState: canvasJSON,
-                  width,
-                  height,
-                  imageUrl: thumbnail,
+                // Save to Supabase backend
+                const response = await fetch(`/api/projects/${project._id || project.id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    canvasState: canvasJSON,
+                    width,
+                    height,
+                    imageUrl: thumbnail,
+                  }),
                 });
-                console.log('✅ Auto-saved to Convex backend');
-              } catch (convexError) {
-                console.warn('Auto-save to Convex failed, saved to localStorage:', convexError);
+
+                if (response.ok) {
+                  console.log('✅ Auto-saved to Supabase backend');
+                } else {
+                  throw new Error('Failed to save');
+                }
+              } catch (saveError) {
+                console.warn('Auto-save to Supabase failed, saved to localStorage:', saveError);
               }
             }
           } catch (error) {
@@ -925,11 +870,11 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
         delete (canvasRef.current as any).__fabricCanvas;
       }
     };
-  }, [convexFonts, setCanvas, setEditor]); // Removed canvasSize dependencies to prevent canvas recreation
+  }, [fonts, setCanvas, setEditor]); // Removed canvasSize dependencies to prevent canvas recreation
 
   // Re-render canvas when fonts are loaded to ensure text displays correctly
   useEffect(() => {
-    if (!convexFonts || convexFonts.length === 0) return;
+    if (!fonts || fonts.length === 0) return;
     
     const canvas = (canvasRef.current as any)?.__fabricCanvas;
     if (!canvas) return;
@@ -971,7 +916,7 @@ export function CanvasArea({ project, rulerEnabled }: CanvasAreaProps) {
     }, 100);
 
     return () => clearTimeout(timeout);
-  }, [convexFonts]);
+  }, [fonts]);
 
   // Separate effect to handle canvas size changes without recreating canvas
   useEffect(() => {

@@ -9,12 +9,30 @@ import { useCanvasContext } from "@/providers/canvas-provider";
 import { CanvasBackground } from "./canvas-background";
 import { CanvasSizeModal } from "./canvas-size-modal";
 import { Pencil } from "lucide-react";
+import { ColorPalettePickerCompact } from "@/components/carousel/color-palette-picker-compact";
+import { useCarouselColors } from "@/hooks/useCarouselColors";
+import { BackgroundEffectsPanel } from "@/components/carousel/background-effects-panel";
+import { CustomBackgroundUpload } from "@/components/carousel/custom-background-upload";
 
 export function CanvasSettings() {
   const { canvas, editor } = useCanvasContext();
-  const [width, setWidth] = useState(800);
-  const [height, setHeight] = useState(600);
+  const [width, setWidth] = useState(1080);
+  const [height, setHeight] = useState(1350);
   const [showSizeModal, setShowSizeModal] = useState(false);
+
+  // Carousel color palette hook
+  const {
+    currentColors,
+    alternateColors,
+    applyPalette,
+    updateColor,
+    toggleAlternateColors
+  } = useCarouselColors({
+    canvases: canvas ? [canvas] : [],
+    onColorsChange: (colors) => {
+      console.log('Carousel colors updated:', colors);
+    }
+  });
 
   useEffect(() => {
     if (!canvas || !editor) return;
@@ -22,12 +40,12 @@ export function CanvasSettings() {
     // Get current canvas size
     const currentSize = (editor as any).getCanvasSize?.();
     if (currentSize) {
-      setWidth(currentSize.width || 800);
-      setHeight(currentSize.height || 600);
+      setWidth(currentSize.width || 1080);
+      setHeight(currentSize.height || 1350);
     } else {
-      // Fallback to canvas dimensions
-      setWidth(canvas.getWidth() || 800);
-      setHeight(canvas.getHeight() || 600);
+      // Fallback to canvas dimensions (LinkedIn carousel size)
+      setWidth(canvas.getWidth() || 1080);
+      setHeight(canvas.getHeight() || 1350);
     }
 
     // Listen for canvas size change events
@@ -165,6 +183,27 @@ export function CanvasSettings() {
       </div>
 
       <CanvasBackground />
+
+      {/* Carousel Color Palette */}
+      <ColorPalettePickerCompact
+        customColors={currentColors}
+        alternateColors={alternateColors}
+        onPaletteSelect={applyPalette}
+        onCustomColorChange={updateColor}
+        onAlternateColorsChange={toggleAlternateColors}
+      />
+
+      {/* Background Effects */}
+      <BackgroundEffectsPanel
+        currentAccentColor={currentColors.accent}
+        currentBackgroundColor={currentColors.background}
+      />
+
+      {/* Custom Background Upload */}
+      <CustomBackgroundUpload
+        currentAccentColor={currentColors.accent}
+        currentBackgroundColor={currentColors.background}
+      />
 
       <CanvasSizeModal
         open={showSizeModal}

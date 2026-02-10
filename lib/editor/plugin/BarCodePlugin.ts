@@ -3,7 +3,6 @@
  * @date 2022-05-23
  * @lastEditors Image Editor
  * @lastEditTime 2023-08-01
- * @Description 条形码生成工具
  */
 
 import { FabricImage } from 'fabric'
@@ -18,7 +17,6 @@ declare module '../interface/Editor' {
   interface IEditor extends IPlugin {}
 }
 
-// 条形码生成参数
 // https://github.com/lindell/JsBarcode/wiki/Options
 
 enum CodeType {

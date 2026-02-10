@@ -9,9 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { ImageVariationModal } from "../image-variation-modal";
 import { VariationsManagerModal } from "../variations-manager-modal";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 
 interface ImageElement {
   id: string;
@@ -20,34 +17,36 @@ interface ImageElement {
   variationCount: number;
 }
 
-// Helper function to check if a string looks like a valid Convex ID
-function isValidConvexId(id: string): boolean {
-  if (!id || typeof id !== 'string') return false;
-  const convexIdPattern = /^[a-z][a-z0-9]{15,}$/i;
-  return convexIdPattern.test(id) && id.length >= 16;
-}
-
 export function ImageVariationsPanel() {
   const { canvas } = useCanvasContext();
   const params = useParams();
-  const projectIdParam = params.projectId as string;
-
-  // Check if projectId is a valid Convex ID
-  const isValidId = isValidConvexId(projectIdParam);
-  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+  const projectId = params.projectId as string;
 
   const [imageElements, setImageElements] = useState<ImageElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState<ImageElement | null>(null);
   const [isManagerModalOpen, setIsManagerModalOpen] = useState(false);
+  const [variationCounts, setVariationCounts] = useState<Record<string, number>>({});
 
-  // Convex hooks
-  const variationCounts = useQuery(
-    api.imageVariations.getImageVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const saveVariationsMutation = useMutation(api.imageVariations.saveImageVariations);
+  // Fetch variation counts from REST API
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchVariationCounts = async () => {
+      try {
+        const response = await fetch(`/api/variations/counts?projectId=${projectId}&type=image`);
+        if (response.ok) {
+          const data = await response.json();
+          setVariationCounts(data || {});
+        }
+      } catch (error) {
+        console.error('Error fetching image variation counts:', error);
+      }
+    };
+
+    fetchVariationCounts();
+  }, [projectId]);
 
   const extractImageElements = useCallback(() => {
     if (!canvas) return [];
@@ -80,10 +79,8 @@ export function ImageVariationsPanel() {
           canvas.requestRenderAll();
         }
 
-        // Get variation count from Convex backend
-        const count = projectId && variationCounts
-          ? (variationCounts[imageId] || 0)
-          : 0;
+        // Get variation count from backend
+        const count = variationCounts[imageId] || 0;
 
         // Get image source
         const src = obj.getSrc ? obj.getSrc() : (obj.src || obj._originalElement?.src || '');
@@ -102,7 +99,7 @@ export function ImageVariationsPanel() {
     console.log(`🖼️ Found ${images.length} image elements on canvas:`, images.map(i => ({ id: i.id, src: i.src?.substring(0, 50) })));
 
     return images;
-  }, [canvas, variationCounts, projectId]);
+  }, [canvas, variationCounts]);
 
   useEffect(() => {
     if (!canvas) return;
@@ -165,16 +162,25 @@ export function ImageVariationsPanel() {
 
       console.log(`💾 Saving ${variations.length} image variations for element ID: ${elementId}`);
 
-      // Save to Convex backend (only source of truth)
+      // Save to backend via REST API
       try {
-        await saveVariationsMutation({
-          projectId,
-          elementId, // Use stable ID from canvas
-          originalImageUrl: selectedElement.src,
-          variations: variations as any, // Cast to match Convex ID type
-          userId: undefined, // TODO: Get from auth context
+        const response = await fetch('/api/image-variations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectId,
+            elementId, // Use stable ID from canvas
+            originalImageUrl: selectedElement.src,
+            variations: variations,
+            userId: undefined, // TODO: Get from auth context
+          }),
         });
-        console.log(`✅ Image variations saved to Convex backend for ID: ${elementId}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to save variations');
+        }
+
+        console.log(`✅ Image variations saved to backend for ID: ${elementId}`);
 
         // Update local state to show variation count immediately
         setImageElements((prev) =>
@@ -184,8 +190,15 @@ export function ImageVariationsPanel() {
               : el
           )
         );
-      } catch (convexError) {
-        console.error("❌ Failed to save to Convex:", convexError);
+
+        // Refresh variation counts
+        const countsResponse = await fetch(`/api/variations/counts?projectId=${projectId}&type=image`);
+        if (countsResponse.ok) {
+          const data = await countsResponse.json();
+          setVariationCounts(data || {});
+        }
+      } catch (apiError) {
+        console.error("❌ Failed to save to backend:", apiError);
         throw new Error("Failed to save variations to backend");
       }
     } catch (error) {
@@ -322,7 +335,7 @@ export function ImageVariationsPanel() {
         isOpen={isManagerModalOpen}
         onClose={() => setIsManagerModalOpen(false)}
         projectId={projectId}
-        projectIdParam={projectIdParam}
+        projectIdParam={projectId}
       />
     </div>
   );

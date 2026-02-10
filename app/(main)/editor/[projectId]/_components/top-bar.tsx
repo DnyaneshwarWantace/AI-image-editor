@@ -25,16 +25,12 @@ import {
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
 import type { ExportFormat } from "@/types/editor";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { ImportMenu } from "./top-bar-actions/import-menu";
 import { PreviewButton } from "./top-bar-actions/preview-button";
 import { WatermarkButton } from "./top-bar-actions/watermark-button";
 import { DragModeToggle } from "./top-bar-actions/drag-mode-toggle";
 import { VariationsManagerModal } from "./variations-manager-modal";
 import { useParams } from "next/navigation";
-import type { Id } from "@/convex/_generated/dataModel";
-import { useQuery } from "convex/react";
 
 const EXPORT_FORMATS: ExportFormat[] = [
   {
@@ -73,9 +69,13 @@ const EXPORT_FORMATS: ExportFormat[] = [
 
 interface TopBarProps {
   project: any;
+  rulerEnabled: boolean;
+  onRulerToggle: () => void;
+  isCarouselMode: boolean;
+  onCarouselToggle: () => void;
 }
 
-export function TopBar({ project }: TopBarProps) {
+export function TopBar({ project, rulerEnabled, onRulerToggle, isCarouselMode, onCarouselToggle }: TopBarProps) {
   const router = useRouter();
   const params = useParams();
   const { canvas, editor } = useCanvasContext();
@@ -84,9 +84,6 @@ export function TopBar({ project }: TopBarProps) {
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [isVariationsModalOpen, setIsVariationsModalOpen] = useState(false);
-
-  // Convex mutation for saving projects
-  const updateProjectMutation = useMutation(api.projects.updateProject);
 
   // Helper to check if ID is valid Convex ID
   const isValidConvexId = (id: string): boolean => {
@@ -98,29 +95,44 @@ export function TopBar({ project }: TopBarProps) {
   // Check if projectId is valid Convex ID
   const projectIdParam = params.projectId as string;
   const isValidId = isValidConvexId(projectIdParam);
-  const projectId = isValidId ? (projectIdParam as Id<"projects">) : null;
+  const projectId = isValidId ? projectIdParam : null;
 
-  // Query variation counts
-  const textVariationCounts = useQuery(
-    api.textVariations.getVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const imageVariationCounts = useQuery(
-    api.imageVariations.getImageVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const fontVariationCounts = useQuery(
-    api.fontVariations.getFontVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
-  const backgroundColorVariationCount = useQuery(
-    api.backgroundColorVariations.getBackgroundColorVariationCount,
-    projectId ? { projectId } : "skip"
-  );
-  const textColorVariationCounts = useQuery(
-    api.textColorVariations.getTextColorVariationCounts,
-    projectId ? { projectId } : "skip"
-  );
+  // State for variation counts
+  const [textVariationCounts, setTextVariationCounts] = useState<Record<string, number>>({});
+  const [imageVariationCounts, setImageVariationCounts] = useState<Record<string, number>>({});
+  const [fontVariationCounts, setFontVariationCounts] = useState<Record<string, number>>({});
+  const [backgroundColorVariationCount, setBackgroundColorVariationCount] = useState(0);
+  const [textColorVariationCounts, setTextColorVariationCounts] = useState<Record<string, number>>({});
+
+  // Fetch variation counts
+  React.useEffect(() => {
+    if (!projectId) return;
+
+    const fetchVariationCounts = async () => {
+      try {
+        const [textRes, imageRes, fontRes, bgColorRes, textColorRes] = await Promise.all([
+          fetch(`/api/variations/counts?projectId=${projectId}&type=text`),
+          fetch(`/api/variations/counts?projectId=${projectId}&type=image`),
+          fetch(`/api/variations/counts?projectId=${projectId}&type=font`),
+          fetch(`/api/variations/counts?projectId=${projectId}&type=backgroundColor`),
+          fetch(`/api/variations/counts?projectId=${projectId}&type=textColor`),
+        ]);
+
+        if (textRes.ok) setTextVariationCounts(await textRes.json());
+        if (imageRes.ok) setImageVariationCounts(await imageRes.json());
+        if (fontRes.ok) setFontVariationCounts(await fontRes.json());
+        if (bgColorRes.ok) {
+          const bgData = await bgColorRes.json();
+          setBackgroundColorVariationCount(bgData.count || 0);
+        }
+        if (textColorRes.ok) setTextColorVariationCounts(await textColorRes.json());
+      } catch (error) {
+        console.error('Error fetching variation counts:', error);
+      }
+    };
+
+    fetchVariationCounts();
+  }, [projectId]);
 
   // Calculate total variations
   const totalTextVariations = textVariationCounts
@@ -345,18 +357,22 @@ export function TopBar({ project }: TopBarProps) {
         };
         localStorage.setItem(`project-meta-${project._id}`, JSON.stringify(meta));
 
-        // Save to Convex backend only if project ID is a valid Convex ID
+        // Save to Supabase backend only if project ID is a valid ID
         if (project._id && typeof project._id === 'string' && isValidConvexId(project._id)) {
           try {
-            await updateProjectMutation({
-              projectId: project._id as any,
-              canvasState: canvasJSON,
-              width: canvas.getWidth(),
-              height: canvas.getHeight(),
-              imageUrl: thumbnail,
+            const response = await fetch(`/api/projects/${project._id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                canvasState: canvasJSON,
+                width: canvas.getWidth(),
+                height: canvas.getHeight(),
+                imageUrl: thumbnail,
+              }),
             });
+            if (!response.ok) throw new Error('Failed to save project');
           } catch (saveError) {
-            console.warn('Could not save to Convex, saved to localStorage:', saveError);
+            console.warn('Could not save to Supabase, saved to localStorage:', saveError);
           }
         }
 
@@ -441,23 +457,27 @@ export function TopBar({ project }: TopBarProps) {
       };
       localStorage.setItem(`project-meta-${project._id}`, JSON.stringify(meta));
 
-      // Save to Convex backend only if project ID is a valid Convex ID
+      // Save to Supabase backend only if project ID is a valid ID
       if (project._id && typeof project._id === 'string' && isValidConvexId(project._id)) {
         try {
-          await updateProjectMutation({
-            projectId: project._id as any,
-            canvasState: canvasJSON,
-            width: canvas.getWidth(),
-            height: canvas.getHeight(),
-            imageUrl: thumbnail, // Save thumbnail for preview
+          const response = await fetch(`/api/projects/${project._id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              canvasState: canvasJSON,
+              width: canvas.getWidth(),
+              height: canvas.getHeight(),
+              imageUrl: thumbnail, // Save thumbnail for preview
+            }),
           });
+          if (!response.ok) throw new Error('Failed to save project');
           toast.success("Project saved!");
-        } catch (convexError) {
-          console.warn('Could not save to Convex, saved to localStorage:', convexError);
+        } catch (apiError) {
+          console.warn('Could not save to Supabase, saved to localStorage:', apiError);
           toast.success("Project saved to local storage (backend unavailable)");
         }
       } else {
-        // Not a valid Convex ID, just save to localStorage
+        // Not a valid ID, just save to localStorage
         toast.success("Project saved to local storage!");
       }
     } catch (error) {
@@ -678,6 +698,20 @@ export function TopBar({ project }: TopBarProps) {
 
             <div className="h-6 w-px bg-gray-300 mx-0.5" />
 
+            {/* Carousel Mode Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCarouselToggle}
+              className={`gap-1 px-2 ${isCarouselMode ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+              title={isCarouselMode ? "Switch to Editor" : "Switch to Carousel"}
+            >
+              <Layers2 className="h-4 w-4" />
+              <span className="hidden lg:inline">{isCarouselMode ? "Editor" : "Carousel"}</span>
+            </Button>
+
+            <div className="h-6 w-px bg-gray-300 mx-0.5" />
+
         {/* Undo/Redo */}
         <div className="flex items-center gap-0.5">
           <Button
@@ -833,7 +867,7 @@ export function TopBar({ project }: TopBarProps) {
       <VariationsManagerModal
         isOpen={isVariationsModalOpen}
         onClose={() => setIsVariationsModalOpen(false)}
-        projectId={project?._id as Id<"projects"> | null}
+        projectId={project?._id || null}
         projectIdParam={params.projectId as string}
       />
     </header>

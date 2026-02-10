@@ -9,8 +9,6 @@ import { Input } from "@/components/ui/input";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { Bold, Italic, Underline, Strikethrough } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 const FONT_FAMILIES = [
   "Arial",
@@ -36,17 +34,31 @@ export function AttributeFont() {
   const [linethrough, setLinethrough] = useState(false);
   const [lineHeight, setLineHeight] = useState(1.2);
   const [textAlign, setTextAlign] = useState("left");
+  const [dbFonts, setDbFonts] = useState<any[]>([]);
 
-  // Fetch fonts from database
-  const dbFonts = useQuery(api.fonts.getFonts, {});
+  // Fetch fonts from database using REST API
+  useEffect(() => {
+    const fetchFonts = async () => {
+      try {
+        const response = await fetch('/api/fonts');
+        if (response.ok) {
+          const data = await response.json();
+          setDbFonts(data.fonts || []);
+        }
+      } catch (error) {
+        console.error('Error fetching fonts:', error);
+      }
+    };
+    fetchFonts();
+  }, []);
 
   // Combine default fonts with database fonts
   const allFonts = useMemo(() => {
     const fonts = [...FONT_FAMILIES];
-    if (dbFonts) {
+    if (dbFonts && dbFonts.length > 0) {
       dbFonts.forEach((font: any) => {
-        if (!fonts.includes(font.fontFamily)) {
-          fonts.push(font.fontFamily);
+        if (!fonts.includes(font.font_family)) {
+          fonts.push(font.font_family);
         }
       });
     }

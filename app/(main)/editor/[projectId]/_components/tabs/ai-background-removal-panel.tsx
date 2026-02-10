@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useCanvasContext } from "@/providers/canvas-provider";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 export function AIBackgroundRemovalPanel() {
   const { canvas } = useCanvasContext();
@@ -15,9 +13,6 @@ export function AIBackgroundRemovalPanel() {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
-  const createMaterial = useMutation(api.materials.createMaterial);
 
   const removeBackground = async (imageUrl: string) => {
     setIsProcessing(true);
@@ -182,28 +177,41 @@ export function AIBackgroundRemovalPanel() {
 
   const saveToMyMaterials = async (blob: Blob) => {
     try {
-      // Generate upload URL
-      const uploadUrl = await generateUploadUrl();
+      // Generate upload URL via REST API
+      const uploadUrlResponse = await fetch('/api/files/upload-url', {
+        method: 'POST',
+      });
+      const { uploadUrl, path } = await uploadUrlResponse.json();
 
-      // Upload the file
+      // Upload the file to Supabase storage
       const uploadResponse = await fetch(uploadUrl, {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": blob.type },
         body: blob,
       });
 
-      const { storageId } = await uploadResponse.json();
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload file');
+      }
 
-      // Get the URL from storage
-      const fileUrl = `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${storageId}`;
+      // Get the public URL for the uploaded file
+      const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/materials/${path}`;
 
-      // Save as material
-      await createMaterial({
-        name: `BG Removed - ${Date.now()}`,
-        desc: "Background removed using AI",
-        imageUrl: fileUrl,
-        isPublic: false,
+      // Save as material via REST API
+      const materialResponse = await fetch('/api/materials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `BG Removed - ${Date.now()}`,
+          description: "Background removed using AI",
+          imageUrl: fileUrl,
+          isPublic: false,
+        }),
       });
+
+      if (!materialResponse.ok) {
+        throw new Error('Failed to save material');
+      }
 
       toast.success("Auto-saved to My Materials!");
     } catch (error) {
