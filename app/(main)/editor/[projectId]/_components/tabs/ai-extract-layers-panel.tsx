@@ -4,8 +4,12 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Upload, Loader2, Check, X } from 'lucide-react';
 import { useCanvasContext } from '@/providers/canvas-provider';
-import { extractLayersFromImage, DetectedText, DetectedObject } from '@/lib/ai/image-layer-extractor';
-import { IText, FabricImage } from 'fabric';
+import {
+  analyzeImageForLayerExtraction,
+  buildLayersFromAnalysis,
+  ExtractionAnalysis,
+} from '@/lib/ai/image-layer-extractor';
+import { IText, FabricImage, Rect } from 'fabric';
 import { toast } from 'sonner';
 
 export function AIExtractLayersPanel() {
@@ -14,6 +18,9 @@ export function AIExtractLayersPanel() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStage, setCurrentStage] = useState('');
+  const [analysis, setAnalysis] = useState<ExtractionAnalysis | null>(null);
+  const [selectedObjects, setSelectedObjects] = useState<Record<number, boolean>>({});
+  const [selectedTexts, setSelectedTexts] = useState<Record<number, boolean>>({});
   const [results, setResults] = useState<{
     texts: number;
     objects: number;
@@ -33,31 +40,114 @@ export function AIExtractLayersPanel() {
     setProgress(0);
     setCurrentStage('Starting...');
     setResults(null);
+    setAnalysis(null);
 
     try {
-      // Extract layers using AI
-      const layers = await extractLayersFromImage(file, (stage, prog) => {
+      const a = await analyzeImageForLayerExtraction(file, (stage, prog) => {
         setCurrentStage(stage);
         setProgress(prog);
       });
 
-      console.log('\n=== EXTRACTION COMPLETE ===');
-      console.log(`Layers received:`, {
-        texts: layers.texts.length,
-        objects: layers.objects.length,
-        backgroundUrl: layers.background ? 'Yes' : 'No'
+      setAnalysis(a);
+      setSelectedObjects(Object.fromEntries(a.objects.map((_, i) => [i, true])));
+      setSelectedTexts(Object.fromEntries(a.texts.map((_, i) => [i, true])));
+      toast.success(`Detected ${a.texts.length} text + ${a.objects.length} objects. Choose what to extract.`);
+      return;
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      toast.error('Failed to analyze image. Please try again.');
+      return;
+    } finally {
+      setIsProcessing(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleBuildLayers = async () => {
+    if (!analysis || !canvas) return;
+
+    const removeObjectIndexes = Object.entries(selectedObjects)
+      .filter(([, v]) => v)
+      .map(([k]) => Number(k));
+    const removeTextIndexes = Object.entries(selectedTexts)
+      .filter(([, v]) => v)
+      .map(([k]) => Number(k));
+
+    // Same selection drives extraction: only selected items become editable layers.
+    const extractObjectIndexes = removeObjectIndexes;
+    const extractTextIndexes = removeTextIndexes;
+
+    setIsProcessing(true);
+    setProgress(0);
+    setCurrentStage('Building layers...');
+    setResults(null);
+
+    try {
+      const layers = await buildLayersFromAnalysis(
+        analysis,
+        {
+          removeObjectIndexes,
+          removeTextIndexes,
+          extractObjectIndexes,
+          extractTextIndexes,
+        },
+        (stage, prog) => {
+          setCurrentStage(stage);
+          setProgress(prog);
+        }
+      );
+
+      // IMPORTANT: Resize canvas to EXACT image dimensions
+      console.log(`\n=== CANVAS SETUP ===`);
+      console.log(`Target dimensions: ${layers.originalWidth} x ${layers.originalHeight}`);
+      console.log(`Current canvas: ${canvas.getWidth()} x ${canvas.getHeight()}`);
+
+      // Remove all objects from canvas
+      const allObjects = canvas.getObjects();
+      console.log(`Removing ${allObjects.length} existing objects...`);
+      allObjects.forEach(obj => canvas.remove(obj));
+      canvas.clear();
+
+      // Dispatch event to update canvas size in canvas-area component
+      const canvasSizeEvent = new CustomEvent('canvasSizeChange', {
+        detail: {
+          width: layers.originalWidth,
+          height: layers.originalHeight
+        }
       });
+      window.dispatchEvent(canvasSizeEvent);
+      console.log(`✓ Dispatched canvasSizeChange event: ${layers.originalWidth}x${layers.originalHeight}`);
 
-      // Scale so layers match canvas.
-      // IMPORTANT: never upscale small images (keeps quality sharp) – only shrink if bigger than canvas.
-      const fitScaleX = 1080 / layers.originalWidth;
-      const fitScaleY = 1350 / layers.originalHeight;
-      const fitScale = Math.min(fitScaleX, fitScaleY);
-      const scale = Math.min(1, fitScale);
+      // Wait for canvas to resize (give it a moment to process the event)
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      // LAYER 1: Add background as bottom layer (with objects removed & filled)
+      // Verify canvas size
+      console.log(`Canvas after resize: ${canvas.getWidth()} x ${canvas.getHeight()}`);
+
+      // Recreate workspace at new size
+      const workspace = new Rect({
+        width: layers.originalWidth,
+        height: layers.originalHeight,
+        fill: '#ffffff',
+        selectable: false,
+        evented: false,
+        id: 'workspace',
+      });
+      canvas.add(workspace);
+      canvas.sendObjectToBack(workspace);
+
+      canvas.requestRenderAll();
+      console.log(`✓ Canvas setup complete`);
+
+      // No scaling - 1:1 exact positioning
+      const scale = 1;
+
+      // LAYER 1: Add clean background as bottom layer (Gemini removed all objects/text and filled)
       console.log('\n=== ADDING LAYERS TO CANVAS ===');
-      console.log('Adding clean background layer (objects removed & filled)...');
+      console.log('Adding clean background layer (Gemini Nano Banana)...');
       try {
         const backgroundImage = await FabricImage.fromURL(layers.background, {}, {
           left: 0,
@@ -68,56 +158,66 @@ export function AIExtractLayersPanel() {
         backgroundImage.scale(scale);
         canvas.add(backgroundImage);
         canvas.sendObjectToBack(backgroundImage);
-        console.log('✓ Clean background layer added (objects filled in)');
+        console.log('✓ Clean background layer added (all objects/text removed by Gemini)');
       } catch (error) {
         console.error('Error adding background:', error);
       }
 
-      // LAYER 2: Add detected objects (with background removed, text masked out) – scaled to match canvas
+      // LAYER 2: Add selected objects as transparent PNG layers (full-size images from Nano Banana)
       let objectCount = 0;
-      console.log(`\nAdding ${layers.objects.length} object layers...`);
+      console.log(`\n=== OBJECT LAYERS ===`);
+      console.log(`Adding ${layers.objects.length} transparent object layers...`);
+
       for (let i = 0; i < layers.objects.length; i++) {
         const obj = layers.objects[i];
-        if (obj.imageWithoutBg) {
-          try {
-            const fabricImage = await FabricImage.fromURL(obj.imageWithoutBg, {}, {
-              left: obj.x * scale,
-              top: obj.y * scale,
-              selectable: true,
-            });
-            fabricImage.scale(scale); // Match canvas scale so size matches poster
-            canvas.add(fabricImage);
-            objectCount++;
-            console.log(`✓ Added ${obj.type} (transparent bg) at (${obj.x * scale}, ${obj.y * scale})`);
-          } catch (error) {
-            console.error(`❌ Error adding ${obj.type} to canvas:`, error);
-          }
-        } else {
-          console.warn(`⚠️  Object ${obj.type} has no imageWithoutBg data, skipping`);
+        if (!obj.imageWithoutBg) {
+          console.log(`⚠️  Object ${i + 1} (${obj.type}) has no transparent image, skipping`);
+          continue;
+        }
+        try {
+          // Nano Banana returns full-size transparent PNG (same dimensions as original image)
+          // So place at (0, 0), not at object bbox position
+          console.log(`Adding object ${i + 1}/${layers.objects.length}: ${obj.type}`);
+          const fabricImage = await FabricImage.fromURL(obj.imageWithoutBg, {}, {
+            left: 0,   // Full-size transparent PNG, position at origin
+            top: 0,    // Full-size transparent PNG, position at origin
+            selectable: true,
+            objectCaching: false,
+          });
+          canvas.add(fabricImage);
+          objectCount++;
+          console.log(`  ✓ Added ${obj.type} layer successfully`);
+        } catch (error) {
+          console.error(`❌ Error adding ${obj.type} layer:`, error);
         }
       }
 
-      // LAYER 3: Add detected texts – same scale, real font size & color from image
+      // LAYER 3: Add detected texts at EXACT positions (fully editable)
       let textCount = 0;
-      console.log(`\nAdding ${layers.texts.length} text layers...`);
+      console.log(`\n=== ADDING ${layers.texts.length} TEXT LAYERS ===`);
+
       for (let i = 0; i < layers.texts.length; i++) {
         const text = layers.texts[i];
         try {
-          const fontSize = Math.max(12, (text.fontSize ?? 20) * scale); // Preserve poster size
-          const isLargeTitle = (text.height ?? 0) > 40;
+          // Use exact font size from detection (no scaling since scale = 1)
+          const fontSize = Math.max(12, text.fontSize ?? text.height ?? 20);
+          const isLargeTitle = fontSize > 40; // Consider large if > 40px
+
+          console.log(`Text ${i + 1}: "${text.text}" at (${text.x}, ${text.y}) fontSize=${fontSize}px`);
+
           const fabricText = new IText(text.text, {
-            left: text.x * scale,
-            top: text.y * scale,
+            left: text.x,  // EXACT position, no scaling
+            top: text.y,   // EXACT position, no scaling
             fontSize,
             fontFamily: isLargeTitle ? 'Arial Black' : (text.fontFamily || 'Arial'),
-            fontWeight: isLargeTitle ? 'bold' : undefined,
+            fontWeight: isLargeTitle ? 'bold' : 'normal',
             fill: text.color || '#000000',
             selectable: true,
           });
           canvas.add(fabricText);
-          canvas.bringObjectToFront(fabricText);
+          canvas.bringObjectToFront(fabricText); // Always on top
           textCount++;
-          console.log(`✓ Added text: "${text.text}" at (${text.x * scale}, ${text.y * scale}) fontSize=${fontSize}`);
+          console.log(`  ✓ Added text "${text.text}" successfully`);
         } catch (error) {
           console.error(`❌ Error adding text "${text.text}":`, error);
         }
@@ -141,10 +241,6 @@ export function AIExtractLayersPanel() {
       toast.error('Failed to extract layers. Please try again.');
     } finally {
       setIsProcessing(false);
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
@@ -160,7 +256,7 @@ export function AIExtractLayersPanel() {
           <h3 className="text-sm font-semibold text-gray-900">AI Layer Extraction</h3>
         </div>
         <p className="text-xs text-gray-600">
-          Upload a poster and AI extracts <strong>3 clean layers</strong>: Background (text & objects removed & filled), Objects (transparent bg), and Text (fully editable)
+          Upload an image and AI extracts <strong>3 clean layers</strong>: Clean Background (objects/text removed & filled with Gemini), Objects (transparent PNG), and Text (fully editable)
         </p>
       </div>
 
@@ -192,6 +288,72 @@ export function AIExtractLayersPanel() {
           </>
         )}
       </Button>
+
+      {/* Selection UI (after analysis) */}
+      {analysis && !isProcessing && (
+        <div className="space-y-3">
+          <div className="rounded-lg border border-gray-200 p-3 space-y-1">
+            <div className="text-xs font-semibold text-gray-900">Choose what to extract/remove</div>
+            <div className="text-[11px] text-gray-600">
+              Checked items will be <strong>removed from the background</strong> and added as{' '}
+              <strong>editable layers</strong>. Unchecked items stay baked into the background.
+            </div>
+          </div>
+
+          {analysis.objects.length > 0 && (
+            <div className="rounded-lg border border-gray-200 p-3 space-y-2">
+              <div className="text-xs font-semibold text-gray-900">
+                Objects ({analysis.objects.length})
+              </div>
+              <div className="space-y-1">
+                {analysis.objects.map((o, i) => (
+                  <label key={i} className="flex items-center gap-2 text-xs text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={!!selectedObjects[i]}
+                      onChange={(e) =>
+                        setSelectedObjects((prev) => ({ ...prev, [i]: e.target.checked }))
+                      }
+                    />
+                    <span>
+                      {o.type} ({Math.round((o.confidence || 0) * 100)}%) at [{o.x},{o.y},{o.width}×
+                      {o.height}]
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {analysis.texts.length > 0 && (
+            <div className="rounded-lg border border-gray-200 p-3 space-y-2">
+              <div className="text-xs font-semibold text-gray-900">
+                Text ({analysis.texts.length})
+              </div>
+              <div className="space-y-1 max-h-[180px] overflow-auto pr-1">
+                {analysis.texts.map((t, i) => (
+                  <label key={i} className="flex items-center gap-2 text-xs text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={!!selectedTexts[i]}
+                      onChange={(e) =>
+                        setSelectedTexts((prev) => ({ ...prev, [i]: e.target.checked }))
+                      }
+                    />
+                    <span className="truncate">
+                      “{t.text}” at [{Math.round(t.x)},{Math.round(t.y)}]
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Button onClick={handleBuildLayers} className="w-full" disabled={isProcessing}>
+            Build layers with AI
+          </Button>
+        </div>
+      )}
 
       {/* Progress indicator */}
       {isProcessing && (

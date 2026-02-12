@@ -23,6 +23,7 @@ import {
   Rainbow,
   Copy,
   Paintbrush,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -51,6 +52,7 @@ import { AIFaceDetectionPanel } from "./tabs/ai-face-detection-panel";
 import { AIObjectDetectionPanel } from "./tabs/ai-object-detection-panel";
 import { AITextOverlayChecker } from "./tabs/ai-text-overlay-checker";
 import { AIExtractLayersPanel } from "./tabs/ai-extract-layers-panel";
+import { AIGenerateImagePanel } from "./tabs/ai-generate-image-panel";
 import { AdMockupPreviewPanel } from "./tabs/ad-mockup-preview-panel";
 import { BlendModesPanel } from "./tabs/blend-modes-panel";
 import { BordersFramesPanel } from "./tabs/borders-frames-panel";
@@ -153,6 +155,12 @@ const LEFT_TABS = [
     name: "AI Extract",
     icon: Wand2,
     component: AIExtractLayersPanel,
+  },
+  {
+    key: "aiGenerate",
+    name: "AI Generate",
+    icon: Sparkles,
+    component: AIGenerateImagePanel,
   },
   {
     key: "aiTextOverlay",
